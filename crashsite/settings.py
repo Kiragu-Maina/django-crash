@@ -40,8 +40,7 @@ DEBUG = False
 ALLOWED_HOSTS = ["*"]
 
 
-CSRF_TRUSTED_ORIGINS = ["https://djangorestappserver-production.up.railway.app"]
-
+CSRF_TRUSTED_ORIGINS = ["https://django-crash-production.up.railway.app"]
 
 CORS_ALLOW_ALL_ORIGINS = False
 
@@ -103,7 +102,7 @@ MIDDLEWARE = [
     
 ]
 
-ROOT_URLCONF = 'mysite.urls'
+ROOT_URLCONF = 'crashsite.urls'
 REDISHOST = os.environ["REDISHOST"]
 REDISPORT = os.environ["REDISPORT"]
 REDISPASSWORD = os.environ["REDISPASSWORD"]
