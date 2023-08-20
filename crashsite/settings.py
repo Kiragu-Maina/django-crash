@@ -102,7 +102,7 @@ MIDDLEWARE = [
     
 ]
 
-ROOT_URLCONF = 'mysite.urls'
+ROOT_URLCONF = 'crashsite.urls'
 REDISHOST = os.environ["REDISHOST"]
 REDISPORT = os.environ["REDISPORT"]
 REDISPASSWORD = os.environ["REDISPASSWORD"]
