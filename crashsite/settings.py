@@ -164,14 +164,19 @@ REST_FRAMEWORK = {
 ASGI_APPLICATION = 'crashsite.asgi.application'
 WSGI_APPLICATION = 'crashsite.wsgi.application'
 
+
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [("127.0.0.1", 6379)],
+            "hosts": [(REDISHOST, REDISPORT)],
+            
         },
     },
 }
+
+In this code snippet, the values for REDISHOST, REDISPORT, REDISPASSWORD, and REDISUSER are fetched from environment variables. These variables are then used to populate the configuration dictionaries for both the cache and channel layers. The hosts list inside the CONFIG dictionary for the channel layer is constructed using the REDISHOST and REDISPORT variables, and the password and user options are set accordingly. This way, the configuration remains dynamic and can be easily adjusted based on the environment variables you provide.
+
 
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
