@@ -118,6 +118,7 @@ CACHES = {
         },
     }
 }
+AUTH_USER_MODEL = 'crash.User'
 # CACHES = {
 #     "default": {
 #         "BACKEND": "django_redis.cache.RedisCache",
