@@ -1,5 +1,4 @@
 
-
 class Example extends Phaser.Scene 
     
 {
@@ -10,7 +9,6 @@ class Example extends Phaser.Scene
         this.load.setBaseURL('https://labs.phaser.io')
 
         this.load.image('bg', 'assets/tweens/background.jpg');
-        
         this.load.bitmapFont('desyrel', 'assets/fonts/bitmap/desyrel.png', 'assets/fonts/bitmap/desyrel.xml');
     }
 
@@ -51,26 +49,18 @@ class Example extends Phaser.Scene
 
                 const rect = scene.add.rectangle(100, 400, 2, 2, 0x00ff00);
                 const rt = scene.add.renderTexture(400, 300, 800, 600);
-                // const counterText = scene.add.dynamicBitmapText(400, 200, 'desyrel', '0.00').setOrigin(0.5, 0);
+                const counterText = scene.add.dynamicBitmapText(400, 200, 'desyrel', '0.00').setOrigin(0.5, 0);
                 const crashText = scene.add.dynamicBitmapText(400, 200, 'desyrel', '0.00').setOrigin(0.5, 0);
-                
-                let crashInstructionProcessed = false;
-                let countAndDisplayTimer;   
-                let continueCounting = true;
-                const delayTime = 10;    
-                let counterText;
-                let countdownText;
 
                 
                 rect.setPosition(100, 500);
                 wsSocket.onmessage = async function (e) {
                         const data = JSON.parse(e.data);
-                        
+                        console.log(data)
                         if (data.type == "ongoing_synchronizer") {
                             // Use the current multiplier to render the ongoing graph
                             const currentMultiplier = data.currentMultiplier; // Assuming the currentMultiplier is provided in the data
                             // Use currentMultiplier to render the ongoing graph
-                            countAndDisplay(currentMultiplier);
                             
                             console.log(data)
                         }
@@ -79,98 +69,27 @@ class Example extends Phaser.Scene
                             // Handle crash instruction, e.g., trigger the crash action in the game
                             console.log(data)
                             const crashpoint = data.crash
-                            // isCrashTriggered = true;
-                            CountingComplete(tween,graph, rect, rt, crashpoint);
-                            console.log('back to here');
-                            
-                            
-
-                            crashInstructionProcessed = true;
+                            isCrashTriggered = true;
+                            CountingComplete(tween,graph, rect, rt, counterText, crashText, crashpoint);
 
                         } else if (data.type == "start_synchronizer") {
                             // Start the synchronizer countdown
-                            if (tween) {
-                                tween.stop();
-                            }
-                            crashInstructionProcessed = false;
-                            const countdown = data.count;
-                            console.log(data);
-                            startgame(countdown);
+
+                            const count = data.count;
+                            const countdownText = scene.add.dynamicBitmapText(400, 300, 'desyrel', '0.00').setOrigin(0.5, 0);
                              // Assuming the count is provided in the data
-                            
-                            
-                            
-                            
-                        } 
-                        else if (data.type == "count_update"){
-                            if (countdownText) {
-                                countdownText.destroy();
-                            }
-                            countAndDisplay(data.count);
-
-
-                        }
-                    }
-                    async function startgame(countdown){
-                        console.log('startgame called')
-                            if (crashText) {
-                                crashText.destroy();
-                            }
-                            countdownText = scene.add.dynamicBitmapText(400, 300, 'desyrel', '0.00').setOrigin(0.5, 0);
-                            console.log('countdownText created')
-                            for (let countValue = countdown; countValue >= 0; countValue--) {
+                            crashText.destroy();
+                            for (let countValue = count; countValue >= 0; countValue--) {
                                 
                     
                                 countdownText.setText(`Game starts in ${countValue}`);
                                 await new Promise(resolve => setTimeout(resolve, 1000));
                             }
-                            if (countdownText) {
-                                countdownText.destroy();
-                            }
+                            countdownText.destroy();
+                            console.log(data);
                             drawgraph(scene);
-
+                        } 
                     }
-                   
-                    
-                    function countAndDisplay(count) {
-                        // const counterText = scene.add.dynamicBitmapText(400, 200, 'desyrel', '0.00').setOrigin(0.5, 0);
-                        if (counterText) {
-                            counterText.destroy();
-                        }
-                        
-                        counterText = scene.add.dynamicBitmapText(400, 200, 'desyrel').setOrigin(0.5, 0);                    
-                            
-                        
-                        counterText.setText('x'+ count);                            
-                       
-                }
-                        
-                    function CountingComplete(tween, graph, rect, rt, crashpoint) {
-                        
-                        if (tween) {
-                            tween.stop();
-                        }
-                                clearTimeout(countAndDisplayTimer);
-                                if (counterText) {
-                                    counterText.destroy();
-                                }
-                                graph.clear();
-                                rt.clear();                                                        
-                            
-                                rect.setPosition(100, 500);
-                                
-                               
-                                console.log('its the crashtexts font', crashpoint);
-                                let text = scene.add.text(400, 28, 'Crashed at x' + crashpoint);
-                                text.setColor('#00ff00').setFontSize(32).setShadow(2, 2).setOrigin(0.5, 0);
-                                
-                                // Schedule the text to be cleared after 5 minutes
-                                setTimeout(() => {
-                                    text.destroy();
-                                }, 2000); // 5 minutes in milliseconds                          
-     
-
-                }
                     function drawgraph(scene){
                         
                         const newCrashPoint = 200;
@@ -216,11 +135,54 @@ class Example extends Phaser.Scene
                         
                         
                     
+                        const delayTime = 1;
+
+                        async function fetchNewCrashPointAndRender(scene) {
+                            try {
                                 
-                      
                         
-                      
-                      
+                                    
+                                    scene.scene.restart();
+                            
+                            } catch (error) {
+                                console.error('Error fetching rerendering:', error);
+                            }
+                        }
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        function formatTime(milliseconds) {
+                            const seconds = (1+Math.floor(milliseconds / 1000));
+                            const scaledMilliseconds = Math.floor((milliseconds % 1000) / 10); // Scale to 0-99 range
+                            return `${seconds}.${scaledMilliseconds}`;
+                        }
+                        
+                        window.onload=function countAndDisplay(stopValueInSeconds, delayTime, onComplete) {
+                            const stopValueInMilliseconds = Math.floor((stopValueInSeconds-1) * 1000);
+                            console.log('stopvalueinms',stopValueInMilliseconds);
+                            let currentValue = 0;
+                            
+                        
+                            function update() {
+                                currentValue += delayTime;
+                                const displayValue = formatTime(currentValue);
+                                
+                                counterText.setText('x'+ displayValue);
+                        
+                                if (currentValue <= stopValueInMilliseconds) {
+                                    setTimeout(update, delayTime);
+                                } else {
+                                    CountingComplete();
+                                }
+                            }
+                        
+                            update();
+                        }
                         function CountingComplete () {
                             tween.stop();
                                     graph.clear();
@@ -243,7 +205,7 @@ class Example extends Phaser.Scene
                             
                             console.log('function limits called');
                             console.log('stopValue',stopValue);
-                            
+                            countAndDisplay(stopValue, delayTime);
                             let limitx = 600 - ((stopValue - 1) / 2) * 600;
                             let limity = 400 - ((stopValue - 1) / 2) * 400;
                             let progres =((stopValue - 1) / 2) * 700;
@@ -265,11 +227,15 @@ class Example extends Phaser.Scene
                             
                             return { limitx, limity, progres, durationi};
                         }
-                 
+                        
+                        // ...
+                        
+                        
+                        
 
                         const graphEase  = () => {
                             console.log('graphEase called');
-                            
+                            counterText.destroy();
                             crashText.destroy()
                            
                             const { limitx, limity, progres, durationi } = limits();
@@ -330,42 +296,24 @@ class Example extends Phaser.Scene
 
 
                         graphEase();
-            
+            // } else {
+            //     console.error('Crash point not found in response data');
+            // }
                     }
-                   
-                    // function CountingComplete(tween,graph, rect, rt, counterText, crashText, crashpoint) {
-                    //     WebFont.load({
-                    //         google: {
-                    //             families: ['Droid Sans']
-                    //           },
-                    //         active: function () {
-                    //             if (tween) {
-                    //                 tween.stop();
-                    //             }
-                    //                     graph.clear();
-                    //                     rt.clear();
-                                        
-                                        
-                                    
-                    //                     rect.setPosition(100, 500);
-                    //                     counterText.destroy();
-                    //                     console.log('its the crashtexts font');
-                    //                     crashText.setText('Crashed at x' + crashpoint.toFixed(2));
-                    //                     scene.scene.restart();
-                                       
+                    function CountingComplete(tween,graph, rect, rt, counterText, crashText, crashpoint) {
+                        tween.stop();
+                                graph.clear();
+                                rt.clear();
+                                
+                                
                             
-                    //           // Your code when fonts are loaded
-                    //         },
-                    //         inactive: function () {
-                    //             console.log('inactive');
-                    //           // Your code when fonts failed to load
-                    //         }
-                    //       });
-
-                    //     }
-                          
-                         
-                       
+                                rect.setPosition(100, 500);
+                                counterText.destroy();
+                                crashText.setText('Crashed at x' + crashpoint.toFixed(2));
+                                // setTimeout(() => {
+                                //     crashText.setText('Crashed at x' + crashpoint.toFixed(2));
+                                // }, 5000);
+                    }
                     
         } catch (error) {
             console.error('Error fetching new crash point:', error);

@@ -1,0 +1,80 @@
+<div class="container-fluid py-4">
+    <div class="row mt-4">
+      <div class="col-lg-8 mb-lg-7 mb-7">
+        <div class="card z-index-2 h-100">
+            <div class="card-header pb-0 pt-3 bg-transparent">
+                <h6 class="text-capitalize">Game</h6>
+                <div id="countdown-text"></div>
+            </div>
+            <div class="row">
+              <div class="col-md-7">
+            <div class="game-container" id="game-container"></div>
+              </div>
+            
+                <!-- Content for the game container -->
+           
+          <div class="col-md-5">
+                <form id="bet-form">
+                    <div class="row">
+                        <!-- Six 2x3 buttons for amounts -->
+                        <div class="col-md-4 mb-3">
+                            <button type="button" class="btn btn-secondary btn-block amount-btn" data-amount="50">50</button>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <button type="button" class="btn btn-secondary btn-block amount-btn" data-amount="100">100</button>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <button type="button" class="btn btn-secondary btn-block amount-btn" data-amount="200">200</button>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <button type="button" class="btn btn-secondary btn-block amount-btn" data-amount="300">300</button>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <button type="button" class="btn btn-secondary btn-block amount-btn" data-amount="500">500</button>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <button type="button" class="btn btn-secondary btn-block amount-btn" data-amount="3000">3000</button>
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <!-- Input field to display selected value -->
+                        <div class="col-md-8 mb-3">
+                            <input type="number" class="form-control" id="selected-amount">
+                        </div>
+                        <!-- Arrow buttons to increase or decrease value -->
+                        
+                        <!-- Bet button -->
+                        <div class="col-md-1 mb-2">
+                            <button type="submit" class="btn btn-primary btn-block" id="bet-button">BET</button>
+                        </div>
+                    </div>
+
+                </form>
+              
+            </div>
+            </div>
+        </div>
+    </div>
+    <script src="{% static 'js/phasergame.js' %}"></script>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const gameConfig = {
+            type: Phaser.AUTO,
+            scale: {
+                mode: Phaser.Scale.FIT,
+                parent: 'game-container',
+                width: 800,
+                height: 600
+            },
+            
+           
+            transparent: true,
+            scene: [Example],
+        }
+
+        const game = new Phaser.Game(gameConfig);
+       
+        
+    });
+    </script>
