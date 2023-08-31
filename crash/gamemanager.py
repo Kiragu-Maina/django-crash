@@ -139,11 +139,12 @@ class GameManager:
         
         update_interval = 0.01  # Update interval in milliseconds
         count = 1
+        delay = 0.1
         await self.bettingcashoutmanager.open_cashout_window()
         while count <= self.crash_point:
            
             
-            await asyncio.sleep(update_interval)  # Convert to seconds
+            await asyncio.sleep(delay)  # Convert to seconds
             count += update_interval
             countofron = round(count, 2)
             self.current_multiplier = countofron
