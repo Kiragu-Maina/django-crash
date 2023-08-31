@@ -155,7 +155,7 @@ class Example extends Phaser.Scene
                             if (countdownText) {
                                 countdownText.destroy();
                             }
-                            countAndDisplay(data.count);
+                            countAndDisplay();
 
 
                         }
@@ -197,24 +197,40 @@ class Example extends Phaser.Scene
                     }
                    
                     
-                    async function countAndDisplay(count) {
+                    async function countAndDisplay() {
                         // Destroy the existing counterText if it exists
                         if (counterText) {
                             counterText.destroy();
                         }
+                        const delay = 100;  // Delay in milliseconds
+                        const updateInterval = 0.01;
+                        const crashPoint = 1000000; // Adjust this value as needed
+                        counterText = scene.add.dynamicBitmapText(400, 200, 'desyrel').setOrigin(0.5, 0);
+                        
+                        
+                            let count = 1;
+                            while (count <= crashPoint) {
+                                await new Promise(resolve => setTimeout(resolve, delay));
+                                count += updateInterval;
+                                const count = Math.round(count * 100) / 100;
+                                 // Assuming you have a context with 'self' available
+                                counterText.setText('x' + count);
+                                await updateCashoutButtonText(counterText); 
+                            }
+                          
                         
                         // Create a new counterText
-                        counterText = scene.add.dynamicBitmapText(400, 200, 'desyrel').setOrigin(0.5, 0);
+                        
                     
                         // Set the text of the counterText
-                        counterText.setText('x' + count);
+                        
                     
                         
                         
                         
                         
                             
-                        await updateCashoutButtonText(counterText); 
+                        
                         
                     }
                         
