@@ -71,7 +71,7 @@ class GameManager:
                 self.is_first_user = True
                 print('game should stop')
                 await self.stop_game()
-                await self.game_lock.release()
+                self.game_lock.release()
                 
         except ValueError:
             print(consumer, 'not found in temp_consumers')
