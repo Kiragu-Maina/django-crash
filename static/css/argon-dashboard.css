@@ -1319,9 +1319,9 @@ progress {
 }
 
 @media (min-width: 768px) {
-  /* .col-md {
+  .col-md {
     flex: 1 0 0%;
-  } */
+  }
 
   .row-cols-md-auto>* {
     flex: 0 0 auto;
@@ -1440,7 +1440,7 @@ progress {
   }
 
   .offset-md-4 {
-    margin-left: 5%;
+    margin-left: 33.333333%;
   }
 
   .offset-md-5 {

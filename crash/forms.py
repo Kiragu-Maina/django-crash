@@ -1,7 +1,7 @@
 
 from django import forms
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
-from .models import User
+from .models import User, Transactions
 from django.contrib.auth.forms import AuthenticationForm
 
 class UserCreationForm(forms.ModelForm):
@@ -39,4 +39,11 @@ class UserChangeForm(forms.ModelForm):
 class UserLoginForm(AuthenticationForm):
     password = forms.CharField(widget=forms.PasswordInput(attrs={'placeholder': 'Password'}))
 
-   
+
+class CashoutForm(forms.Form):
+    multiplier = forms.DecimalField(label='Cashout Multiplier', max_digits=10, decimal_places=2)
+
+class TransactionsForm(forms.ModelForm):
+    class Meta:
+        model = Transactions
+        fields = ['user', 'bet']

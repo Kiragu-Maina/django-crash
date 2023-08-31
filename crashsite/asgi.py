@@ -7,6 +7,7 @@ from channels.security.websocket import AllowedHostsOriginValidator
 from django.core.asgi import get_asgi_application
 
 from crash.routing import websocket_urlpatterns
+from channels.sessions import SessionMiddlewareStack
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "crashsite.settings")
 # Initialize Django ASGI application early to ensure the AppRegistry
@@ -19,8 +20,8 @@ application = ProtocolTypeRouter(
     {
         "http": django_asgi_app,
         "websocket": AllowedHostsOriginValidator(
-            AuthMiddlewareStack(URLRouter(websocket_urlpatterns))
+            AuthMiddlewareStack(
+                SessionMiddlewareStack(URLRouter(websocket_urlpatterns)))
         ),
     }
 )
-

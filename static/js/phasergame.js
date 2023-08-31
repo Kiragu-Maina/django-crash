@@ -24,6 +24,7 @@ class Example extends Phaser.Scene
         const graphics = scene.add.graphics({ lineStyle: { width: 2, color: 0x00aa00 } });
         const horizontalLine = new Phaser.Geom.Line(100, 500, 700, 500);
         const verticalLine = new Phaser.Geom.Line(100, 500, 100, 100);
+        
         const counterLimit = 3.0;
        
         async function main(scene) {
@@ -40,7 +41,7 @@ class Example extends Phaser.Scene
                 scene.add.text(400, 28, '').setColor('#00ff00').setFontSize(32).setShadow(2, 2).setOrigin(0.5, 0);
                 
 
-                const types = [ 'quad.in' ];
+                const types = [ 'sinu.in' ];
                 let type = 0;
                 // let tween;
 
@@ -60,7 +61,16 @@ class Example extends Phaser.Scene
                 const delayTime = 10;    
                 let counterText;
                 let countdownText;
-
+                let cashoutclicked = false;
+               
+                
+                
+                
+                
+                let start = true;
+                const betButton = document.getElementById("bet-button");
+                let game_id;
+               
                 
                 rect.setPosition(100, 500);
                 wsSocket.onmessage = async function (e) {
@@ -70,8 +80,14 @@ class Example extends Phaser.Scene
                             // Use the current multiplier to render the ongoing graph
                             const currentMultiplier = data.currentMultiplier; // Assuming the currentMultiplier is provided in the data
                             // Use currentMultiplier to render the ongoing graph
-                            countAndDisplay(currentMultiplier);
                             
+                            countAndDisplay(currentMultiplier);
+                            if (counterText) {
+                                counterText.destroy();
+                            }
+                            if (crashText) {
+                                crashText.destroy();
+                            }
                             console.log(data)
                         }
                          
@@ -82,6 +98,14 @@ class Example extends Phaser.Scene
                             // isCrashTriggered = true;
                             CountingComplete(tween,graph, rect, rt, crashpoint);
                             console.log('back to here');
+                            if (typeof globalBetAmount !== 'undefined') {
+                                globalBetAmount = 0;
+                            }
+                            
+                            betButton.disabled = false;
+                            betButton.textContent = 'BET'
+
+                            console.log('bet_amount reset');
                             
                             
 
@@ -89,19 +113,44 @@ class Example extends Phaser.Scene
 
                         } else if (data.type == "start_synchronizer") {
                             // Start the synchronizer countdown
+                            
+                                if (tween) {
+                                    tween.stop();
+                                }
+                                
+                                crashInstructionProcessed = false;
+                                cashoutclicked = false;
+                                game_id = data.game_id
+                                console.log(game_id);
+                                console.log(data);
+                                startgame(wsSocket);
+                                // Assuming the count is provided in the data
+                            
+                        
+                            
+                            
+                        }
+                        else if (data.type == "count_initial"){
+                            if (countdownText) {
+                                countdownText.destroy();
+                            }
                             if (tween) {
                                 tween.stop();
                             }
-                            crashInstructionProcessed = false;
-                            const countdown = data.count;
-                            console.log(data);
-                            startgame(countdown);
-                             // Assuming the count is provided in the data
-                            
-                            
-                            
-                            
-                        } 
+                            if (crashText) {
+                                crashText.destroy();
+                            }
+                            countAndDisplayInitial(data.count);
+
+
+                        }
+                        else if (data.type == "heartbeat"){
+                            console.log('heartbeat')
+                            wsSocket.send(JSON.stringify({ type: 'heartbeat_response' }));
+
+
+                        }
+                        
                         else if (data.type == "count_update"){
                             if (countdownText) {
                                 countdownText.destroy();
@@ -110,40 +159,123 @@ class Example extends Phaser.Scene
 
 
                         }
+                        else if (data.type == "heartbeat"){
+                            console.log('heartbeat')
+                            wsSocket.send(JSON.stringify({ type: 'heartbeat_response' }));
+
+
+                        }
                     }
-                    async function startgame(countdown){
+                    async function countAndDisplayInitial(count){
+                        countdownText = scene.add.dynamicBitmapText(400, 300, 'desyrel', '0.00').setOrigin(0.5, 0);
+                        countdownText.setText(`Game starts in ${count}`);
+
+                    }
+                    async function startgame(wsSocket){
                         console.log('startgame called')
                             if (crashText) {
                                 crashText.destroy();
                             }
-                            countdownText = scene.add.dynamicBitmapText(400, 300, 'desyrel', '0.00').setOrigin(0.5, 0);
-                            console.log('countdownText created')
-                            for (let countValue = countdown; countValue >= 0; countValue--) {
+                            const cashoutButton = document.getElementById('cashout-button');
+                            cashoutButton.disabled= false;
+                            // countdownText = scene.add.dynamicBitmapText(400, 300, 'desyrel', '0.00').setOrigin(0.5, 0);
+                            // console.log('countdownText created')
+                            // for (let countValue = countdown; countValue >= 0; countValue--) {
                                 
                     
-                                countdownText.setText(`Game starts in ${countValue}`);
-                                await new Promise(resolve => setTimeout(resolve, 1000));
-                            }
+                            //     countdownText.setText(`Game starts in ${countValue}`);
+                            //     await new Promise(resolve => setTimeout(resolve, 1000));
+                            // }
                             if (countdownText) {
                                 countdownText.destroy();
                             }
-                            drawgraph(scene);
+                            await cashout()
+                        
+                            drawgraph(scene, wsSocket);
+
 
                     }
                    
                     
-                    function countAndDisplay(count) {
-                        // const counterText = scene.add.dynamicBitmapText(400, 200, 'desyrel', '0.00').setOrigin(0.5, 0);
+                    async function countAndDisplay(count) {
+                        // Destroy the existing counterText if it exists
                         if (counterText) {
                             counterText.destroy();
                         }
                         
-                        counterText = scene.add.dynamicBitmapText(400, 200, 'desyrel').setOrigin(0.5, 0);                    
-                            
+                        // Create a new counterText
+                        counterText = scene.add.dynamicBitmapText(400, 200, 'desyrel').setOrigin(0.5, 0);
+                    
+                        // Set the text of the counterText
+                        counterText.setText('x' + count);
+                    
                         
-                        counterText.setText('x'+ count);                            
-                       
-                }
+                        
+                        
+                        
+                            
+                        await updateCashoutButtonText(counterText); 
+                        
+                    }
+                        
+                    async function cashout(){
+                        console.log('cashout called')
+                        // Add a click event listener to the cashoutButton
+                        const cashoutButton = document.getElementById('cashout-button');
+                        
+                        cashoutButton.addEventListener('click', function() {
+                            if(!cashoutclicked){
+                            cashoutclicked=true;
+                            console.log('cashout clicked and value set to true');
+                            
+                            const cashOutValue = parseFloat(counterText.text.substring(1)); 
+                            console.log('cashed_out at: ', cashOutValue);// Extract and parse the value
+                            const betForm = document.getElementById("bet-form");
+                            // Send the cashOutValue to the server using an API call
+                            const formData = new FormData();
+                            formData.append('multiplier', cashOutValue);
+                            formData.append('game_id', game_id);
+
+                            const csrfToken = betForm.querySelector('[name=csrfmiddlewaretoken]').value;
+                                                
+                            fetch('/cashout/', {
+                                method: 'POST',
+                                headers: {
+                                    'X-CSRFToken': csrfToken // Make sure to define csrfToken
+                                },
+                                body: formData
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                console.log('data sent', data);
+                                cashoutButton.textContent = 'CASH OUT';
+                                cashoutButton.disabled = true;
+                                
+                                // Update the page content using the data received from the server
+                                // For example, update the user's balance or display a success message
+                            })
+                            .catch(error => {
+                                console.error('Error:', error);
+                            });
+                    }});
+                    
+                    }
+
+                    async function updateCashoutButtonText(counterText) {
+                        let bet_amount = 0;
+                    
+                        if (typeof globalBetAmount !== 'undefined') {
+                            bet_amount = globalBetAmount;
+                        }
+                    
+                        const cashoutButton = document.getElementById('cashout-button');
+                        const counterValue = parseFloat(counterText.text.substring(1)); // Assuming counterText contains something like "$1.23"
+
+                        const cashoutAmount = Math.floor(bet_amount * counterValue);
+
+                        cashoutButton.textContent = `CASHOUT (${cashoutAmount})`;
+                    }
+                    
                         
                     function CountingComplete(tween, graph, rect, rt, crashpoint) {
                         
@@ -171,7 +303,7 @@ class Example extends Phaser.Scene
      
 
                 }
-                    function drawgraph(scene){
+                    function drawgraph(scene, wsSocket){
                         
                         const newCrashPoint = 200;
                         console.log("we're here", newCrashPoint);
@@ -196,23 +328,27 @@ class Example extends Phaser.Scene
                 
                 
                        
-                        const cashOutButton = scene.add.text(400, 550, 'Cash Out', {
-                            color: '#ffffff',
-                            fontSize: 24,
-                            backgroundColor: '#0000FF',
-                            padding: {
-                                x: 10,
-                                y: 5,
-                            },
-                        }).setOrigin(0.5).setInteractive();
-                        cashOutButton.on('pointerdown', () => {
+                        // const cashOutButton = scene.add.text(400, 550, 'Cash Out', {
+                        //     color: '#ffffff',
+                        //     fontSize: 24,
+                        //     backgroundColor: '#FF0000',
+                        //     padding: {
+                        //         x: 10,
+                        //         y: 5,
+                        //     },
+                        // }).setOrigin(0.5).setInteractive();
+                        
                             // Send a request to the server to cash out
-                            const cashOutValue = parseFloat(counterText.text.substring(1)); // Extract and parse the value
-                            // Send the cashOutValue to the server using an API call, WebSocket, or any suitable method
-                            // Example using fetch:
-                            console.log(cashOutValue)
+                            
+                        // cashOutButton.on('pointerdown', () => {
+                        //     // Send a request to the server to cash out
+                        //     const cashOutValue = parseFloat(counterText.text.substring(1)); // Extract and parse the value
+                        //     // Send the cashOutValue to the server using an API call, WebSocket, or any suitable method
+                        //     // Example using fetch:
+                        //     console.log(cashOutValue)
+                            
                        
-                        });
+                        // });
                         
                         
                     
@@ -287,7 +423,7 @@ class Example extends Phaser.Scene
 
                             tween = scene.tweens.add({
                                 targets: rect,
-                                x: { value: 700 - limitx, ease: 'linear' },
+                                x: { value: 700 - limitx, ease: 'expo' },
                                 y: { value: 100 + limity, ease: types[type] },
                                 duration: durationi,
                                 onUpdate: (tween, target, key) => {

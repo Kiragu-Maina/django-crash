@@ -10,6 +10,7 @@ class ServerSeedGenerator:
         self.salt = secrets.token_hex(16)
         self.generated_hash = None
         self.crash_point = None
+        
 
     def generate_hash(self):
         self.generated_hash = hashlib.sha256(self.server_seed.encode()).hexdigest()
@@ -28,14 +29,35 @@ class ServerSeedGenerator:
             h = int(hash_input[:int(52 / 4)], 16)
             e = 2 ** 52
             self.crash_point = math.floor((100 * e - h) / (e - h)) / 100.0
-
+       
         return self.crash_point
 
     def get_generated_hash(self):
-        return self.generated_hash
+        self.generated_hash = self.generate_hash()
+        return self.generated_hash, self.server_seed, self.salt
 
     def get_crash_point(self):
         return self.crash_point
 
 # Create an instance of the ServerSeedGenerator class
 
+def VerifyHash(hash, game_hash, seed, salt):
+        # Received hash, server seed, and salt
+    received_hash = hash
+    game_hash = game_hash
+    received_server_seed = seed
+    salt = salt
+
+    # Concatenate hash and server seed
+    input_string = received_hash + received_server_seed
+
+    # Apply HMAC-SHA-256 with the salt
+    generated_hash = hmac.new(salt.encode(), input_string.encode(), hashlib.sha256).hexdigest()
+
+    # Compare generated hash with received hash
+    if generated_hash == game_hash:
+        return True
+        
+    else:
+        return False
+        

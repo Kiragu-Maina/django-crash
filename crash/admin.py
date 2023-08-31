@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
-from .models import Transactions, User
+from .models import Transactions, User, Games, Bank, Clients
 from .forms import UserChangeForm, UserCreationForm  # Import your UserChangeForm and UserCreationForm
 
 @admin.register(Transactions)
@@ -37,4 +37,10 @@ class CustomUserAdmin(BaseUserAdmin):
                     form.base_fields[f].disabled = True
         return form
 
+class BankAdmin(admin.ModelAdmin):
+    readonly_fields = ('account_id',)
+
 admin.site.register(User, CustomUserAdmin)
+admin.site.register(Games)
+admin.site.register(Bank, BankAdmin)
+admin.site.register(Clients)

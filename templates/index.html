@@ -57,11 +57,12 @@
 
 
 <body class="g-sidenav-show   bg-gray-100">
+  {{ room_name|json_script:"room-name" }}
   <div class="min-height-300 bg-primary position-absolute w-100"></div>
   <aside class="sidenav bg-white navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-4 " id="sidenav-main">
     <div class="sidenav-header">
       <i class="fas fa-times p-3 cursor-pointer text-secondary opacity-5 position-absolute end-0 top-0 d-none d-xl-none" aria-hidden="true" id="iconSidenav"></i>
-      <a class="navbar-brand m-0" href=" https://demos.creative-tim.com/argon-dashboard/pages/dashboard.html " target="_blank">
+      <a class="navbar-brand m-0" href="  " target="_blank">
         <img src="{% static 'img/logo-ct-dark.png' %}" class="navbar-brand-img h-100" alt="main_logo">
         <span class="ms-1 font-weight-bold">{{username}}</span>
       </a>
@@ -83,14 +84,8 @@
           <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Account pages</h6>
         </li>
         <div>
-        <li class="nav-item">
-          <a class="nav-link " href="./pages/profile.html">
-            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-              <i class="ni ni-single-02 text-dark text-sm opacity-10"></i>
-            </div>
-            <span class="nav-link-text ms-1">Profile</span>
-          </a>
-        </li>
+        
+        {% if user.is_authenticated %}
         <li class="nav-item">
           <a class="nav-link " href="{%url 'logout'%}">
             <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
@@ -99,6 +94,9 @@
             <span class="nav-link-text ms-1">Log out</span>
           </a>
         </li>
+       
+        {% else %}
+        
         <li class="nav-item">
           <a class="nav-link " href="{%url 'login' %}">
             <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
@@ -112,9 +110,10 @@
             <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
               <i class="ni ni-collection text-info text-sm opacity-10"></i>
             </div>
-            <span class="nav-link-text ms-1">Sign Up</span>
+            <span class="nav-link-text ms-1">Register</span>
           </a>
         </li>
+        {% endif %}
         
       </ul>
     </div>
@@ -134,18 +133,38 @@
             </div>
           </div>
           <ul class="navbar-nav  justify-content-end">
+            {% if user.is_authenticated %}
             <li class="nav-item d-flex align-items-center">
-              <a href="{% url 'login' %}" class="nav-link text-white font-weight-bold px-0">
-                <i class="fa fa-user me-sm-1"></i>
-                <span class="d-sm-inline d-none">Sign In </span>
-              </a>
-            </li>
-            <li class="nav-item d-flex align-items-center">
-                <a href="{% url 'register'%}" class="nav-link text-white font-weight-bold px-0">
-                  <i class="fa fa-user me-sm-1"></i>
-                  <span class="d-sm-inline d-none">Register</span>
-                </a>
+             
+                  <a href="{% url 'deposit' %}" class="nav-link text-white font-weight-bold px-0">
+                      <i class="fa fa-money me-sm-1"></i> <!-- Changed the icon to fa-money -->
+                      <span class="d-sm-inline d-none">Deposit</span>
+                  </a>
               </li>
+              <li class="nav-item d-flex align-items-center">
+                  <a href="{% url 'withdraw' %}" class="nav-link text-white font-weight-bold px-0">
+                      <i class="fa fa-credit-card me-sm-1"></i> <!-- Changed the icon to fa-credit-card -->
+                      <span class="d-sm-inline d-none">Withdraw</span>
+                  </a>
+              </li>
+              <li class="nav-item d-flex align-items-center">
+                 <span class="nav-link text-white font-weight-bold px-0" id='balance'>Balance: {{ balance }}</span>
+              </li>
+          {% else %}
+              <li class="nav-item d-flex align-items-center">
+                  <a href="{% url 'login' %}" class="nav-link text-white font-weight-bold px-0">
+                      <i class="fa fa-user me-sm-1"></i>
+                      <span class="d-sm-inline d-none">Sign In</span>
+                  </a>
+              </li>
+              <li class="nav-item d-flex align-items-center">
+                  <a href="{% url 'register' %}" class="nav-link text-white font-weight-bold px-0">
+                      <i class="fa fa-user-plus me-sm-1"></i> <!-- Changed the icon to fa-user-plus -->
+                      <span class="d-sm-inline d-none">Register</span>
+                  </a>
+              </li>
+          {% endif %}
+          
             
            
           </ul>
@@ -165,11 +184,13 @@
                 <div class="col-md-8">
               <div class="game-container" id="game-container"></div>
                 </div>
-              
+              <dialog box when clicked reveals game id>
                   <!-- Content for the game container -->
              
             <div class="col-md-4">
-                  <form id="bet-form">
+              <form id="bet-form" method='post'>
+                {% csrf_token %}
+                    
                       <div class="row">
                           <!-- Six 2x3 buttons for amounts -->
                           
@@ -196,43 +217,99 @@
                           <div class="col-md-7 mb-3">
                               <input type="number" class="form-control" id="selected-amount">
                           </div>
-                          <!-- Arrow buttons to increase or decrease value -->
                           
-                          <!-- Bet button -->
                           <div class="col-md-5 mb-3">
                               <button type="submit" class="btn btn-primary btn-block" id="bet-button">BET</button>
                           </div>
+                          <div class="col-md-12">
+                            <p id="errorfield"></p>
+                          </div>
+                          
                       </div>
+                      <input type="hidden" id="betAmount" name="bet_amount">
 
                   </form>
-                <script>
-                  // Wait for the DOM to be ready
-                document.addEventListener("DOMContentLoaded", function () {
-                  // Get all the amount buttons
-                  const amountButtons = document.querySelectorAll(".amount-btn");
-                  // Get the input field
-                  const selectedAmountInput = document.getElementById("selected-amount");
+                  <div class="col-md-7 mb-3">
+                    <button class="btn btn-primary btn-block" id="cashout-button">CASH OUT</button>
+                </div>
+                <div class="col-md-7 mb-3">
+                  <span  class="nav-link text-red font-weight-bold px-0" id="error-text" style="font-style: italic; display: none;"><span>
+              </div>
+                  <script>
+                    // Wait for the DOM to be ready
+                  document.addEventListener("DOMContentLoaded", function () {
+                    // Get all the amount buttons
+                    const amountButtons = document.querySelectorAll(".amount-btn");
+                    // Get the input field
+                    const selectedAmountInput = document.getElementById("selected-amount");
+                    const betButton = document.getElementById("bet-button");
+                    const errorText = document.getElementById("error-text")
+                    betButton.disabled = false;
 
-                  // Add click event listeners to each amount button
-                  amountButtons.forEach(function (button) {
-                      button.addEventListener("click", function () {
-                          // Get the data-amount attribute value from the button
-                          const amount = button.getAttribute("data-amount");
-                          // Update the input field value with the selected amount
-                          selectedAmountInput.value = amount;
-                      });
+  
+                    // Add click event listeners to each amount button
+                    amountButtons.forEach(function (button) {
+                        button.addEventListener("click", function () {
+                            // Get the data-amount attribute value from the button
+                            const amount = button.getAttribute("data-amount");
+                            // Update the input field value with the selected amount
+                            selectedAmountInput.value = amount;
+                            betButton.textContent = `BET (${amount})`;
+                        });
+                    });
+                    selectedAmountInput.addEventListener("input", function () {
+                      const selectedAmount = selectedAmountInput.value;
+                      betButton.textContent = `BET (${selectedAmount})`;
                   });
-
-                  // Prevent the form from submitting when the "BET" button is clicked
-                  const betForm = document.getElementById("bet-form");
-                  betForm.addEventListener("submit", function (event) {
+  
+                    // Prevent the form from submitting when the "BET" button is clicked
+                    const betForm = document.getElementById("bet-form");
+                    const betAmountInput = document.getElementById("betAmount");
+                    betAmountInput.value = selectedAmountInput.value;
+                    const hideErrorandResetBet = () => {
+                      errorText.style.display = 'none';
+                      errorText.innerHTML = '';
+                      betButton.textContent = 'BET';
+                  };
+                    betForm.addEventListener("submit", function (event) {
                       event.preventDefault();
+                  
+                      const formData = new FormData();
+                      formData.append('bet_amount', selectedAmountInput.value);
                       
-                      // Here you can perform any other actions you want when the "BET" button is clicked
-                      // For example, you might want to submit the form data to a server.
+                      const csrfToken = betForm.querySelector('[name=csrfmiddlewaretoken]').value;
+                  
+                      fetch('', {
+                          method: 'POST',
+                          headers: {
+                              'X-CSRFToken': csrfToken
+                          },
+                          body: formData
+                      })
+                      .then(response => response.json())
+                      .then(data => {
+                          console.log('data sent', data);
+                          if (data.status == 'success'){
+                            window.globalBetAmount = parseFloat(data.bet_amount);
+                            betButton.textContent = `BET Placed`;
+                            betButton.disabled = true;
+                          }
+                          else{
+                          betButton.textContent = 'BET Not Placed';
+                          errorText.innerHTML = data.message;
+                          errorText.style.display = 'block';
+                          setTimeout(hideErrorandResetBet, 5000); 
+                          
+                          }// Update the page content using the data received from the server
+                          // For example, update the user's balance or display a success message
+                      })
+                      .catch(error => {
+                          console.error('Error:', error);
+                      });
+                    });
+                   
                   });
-                });
-                </script>
+                  </script>
               </div>
               </div>
           </div>
@@ -244,23 +321,18 @@
                       <h6 class="mb-0">Bets</h6>
                   </div>
                   <div class="card-body p-3">
-                      <table>
+                      <table class='bet-table'>
                           <thead>
                               <tr>
                                   <th>User</th>
                                   <th>Bet</th>
-                                  <th>Status</th>
+                                  <th>@</th>
+                                  <th>Cashed_Out</th>
+
                               </tr>
                           </thead>
-                          <tbody>
-                            {% for item in items %}
-                            <tr>
-                                <td>{{ item.user }}</td>
-                                <td>{{ item.bet }}</td>
-                                <td>{{ item.won }}</td>
-                                
-                            </tr>
-                            {% endfor %}
+                          <tbody id='bet-table-body'>
+                            
                 </tbody>
                       </table>
                   </div>
@@ -375,14 +447,18 @@
   <script src="{% static 'js/argon-dashboard.min.js' %}"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/phaser/3.60.0/phaser.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/webfont/1.6.28/webfontloader.js"></script>
+  <script src="{% static 'js/updatehtml.js' %}"></script>
   
  
     
 
   <script src="{% static 'js/phasergame.js' %}"></script>
   
+  
   <script>
     document.addEventListener('DOMContentLoaded', function () {
+
+      
         const gameConfig = {
             type: Phaser.AUTO,
             scale: {
@@ -395,6 +471,7 @@
            
             transparent: true,
             scene: [Example],
+            
         }
 
         const game = new Phaser.Game(gameConfig);

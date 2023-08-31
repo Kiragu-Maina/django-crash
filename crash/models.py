@@ -2,6 +2,9 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 from django.core.validators import RegexValidator
 import re
+import datetime
+import django.utils.timezone
+import uuid
 phone_validator = RegexValidator(r"^(\+?\d{0,4})?\s?-?\s?(\(?\d{3}\)?)\s?-?\s?(\(?\d{3}\)?)\s?-?\s?(\(?\d{4}\)?)?$", "The phone number provided is invalid")
 
 
@@ -81,9 +84,40 @@ class User(AbstractBaseUser, PermissionsMixin):
 class Transactions(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     bet = models.IntegerField()
-    multiplier = models.DecimalField(max_digits=10, decimal_places=2, default=1.00)
-    won = models.DecimalField(max_digits=10, decimal_places=2)
+    multiplier = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    won = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    game_id = models.CharField(max_length=200, default='')
+    created_at = models.DateTimeField(auto_now=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    game_played = models.BooleanField(default=False)
+    
 
     def __str__(self):
         return str(self.user)
+    
 
+class Bank(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    account_id = models.UUIDField(default=uuid.uuid4, editable=False)
+    balance = models.DecimalField(max_digits=10, decimal_places=2, default=50000)
+class BettingWindow(models.Model):
+    is_open = models.BooleanField(default=False)
+    
+class CashoutWindow(models.Model):
+    is_open = models.BooleanField(default=False)
+
+class Games(models.Model):
+    game_id = models.CharField(max_length=200)
+    hash = models.CharField(max_length=255, unique=True) 
+    server_seed = models.CharField(max_length=255, unique=True)
+    salt = models.CharField(max_length=255, unique=True)
+    created_at = models.DateTimeField(auto_now=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+class Clients(models.Model):
+    channel_name = models.CharField(max_length=255, unique=True, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.channel_name

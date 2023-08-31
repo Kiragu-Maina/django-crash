@@ -130,7 +130,7 @@ AUTH_USER_MODEL = 'crash.User'
 SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
 SESSION_CACHE_ALIAS = "default"
 SESSION_COOKIE_HTTPONLY = True
-
+LOGIN_URL = '/login/'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
