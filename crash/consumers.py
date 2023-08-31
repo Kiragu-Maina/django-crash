@@ -8,6 +8,7 @@ import time
 
 from .models import Clients
 from channels.db import database_sync_to_async
+from django.db import transaction
 
 class GameConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -165,15 +166,17 @@ class BalanceUpdateConsumer(AsyncWebsocketConsumer):
 
     @database_sync_to_async
     def update_client(self, user, channel_name):
-        client = Clients.objects.select_for_update().get(user=user)
-        
-        client.channel_name = channel_name
-        client.save()
-        return client
+        with transaction.atomic():
+            client = Clients.objects.select_for_update().get(user=user)
+            
+            client.channel_name = channel_name
+            client.save()
+            return client
 
     @database_sync_to_async
     def delete_client(self, user):
-        Clients.objects.filter(user=user).delete()
+        with transaction.atomic():
+            Clients.objects.filter(user=user).delete()
 
     async def receive(self, text_data):
         # Handle received data
