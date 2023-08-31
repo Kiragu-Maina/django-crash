@@ -3,7 +3,7 @@ import asyncio
 
 from channels.generic.websocket import AsyncWebsocketConsumer
 from .gamemanager import GameManager
-from .betsplacing import BetsPlacingandCashout
+
 import time
 
 from .models import Clients
