@@ -31,7 +31,7 @@ function updateTable(updatedItem) {
         <td>${updatedItem.user}</td>
         <td>${updatedItem.bet}</td>
         <td>${updatedItem.multiplier}</td>
-        <td>${updatedItem.won.toFixed(2)}</td>
+        <td>${updatedItem.won}</td>
     `;
     if (parseFloat(updatedItem.multiplier) !== 0) {
         newRow.style.backgroundColor = 'lightgreen'; // Set the background color
@@ -47,7 +47,7 @@ function updateTable(updatedItem) {
 function updateBalance(updatedbalance) {
     const balance = document.getElementById('balance');
 
-    balance.innerHTML = `Balance: ${updatedbalance.balance.toFixed(2)}`;
+    balance.innerHTML = `Balance: ${updatedbalance.balance}`;
     
 }
 });
