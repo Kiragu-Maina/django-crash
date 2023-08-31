@@ -46,29 +46,26 @@ class UserRegistrationView(SuccessMessageMixin, CreateView):
 class UserLoginView(SuccessMessageMixin, FormView):
     form_class = UserLoginForm
     template_name = 'sign-in.html'
-    success_url = ('')  # Redirect to home page after successful login
+    success_url = reverse_lazy('home')  # Redirect to home page after successful login
     success_message = "You have successfully logged in!"
-
-    def dispatch(self, request, *args, **kwargs):
-        if request.user.is_authenticated:
-            print('authenticated')
-            return redirect('/')  # Redirect authenticated user
-        return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
         user = form.get_user()
         login(self.request, user)
-        return redirect('/')
+        return super().form_valid(form)
 
     def form_invalid(self, form):
         messages.error(self.request, 'Invalid phone number or password. Please try again.')
         return self.render_to_response(self.get_context_data(form=form))
 
-    def redirect_to_success_url(self):
-        success_url = self.success_url
-        print(success_url)
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return self.handle_authenticated_user()
+        return super().dispatch(request, *args, **kwargs)
+
+    def handle_authenticated_user(self):
+        return redirect(self.get_success_url())
         
-        return self.render_to_response(self.get_context_data(success_url=success_url))
     
 class UserLogoutView(View):
     def get(self, request, *args, **kwargs):
