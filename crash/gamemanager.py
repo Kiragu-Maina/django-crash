@@ -141,6 +141,7 @@ class GameManager:
         count = 1
         delay = 0.1
         await self.bettingcashoutmanager.open_cashout_window()
+        await self.send_instruction({"type": "count_update", "count": 'start_count'})
         while count <= self.crash_point:
            
             
@@ -150,7 +151,7 @@ class GameManager:
             self.current_multiplier = countofron
             
             # Send count data to consumers
-            await self.send_instruction({"type": "count_update", "count": countofron})
+            
         
         # Send crash instruction and print message
         await self.bettingcashoutmanager.close_cashout_window()
