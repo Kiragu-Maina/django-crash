@@ -167,11 +167,11 @@ class BalanceUpdateConsumer(AsyncWebsocketConsumer):
     @database_sync_to_async
     def update_client(self, user, channel_name):
         with transaction.atomic():
-            client = Clients.objects.select_for_update().get(user=user)
-            
+            client, created = Clients.objects.get_or_create(user=user)
             client.channel_name = channel_name
             client.save()
             return client
+
 
     @database_sync_to_async
     def delete_client(self, user):
