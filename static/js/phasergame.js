@@ -212,9 +212,9 @@ class Example extends Phaser.Scene
                             while (count <= crashPoint) {
                                 await new Promise(resolve => setTimeout(resolve, delay));
                                 count += updateInterval;
-                                const count = Math.round(count * 100) / 100;
+                                const counted = Math.round(count * 100) / 100;
                                  // Assuming you have a context with 'self' available
-                                counterText.setText('x' + count);
+                                counterText.setText('x' + counted);
                                 await updateCashoutButtonText(counterText); 
                             }
                           
