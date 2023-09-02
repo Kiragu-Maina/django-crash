@@ -1,7 +1,7 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from .models import Transactions, User, Bank, Clients, Games
-from .consumers import TableUpdateConsumer
+
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 
