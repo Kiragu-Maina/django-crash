@@ -1,8 +1,8 @@
 document.addEventListener('DOMContentLoaded', function() {
 const roomName = JSON.parse(document.getElementById('room-name').textContent);
-const socket = new WebSocket("wss://" + window.location.host + "/ws/table_updates/");  
-const socket2 = new WebSocket('wss://' + window.location.host + '/ws/balance_updates/');  
-
+const socket = new WebSocket("ws://" + window.location.host + "/ws/table_updates/");  
+const socket2 = new WebSocket('ws://' + window.location.host + '/ws/balance_updates/');  
+const errorText = document.getElementById("error-text");
 // Adjust the WebSocket URL
 
 socket.onmessage = async function (e) {
@@ -15,14 +15,29 @@ socket.onmessage = async function (e) {
         const hash = data.game_hash
         const tableBody = document.getElementById('bet-table-body');
         tableBody.innerHTML = '';
+        errorText.innerHTML = '';
     }
 }
-socket2.onmessage = function (event) {
-    const updatedbalance = JSON.parse(event.data);
+socket2.onmessage = async function (e) {
+    const data = JSON.parse(e.data);
+    if (data.type == "balance_update"){
+    const updatedbalance = data
     console.log('updated balance', updatedbalance);
     updateBalance(updatedbalance);
-};
+    }
+    else if (data.type == "cashout"){
+        
+        errorText.innerHTML = data.message;
+        errorText.style.display = 'block';
+        setTimeout(hideErrorandResetBet, 5000); 
 
+    }
+};
+ const hideErrorandResetBet = () => {
+                      errorText.style.display = 'none';
+                      errorText.innerHTML = '';
+                      
+                  };
 function updateTable(updatedItem) {
     const tableBody = document.getElementById('bet-table-body');
 
@@ -35,6 +50,9 @@ function updateTable(updatedItem) {
     `;
     if (parseFloat(updatedItem.multiplier) !== 0) {
         newRow.style.backgroundColor = 'lightgreen'; // Set the background color
+    }
+    else if (parseFloat(updatedItem.multiplier) == 0) {
+        newRow.style.backgroundColor = 'whitesmoke'; // Set the background color
     }
 
     if (tableBody.firstChild) {

@@ -1,653 +1,588 @@
+
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        {%load static%}
-        <meta charset="utf-8">
-        <title>News 24 - Free News Website Templates</title>
-        <meta content="width=device-width, initial-scale=1.0" name="viewport">
-        <meta content="Bootstrap Ecommerce Template" name="keywords">
-        <meta content="Bootstrap Ecommerce Template Free Download" name="description">
 
-        <!-- Favicon -->
-        <link href="{% static 'img/favicon.ico' %}" rel="icon">
+<head>
+    {%load static%}
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="apple-touch-icon" sizes="76x76" href="{% static 'img/apple-icon.png' %}">
+  <link rel="icon" type="image/png" href="{% static 'img/favicon.png' %}">
+  <title>
+    
+  </title>
+  <!--     Fonts and icons     -->
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
+  <!-- Nucleo Icons -->
+  <link href="{% static 'css/nucleo-icons.css' %}" rel="stylesheet" />
+  <link href="{% static 'css/nucleo-svg.css' %}" rel="stylesheet" />
+  <!-- Font Awesome Icons -->
+  <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+  <link href="{% static 'css/nucleo-svg.css' %}" rel="stylesheet" />
+  <!-- CSS Files -->
+  <link id="pagestyle" href="{% static 'css/argon-dashboard.css' %}" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+  
+</head>
+<style>
+    /* Table styles */
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+    
+    th, td {
+        padding: 10px;
+        border: 1px solid #ddd;
+    }
 
-        <!-- Google Fonts -->
-        <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,600,700&display=swap" rel="stylesheet">
+    th {
+        background-color: #f2f2f2;
+    }
 
-        <!-- CSS Libraries -->
-        <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet">
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
-        <link href="{% static 'lib/slick/slick.css' %}" rel="stylesheet">
-        <link href="{% static 'lib/slick/slick-theme.css' %}" rel="stylesheet">
+    /* Optional hover effect */
+    tr:hover {
+        background-color: #f5f5f5;
+    }
+    .amount-btn {
+      width: 20%;
+      padding: 1px;
+      margin-left: 10px;
+      margin-right:5px; /* Limited padding between buttons */
+    }
+    
+    @media (min-width: 768px) {
+      /* Apply the 3x2 layout for medium and larger screens */
+      
+  }
+</style>
 
-        <!-- Template Stylesheet -->
-        <link href="{% static 'css/style.css' %}" rel="stylesheet">
-    </head>
-    <style>
-        /* Table styles */
-        table {
-            border-collapse: collapse;
-            width: 100%;
-        }
+
+<body class="g-sidenav-show   bg-gray-100">
+  {{ room_name|json_script:"room-name" }}
+  <div class="min-height-300 bg-primary position-absolute w-100"></div>
+  <aside class="sidenav bg-white navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-4 " id="sidenav-main">
+    <div class="sidenav-header">
+      <i class="fas fa-times p-3 cursor-pointer text-secondary opacity-5 position-absolute end-0 top-0 d-none d-xl-none" aria-hidden="true" id="iconSidenav"></i>
+      <a class="navbar-brand m-0" href="  " target="_blank">
+        <img src="{% static 'img/logo-ct-dark.png' %}" class="navbar-brand-img h-100" alt="main_logo">
+        <span class="ms-1 font-weight-bold">{{username}}</span>
+      </a>
+    </div>
+    <hr class="horizontal dark mt-0">
+    <div class="collapse navbar-collapse  w-auto " id="sidenav-collapse-main">
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <a class="nav-link active" href="./pages/dashboard.html">
+            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="ni ni-tv-2 text-primary text-sm opacity-10"></i>
+            </div>
+            <span class="nav-link-text ms-1">Crash</span>
+          </a>
+        </li>
+       
+       
+        <li class="nav-item mt-3">
+          <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Account pages</h6>
+        </li>
+        <div>
         
-        th, td {
-            padding: 10px;
-            border: 1px solid #ddd;
-        }
-
-        th {
-            background-color: #f2f2f2;
-        }
-
-        /* Optional hover effect */
-        tr:hover {
-            background-color: #f5f5f5;
-        }
-    </style>
-
-    <body>
-        <!-- Top Header Start -->
-        <div class="top-header">
-            <div class="container">
-                <div class="row align-items-center">
-                    <div class="col-lg-3 col-md-4">
-                        <div class="logo">
-                            <a href="">
-                                <img src="{% static 'img/logo.png' %}" alt="Logo">
-                            </a>
-                        </div>
-                    </div>
-                    <div class="col-lg-6 col-md-4">
-                        <div class="search">
-                            <input type="text" placeholder="Search">
-                            <button><i class="fa fa-search"></i></button>
-                        </div>
-                    </div>
-                    <div class="col-lg-3 col-md-4">
-                        <div class="social">
-                            <a href=""><i class="fab fa-twitter"></i></a>
-                            <a href=""><i class="fab fa-facebook"></i></a>
-                            <a href=""><i class="fab fa-linkedin"></i></a>
-                            <a href=""><i class="fab fa-instagram"></i></a>
-                            <a href=""><i class="fab fa-youtube"></i></a>
-                        </div>
-                    </div>
+        {% if user.is_authenticated %}
+        <li class="nav-item">
+          <a class="nav-link " href="{%url 'logout'%}">
+            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="ni ni-collection text-info text-sm opacity-10"></i>
+            </div>
+            <span class="nav-link-text ms-1">Log out</span>
+          </a>
+        </li>
+       
+        {% else %}
+        
+        <li class="nav-item">
+          <a class="nav-link " href="{%url 'login' %}">
+            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="ni ni-single-copy-04 text-warning text-sm opacity-10"></i>
+            </div>
+            <span class="nav-link-text ms-1">Sign In</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link " href="{%url 'register'%}">
+            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="ni ni-collection text-info text-sm opacity-10"></i>
+            </div>
+            <span class="nav-link-text ms-1">Register</span>
+          </a>
+        </li>
+        {% endif %}
+        
+      </ul>
+    </div>
+    </div>
+    
+  </aside>
+  <main class="main-content position-relative border-radius-lg ">
+    <!-- Navbar -->
+    <nav class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl " id="navbarBlur" data-scroll="false">
+      <div class="container-fluid py-1 px-3">
+        
+        <div class="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4" id="navbar">
+          <div class="ms-md-auto pe-md-3 d-flex align-items-center">
+            <div class="input-group">
+              
+              <span class="d-sm-inline d-none"></span>
+            </div>
+          </div>
+          <ul class="navbar-nav  justify-content-end">
+            {% if user.is_authenticated %}
+            <li class="nav-item d-flex align-items-center">
+             
+                  <a href="{% url 'deposit' %}" class="nav-link text-white font-weight-bold px-0">
+                      <i class="fa fa-money me-sm-1"></i> <!-- Changed the icon to fa-money -->
+                      <span class="d-sm-inline d-none">Deposit</span>
+                  </a>
+              </li>
+              <li class="nav-item d-flex align-items-center">
+                  <a href="{% url 'withdraw' %}" class="nav-link text-white font-weight-bold px-0">
+                      <i class="fa fa-credit-card me-sm-1"></i> <!-- Changed the icon to fa-credit-card -->
+                      <span class="d-sm-inline d-none">Withdraw</span>
+                  </a>
+              </li>
+              <li class="nav-item d-flex align-items-center">
+                 <span class="nav-link text-white font-weight-bold px-0" id='balance'>Balance: {{ balance }}</span>
+              </li>
+          {% else %}
+              <li class="nav-item d-flex align-items-center">
+                  <a href="{% url 'login' %}" class="nav-link text-white font-weight-bold px-0">
+                      <i class="fa fa-user me-sm-1"></i>
+                      <span class="d-sm-inline d-none">Sign In</span>
+                  </a>
+              </li>
+              <li class="nav-item d-flex align-items-center">
+                  <a href="{% url 'register' %}" class="nav-link text-white font-weight-bold px-0">
+                      <i class="fa fa-user-plus me-sm-1"></i> <!-- Changed the icon to fa-user-plus -->
+                      <span class="d-sm-inline d-none">Register</span>
+                  </a>
+              </li>
+          {% endif %}
+          
+            
+           
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <!-- End Navbar -->
+    <div class="container-fluid py-4">
+      <div class="row mt-4">
+        <div class="col-lg-8 mb-lg-7 mb-7">
+          <div class="card z-index-2 h-100">
+              <div class="card-header pb-0 pt-3 bg-transparent">
+                  <h6 class="text-capitalize">Game</h6>
+                  <div id="countdown-text"></div>
+              </div>
+              <div class="row">
+                <div class="col-md-8">
+              <div class="game-container" id="game-container"></div>
                 </div>
-            </div>
-        </div>
-        <!-- Top Header End -->
-
-
-        <!-- Header Start -->
-        <div class="header">
-            <div class="container">
-                <nav class="navbar navbar-expand-md bg-dark navbar-dark">
-                    <a href="#" class="navbar-brand">MENU</a>
-                    <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbarCollapse">
-                        <span class="navbar-toggler-icon"></span>
-                    </button>
-
-                    <div class="collapse navbar-collapse justify-content-between" id="navbarCollapse">
-                        <div class="navbar-nav m-auto">
-                            <a href="index.html" class="nav-item nav-link active">Home</a>
-                            <a href="#" class="nav-item nav-link">Sports</a>
-                            <a href="#" class="nav-item nav-link">Tech</a>
-                            <a href="#" class="nav-item nav-link">Fashion</a>
-                            <div class="nav-item dropdown">
-                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Dropdown</a>
-                                <div class="dropdown-menu">
-                                    <a href="#" class="dropdown-item">Sub Item 1</a>
-                                    <a href="#" class="dropdown-item">Sub Item 2</a>
-                                </div>
-                            </div>
-                            <a href="single-page.html" class="nav-item nav-link">Single Page</a>
-                            <a href="contact.html" class="nav-item nav-link">Contact Us</a>
-                        </div>
-                    </div>
-                </nav>
-            </div>
-        </div>
-        <!-- Header End -->
-
-
-        <!-- Top News Start-->
-        <div class="top-news">
-            <div class="container-fluid">
-                <div class="row">
-                    <div class="col-md-6 tn-left">
-                        <div class="tn-img">
-                            <img src="{% static 'img/top-news-1.jpg' %}" />
-                            <div class="tn-content">
-                                <div class="tn-content-inner">
-                                    <div id="game-container"></div>
-                                    
-                                    <div id="loading-message"><p>Connecting to Game...</p></div>
-                                    <script>
-                                        // Load and initialize the game
-                                        function loadGame() {
-                                            const gameContainer = document.getElementById('game-container');
-                                            const loadingMessage = document.getElementById('loading-message');
-                                            loadingMessage.textContent = 'Loading Game...';
-                                
-                                            const gameScript = document.createElement('script');
-                                            gameScript.src = ("{% static 'js/game-script.js' %}"); // Path to your Phaser game script
-                                            gameScript.onload = function () {
-                                                loadingMessage.style.display = 'none';
-                                            };
-                                            gameContainer.appendChild(gameScript);
-                                        }
-                                
-                                        // Call loadGame after the main page has loaded
-                                        window.addEventListener('load', loadGame);
-                                    </script>
-                                    {% comment %} <a class="tn-date" href=""><i class="far fa-clock"></i>05-Feb-2020</a>
-                                    <a class="tn-title" href="">Lorem ipsum dolor sit amet adipiscing elit</a> {% endcomment %}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6 tn-right">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>User</th>
-                                    <th>Bet</th>
-                                    <th>Status</th>
-
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for item in items %}
-                                <tr>
-                                    <td>{{ item.user }}</td>
-                                    <td>{{ item.bet }}</td>
-                                    <td>{{ item.won }}</td>
-                                    
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
+              
+             
+            <div class="col-md-4">
+              <form id="bet-form" method='post'>
+                {% csrf_token %}
                     
-                </div>
-            </div>
-        </div>
-        <!-- Top News End-->
-
-
-        <!-- Category News Start-->
-        <div class="cat-news">
-            <div class="container-fluid">
-                <div class="row">
-                    <div class="col-md-6">
-                        <h2><i class="fas fa-align-justify"></i>Sports</h2>
-                        <div class="row cn-slider">
-                            <div class="col-md-6">
-                                <div class="cn-img">
-                                    <img src="{% static 'img/cat-news-1.jpg' %}" />
-                                    <div class="cn-content">
-                                        <div class="cn-content-inner">
-                                            <a class="cn-date" href=""><i class="far fa-clock"></i>05-Feb-2020</a>
-                                            <a class="cn-title" href="">Cras sed semper puru vitae lobortis velit</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="cn-img">
-                                    <img src="{% static 'img/cat-news-2.jpg' %}" />
-                                    <div class="cn-content">
-                                        <div class="cn-content-inner">
-                                            <a class="cn-date" href=""><i class="far fa-clock"></i>05-Feb-2020</a>
-                                            <a class="cn-title" href="">Vestibulum ante ipsum primis</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="cn-img">
-                                    <img src="{% static 'img/cat-news-3.jpg' %}" />
-                                    <div class="cn-content">
-                                        <div class="cn-content-inner">
-                                            <a class="cn-date" href=""><i class="far fa-clock"></i>05-Feb-2020</a>
-                                            <a class="cn-title" href="">Sed quis convallis lacus</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <h2><i class="fas fa-align-justify"></i>Technology</h2>
-                        <div class="row cn-slider">
-                            <div class="col-md-6">
-                                <div class="cn-img">
-                                    <img src="{% static 'img/cat-news-4.jpg' %}" />
-                                    <div class="cn-content">
-                                        <div class="cn-content-inner">
-                                            <a class="cn-date" href=""><i class="far fa-clock"></i>05-Feb-2020</a>
-                                            <a class="cn-title" href="">Vivamus vel felis nec magna</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="cn-img">
-                                    <img src="{% static 'img/cat-news-5.jpg' %}" />
-                                    <div class="cn-content">
-                                        <div class="cn-content-inner">
-                                            <a class="cn-date" href=""><i class="far fa-clock"></i>05-Feb-2020</a>
-                                            <a class="cn-title" href="">Phasellus vitae fermentum est</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="cn-img">
-                                    <img src="{% static 'img/cat-news-6.jpg' %}" />
-                                    <div class="cn-content">
-                                        <div class="cn-content-inner">
-                                            <a class="cn-date" href=""><i class="far fa-clock"></i>05-Feb-2020</a>
-                                            <a class="cn-title" href="">Aenean ut varius dui</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- Category News End-->
-
-
-        <!-- Category News Start-->
-        <div class="cat-news">
-            <div class="container-fluid">
-                <div class="row">
-                    <div class="col-md-6">
-                        <h2><i class="fas fa-align-justify"></i>Business</h2>
-                        <div class="row cn-slider">
-                            <div class="col-md-6">
-                                <div class="cn-img">
-                                    <img src="{% static 'img/cat-news-7.jpg' %}" />
-                                    <div class="cn-content">
-                                        <div class="cn-content-inner">
-                                            <a class="cn-date" href=""><i class="far fa-clock"></i>05-Feb-2020</a>
-                                            <a class="cn-title" href="">Interdum et malesuada fames ac ante</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="cn-img">
-                                    <img src="{% static 'img/cat-news-8.jpg' %}" />
-                                    <div class="cn-content">
-                                        <div class="cn-content-inner">
-                                            <a class="cn-date" href=""><i class="far fa-clock"></i>05-Feb-2020</a>
-                                            <a class="cn-title" href="">Mauris non ligula eget ante sagittis</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="cn-img">
-                                    <img src="{% static 'img/cat-news-9.jpg' %}" />
-                                    <div class="cn-content">
-                                        <div class="cn-content-inner">
-                                            <a class="cn-date" href=""><i class="far fa-clock"></i>05-Feb-2020</a>
-                                            <a class="cn-title" href="">Integer non nunc nec nulla aliquet</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <h2><i class="fas fa-align-justify"></i>Entertainment</h2>
-                        <div class="row cn-slider">
-                            <div class="col-md-6">
-                                <div class="cn-img">
-                                    <img src="{% static 'img/cat-news-10.jpg' %}" />
-                                    <div class="cn-content">
-                                        <div class="cn-content-inner">
-                                            <a class="cn-date" href=""><i class="far fa-clock"></i>05-Feb-2020</a>
-                                            <a class="cn-title" href="">Ut laoreet justo non ornare</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="cn-img">
-                                    <img src="{% static 'img/cat-news-11.jpg' %}" />
-                                    <div class="cn-content">
-                                        <div class="cn-content-inner">
-                                            <a class="cn-date" href=""><i class="far fa-clock"></i>05-Feb-2020</a>
-                                            <a class="cn-title" href="">Proin a nulla ut enim feugiat</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="cn-img">
-                                    <img src="{% static 'img/cat-news-12.jpg' %}" />
-                                    <div class="cn-content">
-                                        <div class="cn-content-inner">
-                                            <a class="cn-date" href=""><i class="far fa-clock"></i>05-Feb-2020</a>
-                                            <a class="cn-title" href="">Sed mauris sem sollicitudin at neque</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- Category News End-->
-
-
-        <!-- Main News Start-->
-        <div class="main-news">
-            <div class="container-fluid">
-                <div class="row">
-                    <div class="col-md-8">
-                        <div class="row">
-                            <div class="col-md-12">
-                                <h2><i class="fas fa-align-justify"></i>Latest News</h2>
-                                <div class="row">
-                                    <div class="col-lg-6">
-                                        <div class="mn-img">
-                                            <img src="{% static 'img/latest-news.jpg' %}" />
-                                        </div>
-                                        <div class="mn-content">
-                                            <a class="mn-title" href="">Cras commodo sem ut porta laoreet</a>
-                                            <a class="mn-date" href=""><i class="far fa-clock"></i>05-Feb-2020</a>
-                                            <p>
-                                                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus sed porta dui. Class aptent taciti sociosqu ad litora torquent per conubia nostra inceptos...
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-6">
-                                        <div class="mn-list">
-                                            <div class="mn-img">
-                                                <img src="{% static 'img/latest-news.jpg' %}" />
-                                            </div>
-                                            <div class="mn-content">
-                                                <a class="mn-title" href="">Pellentesque sit amet rutrum lacus</a>
-                                                <a class="mn-date" href=""><i class="far fa-clock"></i>05-Feb-2020</a>
-                                            </div>
-                                        </div>
-                                        <div class="mn-list">
-                                            <div class="mn-img">
-                                                <img src="{% static 'img/latest-news.jpg' %}" />
-                                            </div>
-                                            <div class="mn-content">
-                                                <a class="mn-title" href="">Proin id pretium orci, quis rhoncus eros</a>
-                                                <a class="mn-date" href=""><i class="far fa-clock"></i>05-Feb-2020</a>
-                                            </div>
-                                        </div>
-                                        <div class="mn-list">
-                                            <div class="mn-img">
-                                                <img src="{% static 'img/latest-news.jpg' %}" />
-                                            </div>
-                                            <div class="mn-content">
-                                                <a class="mn-title" href="">Curabitur viverra scelerisque tempor</a>
-                                                <a class="mn-date" href=""><i class="far fa-clock"></i>05-Feb-2020</a>
-                                            </div>
-                                        </div>
-                                        <div class="mn-list">
-                                            <div class="mn-img">
-                                                <img src="{% static 'img/latest-news.jpg' %}" />
-                                            </div>
-                                            <div class="mn-content">
-                                                <a class="mn-title" href="">Integer nec lorem facilisis interdum lorem non</a>
-                                                <a class="mn-date" href=""><i class="far fa-clock"></i>05-Feb-2020</a>
-                                            </div>
-                                        </div>
-                                        <div class="mn-list">
-                                            <div class="mn-img">
-                                                <img src="{% static 'img/latest-news.jpg' %}" />
-                                            </div>
-                                            <div class="mn-content">
-                                                <a class="mn-title" href="">Interdum et malesuada fames</a>
-                                                <a class="mn-date" href=""><i class="far fa-clock"></i>05-Feb-2020</a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-12">
-                                <h2><i class="fas fa-align-justify"></i>Popular News</h2>
-                                <div class="row">
-                                    <div class="col-lg-6">
-                                        <div class="mn-img">
-                                            <img src="{% static 'img/popular-news.jpg' %}" />
-                                        </div>
-                                        <div class="mn-content">
-                                            <a class="mn-title" href="">Phasellus gravida metus vitae laoreet aliquam</a>
-                                            <a class="mn-date" href=""><i class="far fa-clock"></i>05-Feb-2020</a>
-                                            <p>
-                                                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus sed porta dui. Class aptent taciti sociosqu ad litora torquent per conubia nostra inceptos...
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-6">
-                                        <div class="mn-list">
-                                            <div class="mn-img">
-                                                <img src="{% static 'img/popular-news.jpg' %}" />
-                                            </div>
-                                            <div class="mn-content">
-                                                <a class="mn-title" href="">Nullam risus ante sempe</a>
-                                                <a class="mn-date" href=""><i class="far fa-clock"></i>05-Feb-2020</a>
-                                            </div>
-                                        </div>
-                                        <div class="mn-list">
-                                            <div class="mn-img">
-                                                <img src="{% static 'img/popular-news.jpg' %}" />
-                                            </div>
-                                            <div class="mn-content">
-                                                <a class="mn-title" href="">Pellentesque ultrices quam id ipsum tempor</a>
-                                                <a class="mn-date" href=""><i class="far fa-clock"></i>05-Feb-2020</a>
-                                            </div>
-                                        </div>
-                                        <div class="mn-list">
-                                            <div class="mn-img">
-                                                <img src="{% static 'img/popular-news.jpg' %}" />
-                                            </div>
-                                            <div class="mn-content">
-                                                <a class="mn-title" href="">Nam ex magna, commodo sed turpis rutrum</a>
-                                                <a class="mn-date" href=""><i class="far fa-clock"></i>05-Feb-2020</a>
-                                            </div>
-                                        </div>
-                                        <div class="mn-list">
-                                            <div class="mn-img">
-                                                <img src="{% static 'img/popular-news.jpg' %}" />
-                                            </div>
-                                            <div class="mn-content">
-                                                <a class="mn-title" href="">Aliquam condimentum metus</a>
-                                                <a class="mn-date" href=""><i class="far fa-clock"></i>05-Feb-2020</a>
-                                            </div>
-                                        </div>
-                                        <div class="mn-list">
-                                            <div class="mn-img">
-                                                <img src="{% static 'img/popular-news.jpg' %}" />
-                                            </div>
-                                            <div class="mn-content">
-                                                <a class="mn-title" href="">Ut ornare rutrum ligula erat volutpat</a>
-                                                <a class="mn-date" href=""><i class="far fa-clock"></i>05-Feb-2020</a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-4">
-                        <div class="sidebar">
-                            <div class="sidebar-widget">
-                                <h2><i class="fas fa-align-justify"></i>Category</h2>
-                                <div class="category">
-                                    <ul class="fa-ul">
-                                        <li><span class="fa-li"><i class="far fa-arrow-alt-circle-right"></i></span><a href="">National</a></li>
-                                        <li><span class="fa-li"><i class="far fa-arrow-alt-circle-right"></i></span><a href="">International</a></li>
-                                        <li><span class="fa-li"><i class="far fa-arrow-alt-circle-right"></i></span><a href="">Economics</a></li>
-                                        <li><span class="fa-li"><i class="far fa-arrow-alt-circle-right"></i></span><a href="">Politics</a></li>
-                                        <li><span class="fa-li"><i class="far fa-arrow-alt-circle-right"></i></span><a href="">Lifestyle</a></li>
-                                        <li><span class="fa-li"><i class="far fa-arrow-alt-circle-right"></i></span><a href="">Technology</a></li>
-                                        <li><span class="fa-li"><i class="far fa-arrow-alt-circle-right"></i></span><a href="">Trades</a></li>
-                                    </ul>
-                                </div>
-                            </div>
-
-                            <div class="sidebar-widget">
-                                <h2><i class="fas fa-align-justify"></i>Tags</h2>
-                                <div class="tags">
-                                    <a href="">National</a>
-                                    <a href="">International</a>
-                                    <a href="">Economics</a>
-                                    <a href="">Politics</a>
-                                    <a href="">Lifestyle</a>
-                                    <a href="">Technology</a>
-                                    <a href="">Trades</a>
-                                    <a href="">National</a>
-                                    <a href="">International</a>
-                                    <a href="">Economics</a>
-                                    <a href="">Politics</a>
-                                    <a href="">Lifestyle</a>
-                                    <a href="">Technology</a>
-                                    <a href="">Trades</a>
-                                </div>
-                            </div>
-
-                            <div class="sidebar-widget">
-                                <h2><i class="fas fa-align-justify"></i>Ads 1 column</h2>
-                                <div class="image">
-                                    <a href=""><img src="{% static 'img/adds-1.jpg' %}" alt="Image"></a>
-                                </div>
-                            </div>
-
-                            <div class="sidebar-widget">
-                                <h2><i class="fas fa-align-justify"></i>Ads 2 column</h2>
-                                <div class="image">
-                                    <div class="row">
-                                        <div class="col-sm-6">
-                                            <a href=""><img src="{% static 'img/adds-2.jpg' %}" alt="Image"></a>
-                                        </div>
-                                        <div class="col-sm-6">
-                                            <a href=""><img src="{% static 'img/adds-2.jpg' %}" alt="Image"></a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- Main News End-->
-
-
-        <!-- Footer Start -->
-        <div class="footer">
-            <div class="container-fluid">
-                <div class="row">
-                    <div class="col-lg-3 col-md-6">
-                        <div class="footer-widget">
-                            <h3 class="title">Useful Links</h3>
-                            <ul>
-                                <li><a href="#">Pellentesque</a></li>
-                                <li><a href="#">Aliquam</a></li>
-                                <li><a href="#">Fusce placerat</a></li>
-                                <li><a href="#">Nulla hendrerit</a></li>
-                                <li><a href="#">Maecenas</a></li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-3 col-md-6">
-                        <div class="footer-widget">
-                            <h3 class="title">Quick Links</h3>
-                            <ul>
-                                <li><a href="#">Posuere egestas</a></li>
-                                <li><a href="#">Sollicitudin</a></li>
-                                <li><a href="#">Luctus non</a></li>
-                                <li><a href="#">Duis tincidunt</a></li>
-                                <li><a href="#">Elementum</a></li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-3 col-md-6">
-                        <div class="footer-widget">
-                            <h3 class="title">Get in Touch</h3>
-                            <div class="contact-info">
-                                <p><i class="fa fa-map-marker"></i>123 Terry Lane, New York, USA</p>
-                                <p><i class="fa fa-envelope"></i>email@example.com</p>
-                                <p><i class="fa fa-phone"></i>+123-456-7890</p>
-                                <div class="social">
-                                    <a href=""><i class="fab fa-twitter"></i></a>
-                                    <a href=""><i class="fab fa-facebook"></i></a>
-                                    <a href=""><i class="fab fa-linkedin"></i></a>
-                                    <a href=""><i class="fab fa-instagram"></i></a>
-                                    <a href=""><i class="fab fa-youtube"></i></a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                      <div class="row">
+                          <!-- Six 2x3 buttons for amounts -->
+                          
+                              <button type="button" class="amount-btn" data-amount="50">50</button>
+                          
+                          
+                              <button type="button" class="amount-btn" data-amount="100">100</button>
                     
-                    <div class="col-lg-3 col-md-6">
-                        <div class="footer-widget">
-                            <h3 class="title">Newsletter</h3>
-                            <div class="newsletter">
-                                <p>
-                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus sed porta dui. Class aptent taciti sociosqu ad litora torquent per conubia nostra inceptos
-                                </p>
-                                <form>
-                                    <input class="form-control" type="email" placeholder="Your email here">
-                                    <button class="btn">Submit</button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
+                          
+                              <button type="button" class="amount-btn" data-amount="200">200</button>
+                          
+                          
+                              <button type="button" class="amount-btn" data-amount="300">300</button>
+                          
+                          
+                              <button type="button" class="amount-btn" data-amount="500">500</button>
+                          
+                          
+                              <button type="button" class="amount-btn" data-amount="3000">3000</button>
+                          
+                      </div>
+                      <div class="row mt-2">
+                          <!-- Input field to display selected value -->
+                          <div class="col-md-7 mb-3">
+                              <input type="number" class="form-control" id="selected-amount">
+                          </div>
+                          
+                          <div class="col-md-5 mb-3">
+                              <button type="submit" class="btn btn-primary btn-block" id="bet-button">BET</button>
+                          </div>
+                          <div class="col-md-12">
+                            <p id="errorfield"></p>
+                          </div>
+                          
+                      </div>
+                      <input type="hidden" id="betAmount" name="bet_amount">
+
+                  </form>
+                  <div class="col-md-7 mb-3">
+                    <button class="btn btn-primary btn-block" id="cashout-button">CASH OUT</button>
                 </div>
-            </div>
+                <div class="col-md-7 mb-3">
+                  <span  class="nav-link text-red font-weight-bold px-0" id="error-text" style="font-style: italic; display: none;"><span>
+              </div>
+                  <script>
+                    // Wait for the DOM to be ready
+                  document.addEventListener("DOMContentLoaded", function () {
+                    // Get all the amount buttons
+                    const amountButtons = document.querySelectorAll(".amount-btn");
+                    // Get the input field
+                    const selectedAmountInput = document.getElementById("selected-amount");
+                    const betButton = document.getElementById("bet-button");
+                    const errorText = document.getElementById("error-text")
+                    betButton.disabled = false;
+
+  
+                    // Add click event listeners to each amount button
+                    amountButtons.forEach(function (button) {
+                        button.addEventListener("click", function () {
+                            // Get the data-amount attribute value from the button
+                            const amount = button.getAttribute("data-amount");
+                            // Update the input field value with the selected amount
+                            selectedAmountInput.value = amount;
+                            betButton.textContent = `BET (${amount})`;
+                        });
+                    });
+                    selectedAmountInput.addEventListener("input", function () {
+                      const selectedAmount = selectedAmountInput.value;
+                      betButton.textContent = `BET (${selectedAmount})`;
+                  });
+  
+                    // Prevent the form from submitting when the "BET" button is clicked
+                    const betForm = document.getElementById("bet-form");
+                    const betAmountInput = document.getElementById("betAmount");
+                    betAmountInput.value = selectedAmountInput.value;
+                    const hideErrorandResetBet = () => {
+                      errorText.style.display = 'none';
+                      errorText.innerHTML = '';
+                      betButton.textContent = 'BET';
+                  };
+                    betForm.addEventListener("submit", function (event) {
+                      event.preventDefault();
+                  
+                      const formData = new FormData();
+                      formData.append('bet_amount', selectedAmountInput.value);
+                      
+                      const csrfToken = betForm.querySelector('[name=csrfmiddlewaretoken]').value;
+                  
+                      fetch('', {
+                          method: 'POST',
+                          headers: {
+                              'X-CSRFToken': csrfToken
+                          },
+                          body: formData
+                      })
+                      .then(response => response.json())
+                      .then(data => {
+                          console.log('data sent', data);
+                          if (data.status == 'success'){
+                            window.globalBetAmount = parseFloat(data.bet_amount);
+                            betButton.textContent = `BET Placed`;
+                            betButton.disabled = true;
+                          }
+                          else{
+                          betButton.textContent = 'BET Not Placed';
+                          errorText.innerHTML = data.message;
+                          errorText.style.display = 'block';
+                          setTimeout(hideErrorandResetBet, 5000); 
+                          
+                          }// Update the page content using the data received from the server
+                          // For example, update the user's balance or display a success message
+                      })
+                      .catch(error => {
+                          console.error('Error:', error);
+                      });
+                    });
+                   
+                  });
+                  </script>
+              </div>
+              </div>
+          </div>
+      </div>
+      
+          <div class="col-lg-4"> <!-- Adjusted the column width to 5 to accommodate both columns within a 12-column grid -->
+              <div class="card">
+                  <div class="card-header pb-0 p-3">
+                      <h6 class="mb-0">Bets</h6>
+                  </div>
+                  <div class="card-body p-3">
+                    <table class='bet-table' style="background-color: #333; color: black;">
+                          <thead>
+                              <tr style="">
+                                  <th>User</th>
+                                  <th>Bet</th>
+                                  <th>@</th>
+                                  <th>Cashed_Out</th>
+
+                              </tr>
+                          </thead>
+                          <tbody id='bet-table-body'>
+                            
+                </tbody>
+                      </table>
+                  </div>
+              </div>
+          </div>
+      </div>
+  
+  
+    
+      
+        
+        
         </div>
-        <!-- Footer End -->
+      </div>
+    </div>
+  </div>
+  <!--   Core JS Files   -->
+  <script>
+  const body = document.getElementsByTagName('body')[0];
+  const hr = document.querySelectorAll('div:not(.sidenav) > hr');
+  const sidebar = document.querySelector('.sidenav');
+  const sidebarWhite = document.querySelectorAll('.sidenav.bg-white');
+  const hr_card = document.querySelectorAll('div:not(.bg-gradient-dark) hr');
+  const text_btn = document.querySelectorAll('button:not(.btn) > .text-dark');
+  const text_span = document.querySelectorAll('span.text-dark, .breadcrumb .text-dark');
+  const text_span_white = document.querySelectorAll('span.text-white');
+  const text_strong = document.querySelectorAll('strong.text-dark');
+  const text_strong_white = document.querySelectorAll('strong.text-white');
+  const text_nav_link = document.querySelectorAll('a.nav-link.text-dark');
+  const secondary = document.querySelectorAll('.text-secondary');
+  const bg_gray_100 = document.querySelectorAll('.bg-gray-100');
+  const bg_gray_600 = document.querySelectorAll('.bg-gray-600');
+  const btn_text_dark = document.querySelectorAll('.btn.btn-link.text-dark, .btn .ni.text-dark');
+  const btn_text_white = document.querySelectorAll('.btn.btn-link.text-white, .btn .ni.text-white');
+  const card_border = document.querySelectorAll('.card.border');
+  const card_border_dark = document.querySelectorAll('.card.border.border-dark');
+  const svg = document.querySelectorAll('g');
+  const navbarBrand = document.querySelector('.navbar-brand-img');
+  const navbarBrandImg = navbarBrand.src;
+  const navLinks = document.querySelectorAll('.navbar-main .nav-link, .navbar-main .breadcrumb-item, .navbar-main .breadcrumb-item a, .navbar-main h6');
+  const cardNavLinksIcons = document.querySelectorAll('.card .nav .nav-link i');
+  const cardNavSpan = document.querySelectorAll('.card .nav .nav-link span');
 
 
-        <!-- Footer Bottom Start -->
-        <div class="footer-bottom">
-            <div class="container">
-                <div class="row">
-                    <div class="col-md-6 copyright">
-                        <p>Copyright &copy; <a href="https://htmlcodex.com">HTML Codex</a>. All Rights Reserved</p>
-                    </div>
+  
+    body.classList.add('dark-version');
+    if (navbarBrandImg.includes('logo-ct-dark.png')) {
+      var navbarBrandImgNew = navbarBrandImg.replace("logo-ct-dark", "logo-ct");
+      navbarBrand.src = navbarBrandImgNew;
+    }
+    for (var i = 0; i < cardNavLinksIcons.length; i++) {
+      if (cardNavLinksIcons[i].classList.contains('text-dark')) {
+        cardNavLinksIcons[i].classList.remove('text-dark');
+        cardNavLinksIcons[i].classList.add('text-white');
+      }
+    }
+    for (var i = 0; i < cardNavSpan.length; i++) {
+      if (cardNavSpan[i].classList.contains('text-sm')) {
+        cardNavSpan[i].classList.add('text-white');
+      }
+    }
+    for (var i = 0; i < hr.length; i++) {
+      if (hr[i].classList.contains('dark')) {
+        hr[i].classList.remove('dark');
+        hr[i].classList.add('light');
+      }
+    }
+    for (var i = 0; i < hr_card.length; i++) {
+      if (hr_card[i].classList.contains('dark')) {
+        hr_card[i].classList.remove('dark');
+        hr_card[i].classList.add('light');
+      }
+    }
+    for (var i = 0; i < text_btn.length; i++) {
+      if (text_btn[i].classList.contains('text-dark')) {
+        text_btn[i].classList.remove('text-dark');
+        text_btn[i].classList.add('text-white');
+      }
+    }
+    for (var i = 0; i < text_span.length; i++) {
+      if (text_span[i].classList.contains('text-dark')) {
+        text_span[i].classList.remove('text-dark');
+        text_span[i].classList.add('text-white');
+      }
+    }
+    for (var i = 0; i < text_strong.length; i++) {
+      if (text_strong[i].classList.contains('text-dark')) {
+        text_strong[i].classList.remove('text-dark');
+        text_strong[i].classList.add('text-white');
+      }
+    }
+    for (var i = 0; i < text_nav_link.length; i++) {
+      if (text_nav_link[i].classList.contains('text-dark')) {
+        text_nav_link[i].classList.remove('text-dark');
+        text_nav_link[i].classList.add('text-white');
+      }
+    }
+    for (var i = 0; i < secondary.length; i++) {
+      if (secondary[i].classList.contains('text-secondary')) {
+        secondary[i].classList.remove('text-secondary');
+        secondary[i].classList.add('text-white');
+        secondary[i].classList.add('opacity-8');
+      }
+    }
+    for (var i = 0; i < bg_gray_100.length; i++) {
+      if (bg_gray_100[i].classList.contains('bg-gray-100')) {
+        bg_gray_100[i].classList.remove('bg-gray-100');
+        bg_gray_100[i].classList.add('bg-gray-600');
+      }
+    }
+    for (var i = 0; i < btn_text_dark.length; i++) {
+      btn_text_dark[i].classList.remove('text-dark');
+      btn_text_dark[i].classList.add('text-white');
+    }
+    for (var i = 0; i < sidebarWhite.length; i++) {
+      sidebarWhite[i].classList.remove('bg-white');
+    }
+    for (var i = 0; i < svg.length; i++) {
+      if (svg[i].hasAttribute('fill')) {
+        svg[i].setAttribute('fill', '#fff');
+      }
+    }
+    for (var i = 0; i < card_border.length; i++) {
+      card_border[i].classList.add('border-dark');
+    }
+    
+  {% comment %} else {
+    body.classList.remove('dark-version');
+    sidebar.classList.add('bg-white');
+    if (navbarBrandImg.includes('logo-ct.png')) {
+      var navbarBrandImgNew = navbarBrandImg.replace("logo-ct", "logo-ct-dark");
+      navbarBrand.src = navbarBrandImgNew;
+    }
+    for (var i = 0; i < navLinks.length; i++) {
+      if (navLinks[i].classList.contains('text-dark')) {
+        navLinks[i].classList.add('text-white');
+        navLinks[i].classList.remove('text-dark');
+      }
+    }
+    for (var i = 0; i < cardNavLinksIcons.length; i++) {
+      if (cardNavLinksIcons[i].classList.contains('text-white')) {
+        cardNavLinksIcons[i].classList.remove('text-white');
+        cardNavLinksIcons[i].classList.add('text-dark');
+      }
+    }
+    for (var i = 0; i < cardNavSpan.length; i++) {
+      if (cardNavSpan[i].classList.contains('text-white')) {
+        cardNavSpan[i].classList.remove('text-white');
+      }
+    }
+    for (var i = 0; i < hr.length; i++) {
+      if (hr[i].classList.contains('light')) {
+        hr[i].classList.add('dark');
+        hr[i].classList.remove('light');
+      }
+    }
+    for (var i = 0; i < hr_card.length; i++) {
+      if (hr_card[i].classList.contains('light')) {
+        hr_card[i].classList.add('dark');
+        hr_card[i].classList.remove('light');
+      }
+    }
+    for (var i = 0; i < text_btn.length; i++) {
+      if (text_btn[i].classList.contains('text-white')) {
+        text_btn[i].classList.remove('text-white');
+        text_btn[i].classList.add('text-dark');
+      }
+    }
+    for (var i = 0; i < text_span_white.length; i++) {
+      if (text_span_white[i].classList.contains('text-white') && !text_span_white[i].closest('.sidenav') && !text_span_white[i].closest('.card.bg-gradient-dark')) {
+        text_span_white[i].classList.remove('text-white');
+        text_span_white[i].classList.add('text-dark');
+      }
+    }
+    for (var i = 0; i < text_strong_white.length; i++) {
+      if (text_strong_white[i].classList.contains('text-white')) {
+        text_strong_white[i].classList.remove('text-white');
+        text_strong_white[i].classList.add('text-dark');
+      }
+    }
+    for (var i = 0; i < secondary.length; i++) {
+      if (secondary[i].classList.contains('text-white')) {
+        secondary[i].classList.remove('text-white');
+        secondary[i].classList.remove('opacity-8');
+        secondary[i].classList.add('text-dark');
+      }
+    }
+    for (var i = 0; i < bg_gray_600.length; i++) {
+      if (bg_gray_600[i].classList.contains('bg-gray-600')) {
+        bg_gray_600[i].classList.remove('bg-gray-600');
+        bg_gray_600[i].classList.add('bg-gray-100');
+      }
+    }
+    for (var i = 0; i < svg.length; i++) {
+      if (svg[i].hasAttribute('fill')) {
+        svg[i].setAttribute('fill', '#252f40');
+      }
+    }
+    for (var i = 0; i < btn_text_white.length; i++) {
+      if (!btn_text_white[i].closest('.card.bg-gradient-dark')) {
+        btn_text_white[i].classList.remove('text-white');
+        btn_text_white[i].classList.add('text-dark');
+      }
+    }
+    for (var i = 0; i < card_border_dark.length; i++) {
+      card_border_dark[i].classList.remove('border-dark');
+    } {% endcomment %}
+    
+  
+  </script>
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
 
-                    <!--/*** This template is free as long as you keep the footer author’s credit link/attribution link/backlink. If you'd like to use the template without the footer author’s credit link/attribution link/backlink, you can purchase the Credit Removal License from "https://htmlcodex.com/credit-removal". Thank you for your support. ***/-->
-                    <div class="col-md-6 template-by">
-                        <p>Template By <a href="https://htmlcodex.com">HTML Codex</a></p>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- Footer Bottom End -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/phaser/3.60.0/phaser.min.js"></script>
 
+  <script src="{% static 'js/updatehtml.js' %}"></script>
+  
+ 
+    
 
-        <!-- Back to Top -->
-        <a href="#" class="back-to-top"><i class="fa fa-chevron-up"></i></a>
+  <script src="{% static 'js/phasergame.js' %}"></script>
+  
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
 
+      
+        const gameConfig = {
+            type: Phaser.AUTO,
+            scale: {
+                mode: Phaser.Scale.FIT,
+                parent: 'game-container',
+                width: 800,
+                height: 600
+            },
+            
+           
+            transparent: true,
+            scene: [Example],
+            
+        }
 
-        <!-- JavaScript Libraries -->
-        <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
-        <script src="{% static 'lib/easing/easing.min.js' %}"></script>
-        <script src="{% static 'lib/slick/slick.min.js' %}"></script>
+        const game = new Phaser.Game(gameConfig);
+       
+        
+    });
+    </script>
 
+</body>
 
-        <!-- Template Javascript -->
-        <script src="{% static 'js/main.js' %}"></script>
-        <script src="{% static '/js/phaser.js' %}"></script>
-    </body>
 </html>

@@ -2,13 +2,19 @@ import json
 import asyncio
 
 from channels.generic.websocket import AsyncWebsocketConsumer
-from .gamemanager import GameManager
+
 
 import time
 
-from .models import Clients
+from .models import Clients, Transactions, Bank, Games
 from channels.db import database_sync_to_async
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
+
 from django.db import transaction
+from decimal import Decimal
+from django.core.cache import cache
+
 
 class GameConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -25,12 +31,12 @@ class GameConsumer(AsyncWebsocketConsumer):
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)
 
         await self.accept()
-        self.game_manager = GameManager.get_instance()
+        # self.game_manager = game_manager_instance
         
         # Start the heartbeat mechanism
          # Start the heartbeat mechanism as a concurrent task
         # self.heartbeat_task = asyncio.create_task(self.heartbeat())
-        self.game_play = asyncio.create_task(self.game_manager.add_consumer(self))
+        # self.game_play = asyncio.create_task(self.game_manager.add_consumer(self))
     
     async def heartbeat(self):
         print('heartbeat called')
@@ -65,19 +71,16 @@ class GameConsumer(AsyncWebsocketConsumer):
 
     async def disconnect(self, close_code):
         # Leave room group
-        # Remove this consumer from the GameManager instance
-        print('disconnect called and remove consumer from game called')
-        await self.game_manager.remove_consumer(self)
-        print('game_manager called to remove')
-
+        
         await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
 
         # Remove this consumer from the GameManager instance
-        self.game_manager.remove_consumer(self)
+        # self.game_manager.remove_consumer(self)
 
     async def receive(self, text_data):
         try:
             print('receive called')
+            print(text_data) 
             data = json.loads(text_data)
             message_type = data.get('type', '')
             print(data)
@@ -87,13 +90,100 @@ class GameConsumer(AsyncWebsocketConsumer):
                 await self.handle_crash_instruction(data)
             elif message_type == "start_synchronizer":
                 await self.handle_start_synchronizer(data)
-            elif message_type == "ongoing_synchronizer":
-                await self.handle_ongoing_synchronizer(data)
+            elif message_type == "cashout_validate":
+                response = await self.handle_multiplier_validation(data)
+                if response:
+                    await self.update_cashout(data)
+                    
             
         except Exception as e:
             print(f"Error in receive: {str(e)}")
+    async def handle_multiplier_validation(self, data):
+        sent_game_id = data.get('game_id')
+        sent_multiplier = data.get('multiplier')
+        cached_multiplier = cache.get('game_multiplier')
+        print('cached_multiplier', cached_multiplier)
 
+        if (cache.get('cashout_window_state')):
+            
+                if sent_multiplier <= cached_multiplier:
+                    return True
+        
+        print("Received game ID or multiplier or window closed doesn't match the current game.")
+        return False
 
+    @database_sync_to_async
+    def update_cashout(self, data):
+        with transaction.atomic():
+            user=self.scope["user"]
+        
+            try:
+                new_transaction = Transactions.objects.filter(user=user).order_by('created_at').last()
+                games_game_id = Games.objects.order_by('created_at').last()
+
+                if data.get('game_id') == new_transaction.game_id == games_game_id.game_id:
+                    if not new_transaction.game_played:
+                        new_transaction.multiplier = data.get('multiplier')
+                        new_transaction.won = new_transaction.bet * float(data.get('multiplier'))
+                        new_transaction.game_played = True
+                        new_transaction.save()
+
+                        try:
+                            bank_instance = Bank.objects.select_for_update().get(user=user)
+                            bank_instance.balance += Decimal(new_transaction.won)
+                            bank_instance.save()
+                        except Bank.DoesNotExist:
+                            response_data = {'type':'cashout', 'status': 'error', 'message': 'no_bank'}
+
+                        response_data = {
+                            'type':'cashout',
+                            'status': 'success',
+                            'message': 'Cashout successful'
+                        }
+                    else:
+                        response_data = {
+                            'type':'cashout',
+                            'status': 'error',
+                            'message': 'User already cashed out'
+                        }
+                else:
+                    response_data = {
+                        'type':'cashout',
+                        'status': 'error',
+                        'message': 'Non-matching game_id'
+                    }
+
+            except Exception as e:
+                response_data = {
+                    'type':'cashout',
+                    'status': 'error',
+                    'message': 'Cashout failed',
+                    'error': str(e)
+    
+                  }
+                
+            client = Clients.objects.filter(user=user).first()
+        channel_name = client.channel_name
+        print(channel_name)
+        
+        
+
+        # Send the update to the user's channel
+        channel_layer = get_channel_layer()
+        async_to_sync(channel_layer.send)(
+            f"{channel_name}",  # Use a unique channel name per user
+            {
+                "type": "balance.update",
+                "data": response_data,
+                
+            }
+        )
+        
+        # self.send(text_data=json.dumps(response_data))
+    async def game_update(self, event):
+        print('game update')
+        updated_item = event['data']
+        await self.send(text_data=json.dumps(updated_item))
     
     async def handle_crash_instruction(self, data):
         # Handle crash instruction here, e.g., trigger the crash action in the game

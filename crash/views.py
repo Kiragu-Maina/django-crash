@@ -38,39 +38,36 @@ class UserRegistrationView(SuccessMessageMixin, CreateView):
         response = super().form_valid(form)
         user = form.save()
         login(self.request, user)
-        return response
+        return JsonResponse({'success': True, 'redirect_url': reverse_lazy('home')}, status=200)
     def form_invalid(self, form):
         messages.error(self.request, 'There was an error with your registration. Please check the form and try again.')
-        return self.render_to_response(self.get_context_data(form=form))
+        return JsonResponse({'success': False, 'errors': form.errors}, status=400)
 
-class UserLoginView(SuccessMessageMixin, FormView):
+class UserLoginView(FormView):
     form_class = UserLoginForm
     template_name = 'sign-in.html'
-    success_url = reverse_lazy('home')  # Redirect to home page after successful login
-    success_message = "You have successfully logged in!"
 
     def form_valid(self, form):
         user = form.get_user()
         login(self.request, user)
-        return super().form_valid(form)
+        messages.success(self.request, 'You have successfully logged in!')
+        return JsonResponse({'success': True, 'redirect_url': reverse_lazy('home')}, status=200)
 
     def form_invalid(self, form):
         messages.error(self.request, 'Invalid phone number or password. Please try again.')
-        return self.render_to_response(self.get_context_data(form=form))
+        return JsonResponse({'success': False, 'errors': form.errors}, status=400)
 
     def dispatch(self, request, *args, **kwargs):
         if request.user.is_authenticated:
-            return self.handle_authenticated_user()
+            return JsonResponse({'authenticated': True, 'redirect_url': reverse_lazy('home')})
         return super().dispatch(request, *args, **kwargs)
 
-    def handle_authenticated_user(self):
-        return redirect(self.get_success_url())
         
     
 class UserLogoutView(View):
     def get(self, request, *args, **kwargs):
         logout(request)
-        return redirect('/login')  
+        return redirect('/')  
 
 def get_new_crash_point(request):
     seed_generator = ServerSeedGenerator()

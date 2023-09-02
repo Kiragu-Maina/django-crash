@@ -43,6 +43,7 @@ def bank_updated(sender, instance, **kwargs):
     data = {
         "user": str(instance.user),
         "balance": str(instance.balance),
+        "type":'balance_update',
     }
     user = instance.user
     client = Clients.objects.filter(user=user).first()

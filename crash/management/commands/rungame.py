@@ -1,14 +1,40 @@
 import asyncio
+from django.core.management.base import BaseCommand
+
 import json
-from .utils import ServerSeedGenerator
+from ...utils import ServerSeedGenerator
 import time
 from asyncio import Queue
 import uuid
-from .models import BettingWindow, CashoutWindow, Transactions, Games
+from ...models import BettingWindow, CashoutWindow, Transactions, Games
 from django.core.cache import cache
 from channels.db import database_sync_to_async
 import autobahn
 import channels
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
+
+print('called gamemanager instance')
+class Command(BaseCommand):
+    help = 'Run the GameManager in the background'
+
+    def handle(self, *args, **kwargs):
+        async def main():
+            game_manager = GameManager.get_instance()
+            # Initialize other necessary components or services here
+
+            while True:
+                # Run your game manager here
+                await game_manager.run_game()
+                # Optionally, you can add a delay here to control how often the game restarts
+                await asyncio.sleep(10)  # Adjust the delay as needed
+
+        # Create an event loop and run your main function
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(main())
+        
+
+
 
 class GameManager:
     game_manager_instance = None
@@ -22,8 +48,8 @@ class GameManager:
          # Use asyncio.Queue for thread-safe management
         self.is_first_user = True
         self.current_multiplier = 0
-        self.temp_consumers = [] 
         self.game_running = False
+       
         self.game_ids = set()
         self.current_game_id = None
         self.usercancashout = False
@@ -40,64 +66,17 @@ class GameManager:
             cls.game_manager_instance = cls()
         return cls.game_manager_instance
 
-    async def add_consumer(self, consumer):
-        
-        
-        print('add consumer called')
-        
-        self.temp_consumers.append(consumer)# Use put() for adding to the queue
-        if self.is_first_user:
-            print('self is first user')
-            self.is_first_user = False
-            if not self.game_running:
-                print('start game')# Check if the game is not already running
-                
-            
-            
-        else:
-            await self.ongoing_game_state(consumer)
+    
 
 
 
-    async def remove_consumer(self, consumer):
-        print('remove consumer called')
-        try:
-            self.temp_consumers.remove(consumer)
-            await self.bettingcashoutmanager.remove_consumer(consumer)
-
-            print(consumer, 'removed')
-            if len(self.temp_consumers) == 0:
-                self.is_first_user = True
-                print('game should stop')
-                await self.stop_game()
-                
-                
-        except ValueError:
-            print(consumer, 'not found in temp_consumers')
-            return 
-
-        # Remove the consumer from connected_consumers queue as well
-        # This ensures that the queue doesn't hold a reference to removed consumers
-     
-
-    async def ongoing_game_state(self, consumer):
-        if self.game_running:
-            ongoing_state_data = {
-                'type': 'ongoing_synchronizer',
-                'currentMultiplier': self.current_multiplier,
-                # ... (other relevant data)
-            }
-            print('ongoing called')
-            await consumer.send(text_data=json.dumps(ongoing_state_data))
-        else:
-            # Handle the case where the game is not running
-            await consumer.send(text_data=json.dumps({"type": "game_not_running"}))
+    
 
        
 
     async def run_game(self):
         print('run_game called')
-        self.game_running = True 
+        self.game_running = True
         game_id = await self.generate_unique_game_id()
         self.current_game_id = game_id
         print(f"Starting Game {game_id}")
@@ -105,20 +84,16 @@ class GameManager:
         self.generated_hash, self.server_seed, self.salt = server_seed_generator.get_generated_hash()
         self.crash_point = server_seed_generator.crash_point_from_hash()
         print(self.crash_point)
-        if len(self.temp_consumers) == 0:
-            print('game stopped')
-            await self.stop_game()
-            return
-        for consumer in self.temp_consumers:
-            print(consumer)
+       
          
 
         
         print('15 seconds should start counting from here')
-        await self.bettingcashoutmanager.allow_betting_period(game_id, self.generated_hash, self.server_seed, self.salt, self.temp_consumers)
+        await self.bettingcashoutmanager.allow_betting_period(game_id, self.generated_hash, self.server_seed, self.salt)
 
         print('back after 15 seconds')
         await self.notify_users_game_start(game_id)
+        self.game_multiplier = asyncio.create_task(self.update_game_state_in_cache())
         await self.game_logic()
     async def notify_users_game_start(self, game_id):
         
@@ -142,6 +117,7 @@ class GameManager:
         count = 1
         await self.bettingcashoutmanager.open_cashout_window()
         await self.send_instruction({"type": "count_update", "count": 'countofron'})
+        
         while count <= self.crash_point:
            
             
@@ -149,6 +125,7 @@ class GameManager:
             count += update_interval
             countofron = round(count, 2)
             self.current_multiplier = countofron
+            
             
             # Send count data to consumers
            
@@ -159,27 +136,32 @@ class GameManager:
         print(f"Crash occurred at {self.crash_point} seconds")
 
         # Wait for 5 seconds before running again
-        self.game_running = False
+        
         await asyncio.sleep(5)
-        await self.run_game()
-
-    async def stop_game(self):
         self.game_running = False
+        await self.run_game()
+        await self.game_multiplier
+
+    async def update_game_state_in_cache(self):
+        print('update cache called')
+        while self.game_running:
+                # Update and cache the game state here
+                cache.set('game_multiplier', self.current_multiplier, timeout=1)
+                await asyncio.sleep(0.1)  # Adjust the update frequency as needed
+
                       
     async def send_instruction(self, instruction):
-        tasks = [self.safe_send_instruction(consumer, instruction) for consumer in self.temp_consumers]
-        await asyncio.gather(*tasks)
+        channel_layer = get_channel_layer()
+        await channel_layer.group_send(
+            "realtime_group",
+            {
+                "type": "game.update",
+                "data": instruction,
+            }
+        )
+        
 
-    async def safe_send_instruction(self, consumer, instruction):
-    
-        try:
-               
-            await consumer.send(text_data=json.dumps(instruction))
-        except autobahn.exception.Disconnected:
-            print('exception')
-            await consumer.disconnect()
-            await consumer.close()
-            raise channels.exceptions.StopConsumer
+  
 
 
         
@@ -207,8 +189,7 @@ class BettingCashoutManager:
     def __init__(self):
         self.betting_window_key = 'betting_window_state'
         self.cashout_window_key = 'cashout_window_state'
-        self.temp_consumers = [] 
-        
+       
      
 
     @database_sync_to_async
@@ -244,9 +225,8 @@ class BettingCashoutManager:
         else:
             cache.set(self.cashout_window_key, is_open, timeout=3600)
 
-    async def allow_betting_period(self, game_id, generated_hash, server_seed, salt, temp_consumers):
-        for consumer in temp_consumers:
-            self.temp_consumers.append(consumer)
+    async def allow_betting_period(self, game_id, generated_hash, server_seed, salt):
+       
         
         await self.update_game_id(game_id, generated_hash, server_seed, salt)
         cache.set('game_id', game_id, timeout=3600)
@@ -264,26 +244,16 @@ class BettingCashoutManager:
         await self.set_window_state(CashoutWindow, False)
     
     async def send_instruction(self, instruction):
-        tasks = [self.safe_send_instruction(consumer, instruction) for consumer in self.temp_consumers]
-        await asyncio.gather(*tasks)
+            channel_layer = get_channel_layer()
+            await channel_layer.group_send(
+                "realtime_group",
+                {
+                    "type": "game.update",
+                    "data": instruction,
+                }
+            )
 
     
-    async def safe_send_instruction(self, consumer, instruction):
     
-        try:
-               
-            await consumer.send(text_data=json.dumps(instruction))
-        except autobahn.exception.Disconnected:
-            print('exception')
-            await consumer.disconnect()
-            await consumer.close()
-            raise channels.exceptions.StopConsumer
-
-    async def remove_consumer(self, consumer):
-        try:
-            
-            self.temp_consumers.remove(consumer)
-            print(consumer, 'removed from betcashoutmanager')
-        except ValueError:
-            print(consumer, 'not found in temp_consumers')
-            return
+          
+    

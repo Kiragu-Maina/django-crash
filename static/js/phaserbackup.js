@@ -117,11 +117,7 @@ class Example extends Phaser.Scene
                                 if (tween) {
                                     tween.stop();
                                 }
-                                if (counterText) {
-                                    counterText.destroy();
-                                }
-                                graph.clear();
-                                rt.clear();      
+                                
                                 crashInstructionProcessed = false;
                                 cashoutclicked = false;
                                 game_id = data.game_id
@@ -252,13 +248,11 @@ class Example extends Phaser.Scene
                             console.log('cashed_out at: ', cashOutValue);// Extract and parse the value
                             const betForm = document.getElementById("bet-form");
                             // Send the cashOutValue to the server using an API call
-                           
-                            const formdata = {'type':'cashout_validate', 'multiplier':cashOutValue, 'game_id':game_id}
-
-                            
-                            const data = JSON.stringify(formdata)
-                            console.log(data)
-                            wsSocket.send(data)
+                            const formData = new FormData();
+                            formData.append('type','cashout_validate' )
+                            formData.append('multiplier', cashOutValue);
+                            formData.append('game_id', game_id);
+                            wsSocket.send(JSON.stringify(formData))
 
                             // const csrfToken = betForm.querySelector('[name=csrfmiddlewaretoken]').value;
                                                 
