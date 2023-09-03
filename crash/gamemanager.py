@@ -207,7 +207,11 @@ class BettingCashoutManager:
         print('allow_betting called')
        
         
-        await self.update_game_id(game_id, generated_hash, server_seed, salt)
+        try:
+            await self.update_game_id(game_id, generated_hash, server_seed, salt)
+            print('update_game_id done')
+        except Exception as e:
+            print(f'Error calling update_game_id: {str(e)}')
         print('update_game_id done')
         cache.set('game_id', game_id, timeout=3600)
         print("game_id cache set")
