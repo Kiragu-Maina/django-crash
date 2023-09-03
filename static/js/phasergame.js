@@ -30,7 +30,7 @@ class Example extends Phaser.Scene
         async function main(scene) {
             try {
                 
-                const wsSocket = new WebSocket("ws://" + window.location.host + "/ws/realtime/");
+                const wsSocket = new WebSocket("wss://" + window.location.host + "/ws/realtime/");
                 let isCrashTriggered = false; 
                 let tween;
                 graphics.strokeLineShape(horizontalLine);
