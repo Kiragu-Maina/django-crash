@@ -64,7 +64,7 @@ pycparser==2.21
 PyJWT==2.8.0
 pyOpenSSL==23.2.0
 pytz==2023.3
-redis==4.6.0
+
 requests==2.31.0
 service-identity==23.1.0
 six==1.16.0
