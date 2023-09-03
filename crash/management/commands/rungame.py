@@ -23,15 +23,13 @@ class Command(BaseCommand):
             game_manager = GameManager.get_instance()
             # Initialize other necessary components or services here
 
-            while True:
-                # Run your game manager here
-                await game_manager.run_game()
-                # Optionally, you can add a delay here to control how often the game restarts
-                await asyncio.sleep(10)  # Adjust the delay as needed
+            
+            await game_manager.run_game()
+            # Optionally, you can add a delay here to control how often the game restarts
+            await asyncio.sleep(10)  # Adjust the delay as needed
 
         # Create an event loop and run your main function
-        loop = asyncio.get_event_loop()
-        loop.run_until_complete(main())
+        self.game_play = asyncio.create_task(main())
         
 
 

@@ -6,3 +6,5 @@ class MaiConfig(AppConfig):
     name = 'crash'
     def ready(self):
         from . import signals
+        
+        

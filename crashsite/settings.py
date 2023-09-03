@@ -118,6 +118,8 @@ CACHES = {
         },
     }
 }
+CELERY_BROKER_URL = f"redis://{REDISHOST}:{REDISPORT}"
+CELERY_RESULT_BACKEND = f"redis://{REDISHOST}:{REDISPORT}"
 AUTH_USER_MODEL = 'crash.User'
 # CACHES = {
 #     "default": {
