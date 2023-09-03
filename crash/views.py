@@ -32,24 +32,25 @@ from django.views.decorators.csrf import csrf_exempt
 
 from django.views import View
 import asyncio
-from .gamemanager import GameManager  # Import your GameManager module
+from channels.layers import get_channel_layer # Import your GameManager module
 
 @method_decorator(csrf_exempt, name='dispatch')
 class StartGameView(View):
 
     async def start_game(self):
-        game_manager = GameManager.get_instance()
-        # Initialize other necessary components or services here
-
-        while True:
-            # Run your game manager here
-            await game_manager.run_game()
-            # Optionally, you can add a delay here to control how often the game restarts
-            await asyncio.sleep(10)  # Adjust the delay as needed
+        
+        channel_layer = get_channel_layer()
+        await channel_layer.group_send(
+            "realtime_group",
+            {
+                "type": "start.game",
+                
+            }
+        )  # Adjust the delay as needed
 
     async def get(self, request, *args, **kwargs):
         # Start the game in the background
-        asyncio.create_task(self.start_game())
+        await self.start_game()
         
         # Return a response indicating that the game is running
         return JsonResponse({'status': 'Game is running in the background'})
