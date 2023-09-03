@@ -24,6 +24,35 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.db import transaction
 from decimal import Decimal
+# from .tasks import run_management_command
+from django.core.management import call_command
+# views.py
+
+from django.views.decorators.csrf import csrf_exempt
+
+from django.views import View
+import asyncio
+from .gamemanager import GameManager  # Import your GameManager module
+
+@method_decorator(csrf_exempt, name='dispatch')
+class StartGameView(View):
+
+    async def start_game(self):
+        game_manager = GameManager.get_instance()
+        # Initialize other necessary components or services here
+
+        while True:
+            # Run your game manager here
+            await game_manager.run_game()
+            # Optionally, you can add a delay here to control how often the game restarts
+            await asyncio.sleep(10)  # Adjust the delay as needed
+
+    async def get(self, request, *args, **kwargs):
+        # Start the game in the background
+        asyncio.create_task(self.start_game())
+        
+        # Return a response indicating that the game is running
+        return JsonResponse({'status': 'Game is running in the background'})
 
 
 
@@ -288,5 +317,22 @@ class DepositView(TemplateView):
     
 class WithdrawView(TemplateView):
     template_name = 'withdraw.html'
-
     
+class AdminView(TemplateView):
+    template_name = 'admin.html'
+    
+
+    def post(self, request, *args, **kwargs):
+        action = request.POST.get('action')
+
+        if action == 'start':
+            # Check if a task is already running
+            call_command('rungame')
+            print('started')
+            
+        elif action == 'stop':
+            call_command('run_game')
+
+        return render(request, self.template_name)
+
+  
