@@ -203,13 +203,16 @@ class BettingCashoutManager:
             cache.set(self.cashout_window_key, is_open, timeout=3600)
 
     async def allow_betting_period(self, game_id, generated_hash, server_seed, salt):
+        print('allow_betting called')
        
         
         await self.update_game_id(game_id, generated_hash, server_seed, salt)
         cache.set('game_id', game_id, timeout=3600)
         await self.set_window_state(BettingWindow, True)
+        print('caches set')
         for count in range(15, 0, -1):
             await self.send_instruction({"type": "count_initial", "count": count })
+            print('sent count start instructions')
             await asyncio.sleep(1)  # Allow betting for 15 seconds
         await self.set_window_state(BettingWindow, False)
 
@@ -221,7 +224,9 @@ class BettingCashoutManager:
         await self.set_window_state(CashoutWindow, False)
     
     async def send_instruction(self, instruction):
+            print('send_instruction called')
             channel_layer = get_channel_layer()
+            print('channel layer got')
             await channel_layer.group_send(
                 "realtime_group",
                 {
