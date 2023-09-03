@@ -64,7 +64,7 @@ INSTALLED_APPS = [
      "cloudinary_storage",
     "cloudinary", 
     'channels',
-    'django_eventstream',
+    
 
     
     
