@@ -177,6 +177,7 @@ class BettingCashoutManager:
         
     @database_sync_to_async
     def update_game_id(self, game_id, generated_hash, server_seed, salt):
+        print('database migration')
         try:
             
             game_instance = Games(game_id=game_id, hash = generated_hash, server_seed = server_seed, salt = salt )
@@ -207,7 +208,9 @@ class BettingCashoutManager:
        
         
         await self.update_game_id(game_id, generated_hash, server_seed, salt)
+        print('update_game_id done')
         cache.set('game_id', game_id, timeout=3600)
+        print("game_id cache set")
         await self.set_window_state(BettingWindow, True)
         print('caches set')
         for count in range(15, 0, -1):
