@@ -208,6 +208,7 @@ class BettingCashoutManager:
        
         
         try:
+            print('trying update_game_id')
             await self.update_game_id(game_id, generated_hash, server_seed, salt)
             print('update_game_id done')
         except Exception as e:
