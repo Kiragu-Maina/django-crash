@@ -321,18 +321,39 @@ class WithdrawView(TemplateView):
     
 class AdminView(TemplateView):
     template_name = 'admin.html'
-    
+    async def start_game(self):
+        
+        channel_layer = get_channel_layer()
+        await channel_layer.group_send(
+            "realtime_group",
+            {
+                "type": "start.game",
+                
+            }
+        )  # Adjust the delay as needed
 
-    def post(self, request, *args, **kwargs):
+     async def stop_game(self):
+        
+        channel_layer = get_channel_layer()
+        await channel_layer.group_send(
+            "realtime_group",
+            {
+                "type": "stop.game",
+                
+            }
+        )  # Adjust the delay as needed
+
+    async def post(self, request, *args, **kwargs):
         action = request.POST.get('action')
 
         if action == 'start':
             # Check if a task is already running
-            call_command('rungame')
+            await self.start_game()
             print('started')
-            
+    
         elif action == 'stop':
-            call_command('run_game')
+            await self.stop_game()
+            print('stopped')
 
         return render(request, self.template_name)
 
