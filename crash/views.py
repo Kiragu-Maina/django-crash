@@ -323,7 +323,7 @@ class WithdrawView(TemplateView):
 class AdminView(TemplateView):
     template_name = 'admin.html'
 
-    @async_to_sync
+   
     async def start_game(self):
         channel_layer = get_channel_layer()
         await channel_layer.group_send(
@@ -333,7 +333,7 @@ class AdminView(TemplateView):
             }
         )  # Adjust the delay as needed
 
-    @async_to_sync
+    
     async def stop_game(self):
         channel_layer = get_channel_layer()
         await channel_layer.group_send(
@@ -343,7 +343,7 @@ class AdminView(TemplateView):
             }
         )  # Adjust the delay as needed
 
-    @async_to_sync
+   
     async def post(self, request, *args, **kwargs):
         action = request.POST.get('action')
 
@@ -356,4 +356,11 @@ class AdminView(TemplateView):
             await self.stop_game()
             print('stopped')
 
+        return render(request, self.template_name)
+    
+    async def get(self, request, *args, **kwargs):
+        # Start the game in the background
+        
+        
+        # Return a response indicating that the game is running
         return render(request, self.template_name)
