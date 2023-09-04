@@ -227,11 +227,10 @@ class BettingCashoutManager:
         
        
         
-        try:
+        
+        await self.update_game_id(game_id, generated_hash, server_seed, salt)
             
-            await self.update_game_id(game_id, generated_hash, server_seed, salt)
-            
-        except Exception as e:
+        
            
         
         cache.set('game_id', game_id, timeout=3600)

@@ -332,7 +332,7 @@ class AdminView(TemplateView):
             }
         )  # Adjust the delay as needed
 
-     async def stop_game(self):
+    async def stop_game(self):
         
         channel_layer = get_channel_layer()
         await channel_layer.group_send(
