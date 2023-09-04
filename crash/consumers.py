@@ -32,11 +32,15 @@ class GameConsumer(AsyncWebsocketConsumer):
 
         await self.accept()
         self.game_manager = GameManager.get_instance()
+        cached_multiplier = cache.get('game_multiplier')
+        if cached_multiplier is not None:
+        # Send the cached_multiplier to the connected user
+            await self.send(text_data=json.dumps({
+                'type': 'ongoing_synchronizer',
+                'cached_multiplier': cached_multiplier
+            }))
         
-        # Start the heartbeat mechanism
-         # Start the heartbeat mechanism as a concurrent task
-        # self.heartbeat_task = asyncio.create_task(self.heartbeat())
-        # self.game_play = asyncio.create_task(self.game_manager.add_consumer(self))
+   
     
     async def heartbeat(self):
         print('heartbeat called')

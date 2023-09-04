@@ -30,7 +30,7 @@ class Example extends Phaser.Scene
         async function main(scene) {
             try {
                 
-                const wsSocket = new WebSocket("wss://" + window.location.host + "/ws/realtime/");
+                const wsSocket = new WebSocket("ws://" + window.location.host + "/ws/realtime/");
                 let isCrashTriggered = false; 
                 let tween;
                 graphics.strokeLineShape(horizontalLine);
@@ -53,7 +53,7 @@ class Example extends Phaser.Scene
                 const rect = scene.add.rectangle(100, 400, 2, 2, 0x00ff00);
                 const rt = scene.add.renderTexture(400, 300, 800, 600);
                 // const counterText = scene.add.dynamicBitmapText(400, 200, 'desyrel', '0.00').setOrigin(0.5, 0);
-                const crashText = scene.add.dynamicBitmapText(400, 200, 'desyrel', '0.00').setOrigin(0.5, 0);
+                const crashText = scene.add.dynamicBitmapText(400, 200, 'desyrel', '').setOrigin(0.5, 0);
                 
                 let crashInstructionProcessed = false;
                 let countAndDisplayTimer;   
@@ -61,6 +61,7 @@ class Example extends Phaser.Scene
                 const delayTime = 10;    
                 let counterText;
                 let countdownText;
+                let bet_allowed_text;
                 let cashoutclicked = false;
                
                 
@@ -74,20 +75,22 @@ class Example extends Phaser.Scene
                 
                 rect.setPosition(100, 500);
                 wsSocket.onmessage = async function (e) {
+                    if(loading_game){
+                        loading_game.destroy();}
                         const data = JSON.parse(e.data);
                         
                         if (data.type == "ongoing_synchronizer") {
                             // Use the current multiplier to render the ongoing graph
-                            const currentMultiplier = data.currentMultiplier; // Assuming the currentMultiplier is provided in the data
+                            const currentMultiplier = data.cached_multiplier; // Assuming the currentMultiplier is provided in the data
                             // Use currentMultiplier to render the ongoing graph
-                            
+                            console.log('ongoing synchronizer');
                             countAndDisplayOngoing(currentMultiplier);
-                            if (counterText) {
-                                counterText.destroy();
-                            }
-                            if (crashText) {
-                                crashText.destroy();
-                            }
+                            // if (counterText) {
+                            //     counterText.destroy();
+                            // }
+                            // if (crashText) {
+                            //     crashText.destroy();
+                            // }
                             console.log(data)
                         }
                          
@@ -121,6 +124,9 @@ class Example extends Phaser.Scene
                                 if (counterText) {
                                     counterText.destroy();
                                 }
+                                if (bet_allowed_text) {
+                                    bet_allowed_text.destroy();
+                                }
                                 graph.clear();
                                 rt.clear();      
                                 crashInstructionProcessed = false;
@@ -142,6 +148,7 @@ class Example extends Phaser.Scene
                             if (countdownText) {
                                 countdownText.destroy();
                             }
+                            
                             if (tween) {
                                 tween.stop();
                             }
@@ -163,6 +170,9 @@ class Example extends Phaser.Scene
                             if (countdownText) {
                                 countdownText.destroy();
                             }
+                            if (bet_allowed_text) {
+                                bet_allowed_text.destroy();
+                            }
                             countAndDisplay();
 
 
@@ -175,23 +185,31 @@ class Example extends Phaser.Scene
                         }
                     }
                     async function countAndDisplayInitial(count){
-                        countdownText = scene.add.dynamicBitmapText(400, 300, 'desyrel', '0.00').setOrigin(0.5, 0);
-                        bet_allowed_text = scene.add.dynamicBitmapText(400, 200, 'desyrel', '0.00').setOrigin(0.5, 0);
-                        
-                        if (count<= 5){
+                        if(bet_allowed_text){
                             
-
-                           if (bet_allowed_text){
                             bet_allowed_text.destroy();
-                           }
-                            countdownText.setText(`Game starts in ${count}`);
-
+                               
                         }
-                        else if(count>5){
-                            countdownText.setText(`Game starts in ${count}`);
+                        if (counterText) {
+                            counterText.destroy();
+                        }
+                        countdownText = scene.add.dynamicBitmapText(400, 300, 'desyrel', '').setOrigin(0.5, 0);
+                        bet_allowed_text = scene.add.dynamicBitmapText(400, 200, 'desyrel', '').setOrigin(0.5, 0);
+                        countdownText.setText(`Game starts in ${count}`);
+                       
+                        if(count>5){
+                            
                             bet_allowed_text.setText('Place your bet');
                                
                         }
+                        else {
+                            if(bet_allowed_text){
+                            
+                                bet_allowed_text.destroy();
+                                   
+                            }
+                        }
+
                         
                     
                         
@@ -226,6 +244,7 @@ class Example extends Phaser.Scene
                     }
                    
                     async function countAndDisplayOngoing(multiplier) {
+                        console.log('countAndDisplay Ongoing called')
                         if (counterText) {
                             counterText.destroy();
                         }
@@ -234,7 +253,8 @@ class Example extends Phaser.Scene
                         const updateInterval = 0.01;
                         const crashPoint = 1000000; // Adjust this value as needed
                         counterText = scene.add.dynamicBitmapText(400, 200, 'desyrel').setOrigin(0.5, 0);
-                        
+                        bet_allowed_text = scene.add.dynamicBitmapText(400, 300, 'desyrel', '').setOrigin(0.5, 0);
+                        bet_allowed_text.setText(' Ongoing game,\n Wait for new game');
                         
                             let count = multiplier;
                             while (count <= crashPoint) {
@@ -243,7 +263,7 @@ class Example extends Phaser.Scene
                                 const counted = Math.round(count * 100) / 100;
                                  // Assuming you have a context with 'self' available
                                 counterText.setText('x' + counted);
-                                await updateCashoutButtonText(counterText); 
+                                 
                             }
                           
                         
@@ -267,7 +287,11 @@ class Example extends Phaser.Scene
                         if (counterText) {
                             counterText.destroy();
                         }
-                       
+                        if(bet_allowed_text){
+                            
+                            bet_allowed_text.destroy();
+                               
+                        }
                         const delay = 100;  // Delay in milliseconds
                         const updateInterval = 0.01;
                         const crashPoint = 1000000; // Adjust this value as needed

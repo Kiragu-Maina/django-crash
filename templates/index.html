@@ -64,13 +64,14 @@
 <body class="g-sidenav-show   bg-gray-100">
  
   <div id="ex1" class="modal">
-    {% if error_message %}
-    <p class="error">{{ error_message }}</p>
-    {% endif %}
+  
     
     <div class="card card-plain">
+      
       <div class="card-header pb-0 text-start">
+        
         <h4 class="font-weight-bolder">Sign In</h4>
+        <p id="error1" style="color: red"></p>
         <p class="mb-0">Enter your phone_number and password to sign in</p>
       </div>
       <div class="card-body">
@@ -93,6 +94,7 @@
           Don't have an account?
           <p><a href="#ex2" class="text-primary text-gradient font-weight-bold" rel="modal:open">Register</a></p>
         </p>
+
       </div>
     </div>
 
@@ -103,13 +105,13 @@
   
   </div>
   <div id="ex2" class="modal">
-    {% if error_message %}
-    <p class="error">{{ error_message }}</p>
-    {% endif %}
+    
     
     <div class="card card-plain">
       <div class="card-header pb-0 text-start">
+        
         <h4 class="font-weight-bolder">Register</h4>
+        <p id="error2" style="color: red"></p>
         <p class="mb-0">Enter your email and password to sign in</p>
       </div>
       <div class="card-body">
@@ -618,14 +620,24 @@
                   data: data,
                   success: function (response) {
                       // Handle the response from the server, e.g., redirect or show a success message
+                      console.log('here');
                       console.log(response);
                       location.reload();
                       
                   },
                   error: function (xhr, status, error) {
                       // Handle errors, e.g., display an error message
-                      console.error(xhr.responseText);
-                      error.innerHTML = xhr.responseText;
+                      try {
+                        var errorResponse = JSON.parse(xhr.responseText);
+                        console.log(errorResponse)
+                        var errorMessage = errorResponse.errors.__all__[0];
+                        console.log(errorMessage);
+                        $("#error1").html(errorMessage);
+                      } catch (e) {
+                          // Handle JSON parsing error or other issues
+                          console.error(e);
+                          $("#error1").html("An error occurred.");
+                      }
                   }
               });
           });
@@ -659,9 +671,17 @@
                     
                 },
                 error: function (xhr, status, error) {
-                    // Handle errors, e.g., display an error message
-                    console.error(xhr.responseText);
-                    error.innerHTML = xhr.responseText;
+                    try {
+                      var errorResponse = JSON.parse(xhr.responseText);
+                      console.log(errorResponse)
+                      var errorMessage = errorResponse.errors.__all__[0];
+                      console.log(errorMessage);
+                      $("#error2").html(errorMessage);
+                    } catch (e) {
+                        // Handle JSON parsing error or other issues
+                        console.error(e);
+                        $("#error2").html("An error occurred.");
+                    }
                 }
             });
         });
