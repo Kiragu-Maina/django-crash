@@ -32,6 +32,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 from django.views import View
 import asyncio
+from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer # Import your GameManager module
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -321,28 +322,28 @@ class WithdrawView(TemplateView):
     
 class AdminView(TemplateView):
     template_name = 'admin.html'
+
+    @async_to_sync
     async def start_game(self):
-        
         channel_layer = get_channel_layer()
         await channel_layer.group_send(
             "realtime_group",
             {
                 "type": "start.game",
-                
             }
         )  # Adjust the delay as needed
 
+    @async_to_sync
     async def stop_game(self):
-        
         channel_layer = get_channel_layer()
         await channel_layer.group_send(
             "realtime_group",
             {
                 "type": "stop.game",
-                
             }
         )  # Adjust the delay as needed
 
+    @async_to_sync
     async def post(self, request, *args, **kwargs):
         action = request.POST.get('action')
 
@@ -356,5 +357,3 @@ class AdminView(TemplateView):
             print('stopped')
 
         return render(request, self.template_name)
-
-  
