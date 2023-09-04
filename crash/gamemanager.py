@@ -123,11 +123,28 @@ class GameManager:
         await self.game_multiplier
 
     async def update_game_state_in_cache(self):
-        print('update cache called')
+       
         while self.game_running:
                 # Update and cache the game state here
                 cache.set('game_multiplier', self.current_multiplier, timeout=1)
                 await asyncio.sleep(0.1)  # Adjust the update frequency as needed
+
+    async def send_multiplier_every_five(self):
+        print('update ongoing called')
+        channel_layer = get_channel_layer()
+        while self.game_running:
+            data = {"type":"ongoing_synchronizer",
+                    "data":self.current_multiplier}
+                
+            await channel_layer.group_send(
+                "realtime_group",
+                {
+                    "type": "game.update",
+                    "data": data,
+                }
+            )
+            await asyncio.sleep(5)
+
 
                       
     async def send_instruction(self, instruction):
