@@ -182,6 +182,9 @@ class GameConsumer(AsyncWebsocketConsumer):
         print('start_game called')
         self.game_play = asyncio.create_task(self.game_manager.run_game()) 
         # self.send(text_data=json.dumps(response_data))
+    async def stop_game(self, event):
+        print('stop_game called')
+        await self.game_manager.stop_game() 
     async def game_update(self, event):
         print('game update')
         updated_item = event['data']
