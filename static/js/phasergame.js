@@ -136,6 +136,9 @@ class Example extends Phaser.Scene
                             
                         }
                         else if (data.type == "count_initial"){
+                            if (loading_game) {
+                                loading_game.setText('');
+                            }
                             if (countdownText) {
                                 countdownText.destroy();
                             }
@@ -182,13 +185,13 @@ class Example extends Phaser.Scene
                         }
                         else if(count>5){
                             countdownText.setText(`Game starts in ${count}`);
-                            let text = scene.add.text(400, 28, 'Place your bet');
+                            let text = scene.add.text(400, 128, 'Place your bet');
                                 text.setColor('#00ff00').setFontSize(32).setShadow(2, 2).setOrigin(0.5, 0);
                                 
                                 // Schedule the text to be cleared after 5 minutes
                                 setTimeout(() => {
                                     text.destroy();
-                                }, 10000);
+                                }, 8000);
                         }
                         
                     
