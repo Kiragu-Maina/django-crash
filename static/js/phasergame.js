@@ -173,12 +173,31 @@ class Example extends Phaser.Scene
                     }
                     async function countAndDisplayInitial(count){
                         countdownText = scene.add.dynamicBitmapText(400, 300, 'desyrel', '0.00').setOrigin(0.5, 0);
-                        bet_allowed = scene.add.text(400, 28, 'Place your Bet. Game starts in the next 10s').setColor('#00ff00').setFontSize(32).setShadow(2, 2).setOrigin(0.5, 0);
+                        
                         if (count<= 5){
-                        countdownText.setText(`Game starts in ${count}`);
+                            
+
+                           
+                            countdownText.setText(`Game starts in ${count}`);
+                        }
+                        else if(count>5){
+                            countdownText.setText(`Game starts in ${count}`);
+                            let text = scene.add.text(400, 28, 'Place your bet');
+                                text.setColor('#00ff00').setFontSize(32).setShadow(2, 2).setOrigin(0.5, 0);
+                                
+                                // Schedule the text to be cleared after 5 minutes
+                                setTimeout(() => {
+                                    text.destroy();
+                                }, 10000);
+                        }
+                        
+                    
+                        
+                        
                         }
 
-                    }
+
+                    
                     async function startgame(wsSocket){
                         console.log('startgame called')
                             if (crashText) {

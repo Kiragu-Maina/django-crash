@@ -359,7 +359,7 @@ class AdminView(TemplateView):
         return render(request, self.template_name)
     
     async def get(self, request, *args, **kwargs):
-        # Start the game in the background
+       
         
         
         # Return a response indicating that the game is running
