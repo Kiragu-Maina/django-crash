@@ -38,7 +38,7 @@ class Example extends Phaser.Scene
 
                 graphics.lineStyle(2, 0xaa0000);
 
-                scene.add.text(400, 28, '').setColor('#00ff00').setFontSize(32).setShadow(2, 2).setOrigin(0.5, 0);
+                const loading_game = scene.add.text(400, 28, 'Game loading....').setColor('#00ff00').setFontSize(32).setShadow(2, 2).setOrigin(0.5, 0);
                 
 
                 const types = [ 'sinu.in' ];
@@ -81,7 +81,7 @@ class Example extends Phaser.Scene
                             const currentMultiplier = data.currentMultiplier; // Assuming the currentMultiplier is provided in the data
                             // Use currentMultiplier to render the ongoing graph
                             
-                            countAndDisplay(currentMultiplier);
+                            countAndDisplayOngoing(currentMultiplier);
                             if (counterText) {
                                 counterText.destroy();
                             }
@@ -113,7 +113,8 @@ class Example extends Phaser.Scene
 
                         } else if (data.type == "start_synchronizer") {
                             // Start the synchronizer countdown
-                            
+                                if(loading_game){
+                                    loading_game.destroy();}
                                 if (tween) {
                                     tween.stop();
                                 }
@@ -172,7 +173,10 @@ class Example extends Phaser.Scene
                     }
                     async function countAndDisplayInitial(count){
                         countdownText = scene.add.dynamicBitmapText(400, 300, 'desyrel', '0.00').setOrigin(0.5, 0);
+                        bet_allowed = scene.add.text(400, 28, 'Place your Bet. Game starts in the next 10s').setColor('#00ff00').setFontSize(32).setShadow(2, 2).setOrigin(0.5, 0);
+                        if (count<= 5){
                         countdownText.setText(`Game starts in ${count}`);
+                        }
 
                     }
                     async function startgame(wsSocket){
@@ -200,12 +204,49 @@ class Example extends Phaser.Scene
 
                     }
                    
+                    async function countAndDisplayOngoing(multiplier) {
+                        if (counterText) {
+                            counterText.destroy();
+                        }
+                       
+                        const delay = 100;  // Delay in milliseconds
+                        const updateInterval = 0.01;
+                        const crashPoint = 1000000; // Adjust this value as needed
+                        counterText = scene.add.dynamicBitmapText(400, 200, 'desyrel').setOrigin(0.5, 0);
+                        
+                        
+                            let count = multiplier;
+                            while (count <= crashPoint) {
+                                await new Promise(resolve => setTimeout(resolve, delay));
+                                count += updateInterval;
+                                const counted = Math.round(count * 100) / 100;
+                                 // Assuming you have a context with 'self' available
+                                counterText.setText('x' + counted);
+                                await updateCashoutButtonText(counterText); 
+                            }
+                          
+                        
+                        // Create a new counterText
+                        
                     
+                        // Set the text of the counterText
+                        
+                    
+                        
+                        
+                        
+                        
+                            
+                        
+                        
+                    
+                    }
                     async function countAndDisplay() {
                         // Destroy the existing counterText if it exists
                         if (counterText) {
                             counterText.destroy();
                         }
+                       
                         const delay = 100;  // Delay in milliseconds
                         const updateInterval = 0.01;
                         const crashPoint = 1000000; // Adjust this value as needed
