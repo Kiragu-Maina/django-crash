@@ -46,10 +46,10 @@ class GameManager:
 
     async def stop_game(self):
         self.game_play = False
-
-
-
-    
+        
+    async def start_game(self):
+        self.game_play = True
+        await self.run_game()
 
        
 
