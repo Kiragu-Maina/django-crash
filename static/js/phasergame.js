@@ -7,53 +7,69 @@ class Example extends Phaser.Scene
 
     preload ()
     {
-        this.load.setBaseURL('https://labs.phaser.io')
-
-        this.load.image('bg', 'assets/tweens/background.jpg');
+        this.load.image('balloon', balloon);
+        this.load.image('bg', space);
+        this.load.image('pumpUp', pumpup);
+        this.load.image('pumpDown', pumpdown);
         
-        this.load.bitmapFont('desyrel', 'assets/fonts/bitmap/desyrel.png', 'assets/fonts/bitmap/desyrel.xml');
+        this.load.image('popped', popped);
+       
+        
+        this.load.bitmapFont('desyrel', 'https://labs.phaser.io/assets/fonts/bitmap/desyrel.png', 'https://labs.phaser.io/assets/fonts/bitmap/desyrel.xml');
     }
 
    async create ()
     {
         
-    
+        
         console.log('create called');
         const scene = this;
+        let backg = scene.add.image(400, 300, 'bg');
 
-        const graphics = scene.add.graphics({ lineStyle: { width: 2, color: 0x00aa00 } });
-        const horizontalLine = new Phaser.Geom.Line(100, 500, 700, 500);
-        const verticalLine = new Phaser.Geom.Line(100, 500, 100, 100);
+        const loading_game = scene.add.text(400, 28, 'Game loading....').setColor('#00ff00').setFontSize(32).setShadow(2, 2).setOrigin(0.5, 0);
         
-        const counterLimit = 3.0;
+        
+        
        
         async function main(scene) {
             try {
                 
-                const wsSocket = new WebSocket("wss://" + window.location.host + "/ws/realtime/");
+                const wsSocket = new WebSocket("ws://" + window.location.host + "/ws/realtime/");
                 let isCrashTriggered = false; 
-                let tween;
-                graphics.strokeLineShape(horizontalLine);
-                graphics.strokeLineShape(verticalLine); 
-
-                graphics.lineStyle(2, 0xaa0000);
-
-                const loading_game = scene.add.text(400, 28, 'Game loading....').setColor('#00ff00').setFontSize(32).setShadow(2, 2).setOrigin(0.5, 0);
+             
+                // scene.add.sprite(400, 300, 'background').play('explodeAnimation');
                 
-
-                const types = [ 'sinu.in' ];
-                let type = 0;
-                // let tween;
-
-                
-
+                let currentImage = 'pumpUp'; // Start with 'pump up'
+                let balloonsTween = null;
+                let lightsTween = null;
                 const graph = scene.add.graphics();
-                graphics.lineGradientStyle(128, 0xff0000, 0xff0000, 0x0000ff, 0x0000ff, 1);
+                let delay = 200; // Delay in milliseconds (0.1 seconds)
+               
+        
+               
+        
+                const centerX = 400;
+                const centerY = 500;
+        
+                // Create a strong point line
+                const graphics = scene.add.graphics({ lineStyle: { width: 6, color: 0x0000ff  } });
+               
+               
+               
+               
+        
+        
+               
 
-                const rect = scene.add.rectangle(100, 400, 2, 2, 0x00ff00);
-                const rt = scene.add.renderTexture(400, 300, 800, 600);
+                
+
+                
+
+                
+                
+                
                 // const counterText = scene.add.dynamicBitmapText(400, 200, 'desyrel', '0.00').setOrigin(0.5, 0);
-                const crashText = scene.add.dynamicBitmapText(400, 200, 'desyrel', '').setOrigin(0.5, 0);
+                
                 
                 let crashInstructionProcessed = false;
                 let countAndDisplayTimer;   
@@ -61,6 +77,7 @@ class Example extends Phaser.Scene
                 const delayTime = 10;    
                 let counterText;
                 let countdownText;
+                let crashText;
                 let bet_allowed_text;
                 let cashoutclicked = false;
                
@@ -71,9 +88,14 @@ class Example extends Phaser.Scene
                 let start = true;
                 const betButton = document.getElementById("bet-button");
                 let game_id;
-               
-                
-                rect.setPosition(100, 500);
+                let balloons;
+                let light;
+                let poppedbackground;
+                let pump;
+                let Line;
+                let animationTimer;
+                let start_initial = true;
+
                 wsSocket.onmessage = async function (e) {
                     if(loading_game){
                         loading_game.destroy();}
@@ -90,16 +112,44 @@ class Example extends Phaser.Scene
                             // }
                             // if (crashText) {
                             //     crashText.destroy();
-                            // }
+                           // }
                             console.log(data)
                         }
                          
                         else if (data.type === "crash_instruction") {
                             // Handle crash instruction, e.g., trigger the crash action in the game
                             console.log(data)
+                            
                             const crashpoint = data.crash
+                            if (backg) {
+                                // Destroy the existing background image
+                                backg.destroy();
+                            }
+                            if (balloonsTween) {
+                                balloonsTween.stop(); // Stop the balloon animation
+                                balloonsTween = null; // Clear the tween reference
+                            }
+                            
+                            // Clear any balloons that might still be visible
+                            if (balloons) {
+                                balloons.clear(true, true);
+                            }
+                            if (animationTimer) {
+                                animationTimer.remove(); // Remove the timer
+                                animationTimer = null; // Clear the timer reference
+                            }
+                            if (pump){
+                                pump.destroy();
+                            }
+                            
+                            
+                            
+                        
+                            // Create a new background image with the new texture
+                            poppedbackground = scene.add.image(400, 300, 'popped');
+                            
                             // isCrashTriggered = true;
-                            CountingComplete(tween,graph, rect, rt, crashpoint);
+                            CountingComplete(crashpoint);
                             console.log('back to here');
                             if (typeof globalBetAmount !== 'undefined') {
                                 globalBetAmount = 0;
@@ -109,49 +159,58 @@ class Example extends Phaser.Scene
                             betButton.textContent = 'BET'
 
                             console.log('bet_amount reset');
-                            
+                            start_initial = true
                             
 
                             crashInstructionProcessed = true;
 
                         } else if (data.type == "start_synchronizer") {
                             // Start the synchronizer countdown
-                                if(loading_game){
-                                    loading_game.destroy();}
-                                if (tween) {
-                                    tween.stop();
-                                }
+                               
                                 if (counterText) {
                                     counterText.destroy();
                                 }
                                 if (bet_allowed_text) {
                                     bet_allowed_text.destroy();
                                 }
-                                graph.clear();
-                                rt.clear();      
+                                    
                                 crashInstructionProcessed = false;
                                 cashoutclicked = false;
+                                start = true;
                                 game_id = data.game_id
                                 console.log(game_id);
                                 console.log(data);
-                                startgame(wsSocket);
-                                // Assuming the count is provided in the data
+                                
+                               
+                                
                             
                         
                             
                             
                         }
                         else if (data.type == "count_initial"){
-                            if (loading_game) {
-                                loading_game.setText('');
+                            if (start_initial){
+                                start_initial = false;
+                                if (poppedbackground) {
+                                    // Destroy the existing background image
+                                    poppedbackground.destroy();
+                                }
+                                if (backg) {
+                                    // Destroy the existing background image
+                                    backg.destroy();
+                                }
+    
+                                backg = scene.add.image(400, 300, 'bg').setPipeline('Light2D');
+                                
+                                
+                                
                             }
+                            
                             if (countdownText) {
                                 countdownText.destroy();
                             }
                             
-                            if (tween) {
-                                tween.stop();
-                            }
+                           
                             if (crashText) {
                                 crashText.destroy();
                             }
@@ -167,6 +226,11 @@ class Example extends Phaser.Scene
                         }
                         
                         else if (data.type == "count_update"){
+                            if (start){
+                                start = false;
+                                
+                                startgame(scene);
+                            }
                             if (countdownText) {
                                 countdownText.destroy();
                             }
@@ -220,28 +284,135 @@ class Example extends Phaser.Scene
                     
                     async function startgame(wsSocket){
                         console.log('startgame called')
+                        pump = scene.add.image(650, 450, 'pumpUp');
+                        Line = new Phaser.Geom.Line(centerX-4, centerY-2, 638, 572);
+                        graphics.strokeLineShape(Line);
+                        // graphics.strokeLineShape(verticalLine);
+                
+                        // Start the animation
+                        
+                       
+                
+                        balloons = scene.add.group({ key: 'balloon', repeat: 50 });
+                
+                        balloons.getChildren().forEach((balloon) => {
+                            balloon.setOrigin(0.5, 1); // Set the anchor point to the bottom center
+                            balloon.setScale(0.1);
+                            balloon.x = centerX; // Set the initial x position to the center
+                            balloon.y = centerY+10; // Set the initial y position to the bottom
+                        });
+                
+                        
+                    
                             if (crashText) {
                                 crashText.destroy();
                             }
+                            
                             const cashoutButton = document.getElementById('cashout-button');
                             cashoutButton.disabled= false;
-                            // countdownText = scene.add.dynamicBitmapText(400, 300, 'desyrel', '0.00').setOrigin(0.5, 0);
-                            // console.log('countdownText created')
-                            // for (let countValue = countdown; countValue >= 0; countValue--) {
-                                
-                    
-                            //     countdownText.setText(`Game starts in ${countValue}`);
-                            //     await new Promise(resolve => setTimeout(resolve, 1000));
-                            // }
+                           
                             if (countdownText) {
                                 countdownText.destroy();
                             }
                             await cashout()
+                            // scene.add.sprite(400, 300, 'background').play('explodeAnimation');
+                            function animateImages() {
+                                // Switch between 'pumpUp' and 'pumpDown'
+                                currentImage = currentImage === 'pumpUp' ? 'pumpDown' : 'pumpUp';
+
+                                // Display the current image
+                                pump.setTexture(currentImage);
+
+                                // Set a timer to call this function again after the delay
+                                animationTimer = scene.time.delayedCall(delay, animateImages, [], scene);
+                            }
+
+                            animateImages.call(scene);
+                             // Create a promise for each animation
+                             const balloonsAnimationPromise = animateBalloons();
+                             const lightsAnimationPromise = animateLights();
+ 
+                             // Wait for both animations to complete before continuing
+                             await Promise.all([balloonsAnimationPromise, lightsAnimationPromise]);
+
+                        }
+
+                        async function animateBalloons() {
+                            const duration = 500000; // Set the desired animation duration in milliseconds
+                            
+                            // Your balloon animation code here...
+                            balloonsTween = scene.tweens.add({
+                                targets: balloons.getChildren(),
+                                scaleX: 2,
+                                scaleY: 2,
+                                radius: 228,
+                                ease: 'Quintic.easeOut',
+                                duration: duration, // Use the specified duration
+                                yoyo: true,
+                                repeat: -1,
+                                onUpdate: function () {
+                                    // Update the x and y positions based on the new scale
+                                    balloons.getChildren().forEach((balloon) => {
+                                        balloon.x = centerX;
+                                        balloon.y = centerY;
+                                    });
+                                },
+                                onComplete: function () {
+                                    // Resolve the promise when the animation is done
+                                    resolve();
+                                }
+                            });
                         
-                            drawgraph(scene, wsSocket);
-
-
-                    }
+                            return new Promise((resolve) => {});
+                        }
+                        
+                        async function animateLights() {
+                            const duration = 5000; // Set the desired animation duration in milliseconds
+                            
+                            // Your light animation code here...
+                            scene.lights.enable().setAmbientColor(0x555555);
+                        
+                            const hsv = Phaser.Display.Color.HSVColorWheel();
+                        
+                            const radius = 80;
+                            const intensity = 6;
+                            let x = radius;
+                            let y = 0;
+                        
+                            //  To change the total number of lights see the Game Config object
+                            const maxLights = 20;
+                        
+                            //  Create a bunch of lights
+                            for (let i = 0; i < maxLights; i++) {
+                                const color = hsv[i * 10].color;
+                        
+                                light = scene.lights.addLight(x, y, radius, color, intensity);
+                        
+                                lightsTween = scene.tweens.add({
+                                    targets: light,
+                                    y: 600,
+                                    yoyo: true,
+                                    repeat: -1,
+                                    ease: 'Sine.easeInOut',
+                                    duration: duration, // Use the specified duration
+                                    delay: i * 100,
+                                    onComplete: function () {
+                                        // Resolve the promise when the animation is done
+                                        resolve();
+                                    }
+                                });
+                        
+                                x += radius * 2;
+                        
+                                if (x > 800) {
+                                    x = radius;
+                                    y += radius;
+                                }
+                            }
+                        
+                            return new Promise((resolve) => {});
+                        }
+                        
                    
                     async function countAndDisplayOngoing(multiplier) {
                         console.log('countAndDisplay Ongoing called')
@@ -267,12 +438,7 @@ class Example extends Phaser.Scene
                             }
                           
                         
-                        // Create a new counterText
-                        
-                    
-                        // Set the text of the counterText
-                        
-                    
+                 
                         
                         
                         
@@ -309,14 +475,6 @@ class Example extends Phaser.Scene
                             }
                           
                         
-                        // Create a new counterText
-                        
-                    
-                        // Set the text of the counterText
-                        
-                    
-                        
-                        
                         
                         
                             
@@ -346,27 +504,7 @@ class Example extends Phaser.Scene
                             console.log(data)
                             wsSocket.send(data)
 
-                            // const csrfToken = betForm.querySelector('[name=csrfmiddlewaretoken]').value;
-                                                
-                            // fetch('/cashout/', {
-                            //     method: 'POST',
-                            //     headers: {
-                            //         'X-CSRFToken': csrfToken // Make sure to define csrfToken
-                            //     },
-                            //     body: formData
-                            // })
-                            // .then(response => response.json())
-                            // .then(data => {
-                            //     console.log('data sent', data);
-                            //     cashoutButton.textContent = 'CASH OUT';
-                            //     cashoutButton.disabled = true;
-                                
-                            //     // Update the page content using the data received from the server
-                            //     // For example, update the user's balance or display a success message
-                            // })
-                            // .catch(error => {
-                            //     console.error('Error:', error);
-                            // });
+                           
                     }});
                     
                     }
@@ -387,79 +525,33 @@ class Example extends Phaser.Scene
                     }
                     
                         
-                    function CountingComplete(tween, graph, rect, rt, crashpoint) {
+                    function CountingComplete( crashpoint) {
                         
-                        if (tween) {
-                            tween.stop();
-                        }
+                        
                                 clearTimeout(countAndDisplayTimer);
                                 if (counterText) {
                                     counterText.destroy();
                                 }
-                                graph.clear();
-                                rt.clear();                                                        
-                            
-                                rect.setPosition(100, 500);
+                               
+                                
                                 
                                
                                 console.log('its the crashtexts font', crashpoint);
-                                let text = scene.add.text(400, 28, 'Crashed at x' + crashpoint);
-                                text.setColor('#00ff00').setFontSize(32).setShadow(2, 2).setOrigin(0.5, 0);
+                                crashText = scene.add.dynamicBitmapText(400, 200, 'desyrel').setOrigin(0.5, 0);
+                                crashText.setText('Popped at x' + crashpoint);
                                 
                                 // Schedule the text to be cleared after 5 minutes
                                 setTimeout(() => {
-                                    text.destroy();
+                                    crashText.destroy();
                                 }, 2000); // 5 minutes in milliseconds                          
      
 
                 }
                     function drawgraph(scene, wsSocket){
                         
-                        const newCrashPoint = 200;
-                        console.log("we're here", newCrashPoint);
-                        
-                       
-                        
-                        console.log("I think we crash here");
-                        // Update crash point value and re-render
-                        const crashPointValue = newCrashPoint;
-            
-                
-                        let stopValue = 600;
-                        
-
-                        if (stopValue==1){
-                            crashText.setText('Crashed at x' + stopValue.toFixed(2));
-                            setTimeout(() => {
-                                scene.scene.restart();;
-                            }, 5000);
-                            
-                        }
-                
+                                               
                 
                        
-                        // const cashOutButton = scene.add.text(400, 550, 'Cash Out', {
-                        //     color: '#ffffff',
-                        //     fontSize: 24,
-                        //     backgroundColor: '#FF0000',
-                        //     padding: {
-                        //         x: 10,
-                        //         y: 5,
-                        //     },
-                        // }).setOrigin(0.5).setInteractive();
-                        
-                            // Send a request to the server to cash out
-                            
-                        // cashOutButton.on('pointerdown', () => {
-                        //     // Send a request to the server to cash out
-                        //     const cashOutValue = parseFloat(counterText.text.substring(1)); // Extract and parse the value
-                        //     // Send the cashOutValue to the server using an API call, WebSocket, or any suitable method
-                        //     // Example using fetch:
-                        //     console.log(cashOutValue)
-                            
-                       
-                        // });
-                        
                         
                     
                                 
@@ -467,149 +559,17 @@ class Example extends Phaser.Scene
                         
                       
                       
-                        function CountingComplete () {
-                            tween.stop();
-                                    graph.clear();
-                                    rt.clear();
-                                    graph.clear();
-                                    
-                                
-                                    rect.setPosition(100, 500);
-                                    counterText.destroy();
-                                    crashText.setText('Crashed at x' + stopValue.toFixed(2));
-                                    // setTimeout(() => {
-                                    //     fetchNewCrashPointAndRender(scene);
-                                    // }, 5000);
-                        }
                         
                         
-                        
-                        
-                        function limits() {
-                            
-                            console.log('function limits called');
-                            console.log('stopValue',stopValue);
-                            
-                            let limitx = 600 - ((stopValue - 1) / 2) * 600;
-                            let limity = 400 - ((stopValue - 1) / 2) * 400;
-                            let progres =((stopValue - 1) / 2) * 700;
-                            let durationi = ((stopValue - 1) / 3) * 30000;
-                            console.log('limitx', limitx);
-                            
-                            // Ensure limity is not negative
-                            if (durationi > 60000) {
-                                durationi = 60000
-                            }
-                            if (limity < 0) {
-                                limity = 0;
-                            }
-                        
-                            // Ensure limitx is not negative
-                            if (limitx < 0) {
-                                limitx = 0;
-                            }
-                            
-                            return { limitx, limity, progres, durationi};
-                        }
                  
 
-                        const graphEase  = () => {
-                            console.log('graphEase called');
-                            
-                            crashText.destroy()
-                           
-                            const { limitx, limity, progres, durationi } = limits();
-                            if (tween) {
-                                tween.stop();
-                            }
 
-                            rt.clear();
-                            graph.clear();
-                            graph.lineStyle(1, 0x00ff00);
-                            graphics.lineGradientStyle(6, 0xffff00, 0xff00ff, 0xff0000, 0x0000ff, 1);
-                            graph.beginPath();
 
-                            rect.setPosition(100, 500);
-
-                            tween = scene.tweens.add({
-                                targets: rect,
-                                x: { value: 700 - limitx, ease: 'expo' },
-                                y: { value: 100 + limity, ease: types[type] },
-                                duration: durationi,
-                                onUpdate: (tween, target, key) => {
-                                    if (key === 'x') {
-                                        rt.draw(rect);
-                                        graph.lineTo(rect.x, rect.y);
-                                        
-                                        // Update the counter text based on tween progress
-                                        const progress1 = tween.getValue();
-                                        const progress2 = progress1-100;
-                                        const progress = progress1;
-                                        // console.log('progress',progress);
-                                        // const counterValue = ((progress / 700) * 3)+1;
-                                        // Calculate counter value based on stopValue
-                                        // counterText.setText('x'+ counterValue.toFixed(2));
-                                        
-                                        if (progress2 >= progres) { // Stop the tween when the progress reaches half (350) of the total duration
-                                            tween.stop();
-                                            graph.clear();
-                                            rt.clear();
-                                            graph.clear();
-                                            
-                                        
-                                            rect.setPosition(100, 500);
-                                            counterText.destroy();
-                                            // crashText.setText('Crashed at x' + counterValue.toFixed(2));
-                                        }
                         
-                                    }
-                                },
-                            
-                                onComplete: () => {
-                                    graph.stroke();
-                                    tween.stop();
-                                    
-                                
-                                }
-                            });
-                        }
-
-
-                        graphEase();
             
                     }
                    
-                    // function CountingComplete(tween,graph, rect, rt, counterText, crashText, crashpoint) {
-                    //     WebFont.load({
-                    //         google: {
-                    //             families: ['Droid Sans']
-                    //           },
-                    //         active: function () {
-                    //             if (tween) {
-                    //                 tween.stop();
-                    //             }
-                    //                     graph.clear();
-                    //                     rt.clear();
-                                        
-                                        
-                                    
-                    //                     rect.setPosition(100, 500);
-                    //                     counterText.destroy();
-                    //                     console.log('its the crashtexts font');
-                    //                     crashText.setText('Crashed at x' + crashpoint.toFixed(2));
-                    //                     scene.scene.restart();
-                                       
-                            
-                    //           // Your code when fonts are loaded
-                    //         },
-                    //         inactive: function () {
-                    //             console.log('inactive');
-                    //           // Your code when fonts failed to load
-                    //         }
-                    //       });
-
-                    //     }
-                          
+                   
                          
                        
                     
