@@ -24,6 +24,37 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.db import transaction
 from decimal import Decimal
+# from .tasks import run_management_command
+from django.core.management import call_command
+# views.py
+
+from django.views.decorators.csrf import csrf_exempt
+
+from django.views import View
+import asyncio
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer # Import your GameManager module
+
+@method_decorator(csrf_exempt, name='dispatch')
+class StartGameView(View):
+
+    async def start_game(self):
+        
+        channel_layer = get_channel_layer()
+        await channel_layer.group_send(
+            "realtime_group",
+            {
+                "type": "start.game",
+                
+            }
+        )  # Adjust the delay as needed
+
+    async def get(self, request, *args, **kwargs):
+        # Start the game in the background
+        await self.start_game()
+        
+        # Return a response indicating that the game is running
+        return JsonResponse({'status': 'Game is running in the background'})
 
 
 
@@ -288,5 +319,48 @@ class DepositView(TemplateView):
     
 class WithdrawView(TemplateView):
     template_name = 'withdraw.html'
+    
+class AdminView(TemplateView):
+    template_name = 'admin.html'
+
+   
+    async def start_game(self):
+        channel_layer = get_channel_layer()
+        await channel_layer.group_send(
+            "realtime_group",
+            {
+                "type": "start.game",
+            }
+        )  # Adjust the delay as needed
 
     
+    async def stop_game(self):
+        channel_layer = get_channel_layer()
+        await channel_layer.group_send(
+            "realtime_group",
+            {
+                "type": "stop.game",
+            }
+        )  # Adjust the delay as needed
+
+   
+    async def post(self, request, *args, **kwargs):
+        action = request.POST.get('action')
+
+        if action == 'start':
+            # Check if a task is already running
+            await self.start_game()
+            print('started')
+    
+        elif action == 'stop':
+            await self.stop_game()
+            print('stopped')
+
+        return render(request, self.template_name)
+    
+    async def get(self, request, *args, **kwargs):
+       
+        
+        
+        # Return a response indicating that the game is running
+        return render(request, self.template_name)

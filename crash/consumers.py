@@ -14,7 +14,7 @@ from asgiref.sync import async_to_sync
 from django.db import transaction
 from decimal import Decimal
 from django.core.cache import cache
-
+from .gamemanager import GameManager
 
 class GameConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -31,12 +31,16 @@ class GameConsumer(AsyncWebsocketConsumer):
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)
 
         await self.accept()
-        # self.game_manager = game_manager_instance
+        self.game_manager = GameManager.get_instance()
+        cached_multiplier = cache.get('game_multiplier')
+        if cached_multiplier is not None:
+        # Send the cached_multiplier to the connected user
+            await self.send(text_data=json.dumps({
+                'type': 'ongoing_synchronizer',
+                'cached_multiplier': cached_multiplier
+            }))
         
-        # Start the heartbeat mechanism
-         # Start the heartbeat mechanism as a concurrent task
-        # self.heartbeat_task = asyncio.create_task(self.heartbeat())
-        # self.game_play = asyncio.create_task(self.game_manager.add_consumer(self))
+   
     
     async def heartbeat(self):
         print('heartbeat called')
@@ -178,8 +182,13 @@ class GameConsumer(AsyncWebsocketConsumer):
                 
             }
         )
-        
+    async def start_game(self, event):
+        print('start_game called')
+        self.game_play = asyncio.create_task(self.game_manager.start_game()) 
         # self.send(text_data=json.dumps(response_data))
+    async def stop_game(self, event):
+        print('stop_game called')
+        await self.game_manager.stop_game() 
     async def game_update(self, event):
         print('game update')
         updated_item = event['data']
@@ -277,3 +286,4 @@ class BalanceUpdateConsumer(AsyncWebsocketConsumer):
         print('balance update')
         updated_item = event['data']
         await self.send(text_data=json.dumps(updated_item))
+

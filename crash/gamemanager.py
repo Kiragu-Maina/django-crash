@@ -26,6 +26,7 @@ class GameManager:
         self.is_first_user = True
         self.current_multiplier = 0
         self.game_running = False
+        self.game_play = True
        
         self.game_ids = set()
         self.current_game_id = None
@@ -43,35 +44,37 @@ class GameManager:
             cls.game_manager_instance = cls()
         return cls.game_manager_instance
 
-    
-
-
-
-    
+    async def stop_game(self):
+        self.game_play = False
+        
+    async def start_game(self):
+        self.game_play = True
+        await self.run_game()
 
        
 
     async def run_game(self):
         print('run_game called')
-        self.game_running = True
-        game_id = await self.generate_unique_game_id()
-        self.current_game_id = game_id
-        print(f"Starting Game {game_id}")
-        server_seed_generator = ServerSeedGenerator()
-        self.generated_hash, self.server_seed, self.salt = server_seed_generator.get_generated_hash()
-        self.crash_point = server_seed_generator.crash_point_from_hash()
-        print(self.crash_point)
-       
-         
-
-        
-        print('15 seconds should start counting from here')
-        await self.bettingcashoutmanager.allow_betting_period(game_id, self.generated_hash, self.server_seed, self.salt)
-
-        print('back after 15 seconds')
-        await self.notify_users_game_start(game_id)
-        self.game_multiplier = asyncio.create_task(self.update_game_state_in_cache())
-        await self.game_logic()
+        if self.game_play == True: 
+            self.game_running = True
+            game_id = await self.generate_unique_game_id()
+            self.current_game_id = game_id
+            print(f"Starting Game {game_id}")
+            server_seed_generator = ServerSeedGenerator()
+            self.generated_hash, self.server_seed, self.salt = server_seed_generator.get_generated_hash()
+            self.crash_point = server_seed_generator.crash_point_from_hash()
+            print(self.crash_point)
+           
+             
+    
+            
+            print('15 seconds should start counting from here')
+            await self.bettingcashoutmanager.allow_betting_period(game_id, self.generated_hash, self.server_seed, self.salt)
+    
+            print('back after 15 seconds')
+            await self.notify_users_game_start(game_id)
+            self.game_multiplier = asyncio.create_task(self.update_game_state_in_cache())
+            await self.game_logic()
     async def notify_users_game_start(self, game_id):
         
         await self.send_instruction({"type": "start_synchronizer", "game_id": game_id})
@@ -94,6 +97,8 @@ class GameManager:
         count = 1
         await self.bettingcashoutmanager.open_cashout_window()
         await self.send_instruction({"type": "count_update", "count": 'countofron'})
+        # self.update_multiplier = asyncio.create_task(self.send_multiplier_every_five())
+        
         
         while count <= self.crash_point:
            
@@ -120,11 +125,28 @@ class GameManager:
         await self.game_multiplier
 
     async def update_game_state_in_cache(self):
-        print('update cache called')
+       
         while self.game_running:
                 # Update and cache the game state here
                 cache.set('game_multiplier', self.current_multiplier, timeout=1)
                 await asyncio.sleep(0.1)  # Adjust the update frequency as needed
+
+    # async def send_multiplier_every_five(self):
+    #     print('update ongoing called')
+    #     channel_layer = get_channel_layer()
+    #     while self.game_running:
+    #         data = {"type":"ongoing_synchronizer",
+    #                 "data":self.current_multiplier}
+                
+    #         await channel_layer.group_send(
+    #             "realtime_group",
+    #             {
+    #                 "type": "game.update",
+    #                 "data": data,
+    #             }
+    #         )
+    #         await asyncio.sleep(5)
+
 
                       
     async def send_instruction(self, instruction):
@@ -177,6 +199,7 @@ class BettingCashoutManager:
         
     @database_sync_to_async
     def update_game_id(self, game_id, generated_hash, server_seed, salt):
+        
         try:
             
             game_instance = Games(game_id=game_id, hash = generated_hash, server_seed = server_seed, salt = salt )
@@ -203,13 +226,22 @@ class BettingCashoutManager:
             cache.set(self.cashout_window_key, is_open, timeout=3600)
 
     async def allow_betting_period(self, game_id, generated_hash, server_seed, salt):
+        
        
         
+        
         await self.update_game_id(game_id, generated_hash, server_seed, salt)
+            
+        
+           
+        
         cache.set('game_id', game_id, timeout=3600)
+        
         await self.set_window_state(BettingWindow, True)
+        
         for count in range(15, 0, -1):
             await self.send_instruction({"type": "count_initial", "count": count })
+            
             await asyncio.sleep(1)  # Allow betting for 15 seconds
         await self.set_window_state(BettingWindow, False)
 
@@ -221,7 +253,9 @@ class BettingCashoutManager:
         await self.set_window_state(CashoutWindow, False)
     
     async def send_instruction(self, instruction):
+            
             channel_layer = get_channel_layer()
+            
             await channel_layer.group_send(
                 "realtime_group",
                 {
