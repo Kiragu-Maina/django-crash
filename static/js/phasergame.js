@@ -37,7 +37,7 @@ class Example extends Phaser.Scene
         async function main(scene) {
             try {
                 
-                const wsSocket = new WebSocket("ws://" + window.location.host + "/ws/realtime/");
+                const wsSocket = new WebSocket("wss://" + window.location.host + "/ws/realtime/");
                 // const wsSocket = new WebSocket('ws://'
                 // + window.location.host
                 // + '/ws/real_time_updates/'
@@ -220,7 +220,7 @@ class Example extends Phaser.Scene
 
                         }
                         groupSocket = new WebSocket(
-                                'ws://'
+                                'wss://'
                                 + window.location.host
                                 + '/ws/real_time_updates/'
                                 + roomName
