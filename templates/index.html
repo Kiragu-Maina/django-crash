@@ -180,6 +180,99 @@
       </div>
     </nav>
     <!-- End Navbar -->
+    <div id="ex1" class="modal">
+  
+    
+      <div class="card card-plain" style="width: auto; height: auto;">
+        
+        <div class="card-header pb-0 text-start">
+          
+          <h4 class="font-weight-bolder">Sign In</h4>
+          <p id="error1" style="color: red"></p>
+          <p class="mb-0">Enter your phone_number and password to sign in</p>
+        </div>
+        <div class="card-body">
+          <form id='login-form' role="form">
+            {% csrf_token %}
+            <div class="mb-3">
+              <input type="text" id = "phone_number1" class="form-control form-control-lg" placeholder="Phone Number" aria-label="Phone_number">
+            </div>
+            <div class="mb-3">
+              <input type="password" id = "password" class="form-control form-control-lg" placeholder="Password" aria-label="Password">
+            </div>
+           
+            <div class="text-center">
+              <button type="button" id="login-submit-btn" class="btn btn-lg btn-primary btn-lg w-100 mt-4 mb-0">Sign in</button>
+            </div>
+            <div id="spinner1" style="display: none;">
+              <!-- Add your spinner HTML or image here -->
+              <div class="spinner-border" role="status">
+                  <span class="sr-only">Loading...</span>
+              </div>
+          </div>
+          </form>
+        </div>
+        <div class="card-footer text-center pt-0 px-lg-2 px-1">
+          <p class="mb-4 text-sm mx-auto">
+            Don't have an account?
+            <p><a href="#ex2" class="text-primary text-gradient font-weight-bold" rel="modal:open">Register</a></p>
+          </p>
+  
+        </div>
+      </div>
+  
+    
+      
+      <a href="#" rel="modal:close">Close</a>
+      
+    
+    </div>
+    <div id="ex2" class="modal">
+      
+      
+      <div class="card card-plain">
+        <div class="card-header pb-0 text-start">
+          
+          <h4 class="font-weight-bolder">Register</h4>
+          <p id="error2" style="color: red"></p>
+          <p class="mb-0">Enter your email and password to sign in</p>
+        </div>
+        <div class="card-body">
+          <form id="register-form" role="form">
+            {% csrf_token %}
+            <div class="mb-3">
+              <input type="text" class="form-control" id = "user_name" name = "user_name" placeholder="Username" aria-label="Name">
+            </div>
+            <div class="mb-3">
+              <input type="text" class="form-control" id="phone_number2" name = "phone_number" placeholder="Phone_number" aria-label="phone_number">
+            </div>
+            <div class="mb-3">
+              <input type="password" class="form-control" id="password1" name="password1" placeholder="Password" aria-label="Password">
+            </div>
+            <div class="mb-3">
+              <input type="password" class="form-control" id="password2" name="password2" placeholder="Confirm Password" aria-label="Password">
+            </div>
+            
+            <div class="text-center">
+              <button type="button" id="register-submit-btn" class="btn bg-gradient-dark w-100 my-4 mb-2">Sign up</button>
+            </div>
+            <div id="spinner2" style="display: none;">
+              <!-- Add your spinner HTML or image here -->
+              <div class="spinner-border" role="status">
+                  <span class="sr-only">Loading...</span>
+              </div>
+          </div>
+            <p class="text-sm mt-3 mb-0">Already have an account? <p><a href="#ex1" class="text-primary text-gradient font-weight-bold" rel="modal:open">Log In</a></p>
+  
+          </form>
+        </div>
+      
+        
+      </div>
+    
+      
+      <a href="#" rel="modal:close">Close</a>
+    </div>
    
     <div class="container-fluid py-4">
       <div class="row mt-4">
@@ -389,99 +482,7 @@
       </div>
     </div>
   </div>
-  <div id="ex1" class="modal">
   
-    
-    <div class="card card-plain" style="width: auto; height: auto;">
-      
-      <div class="card-header pb-0 text-start">
-        
-        <h4 class="font-weight-bolder">Sign In</h4>
-        <p id="error1" style="color: red"></p>
-        <p class="mb-0">Enter your phone_number and password to sign in</p>
-      </div>
-      <div class="card-body">
-        <form id='login-form' role="form">
-          {% csrf_token %}
-          <div class="mb-3">
-            <input type="text" id = "phone_number1" class="form-control form-control-lg" placeholder="Phone Number" aria-label="Phone_number">
-          </div>
-          <div class="mb-3">
-            <input type="password" id = "password" class="form-control form-control-lg" placeholder="Password" aria-label="Password">
-          </div>
-         
-          <div class="text-center">
-            <button type="button" id="login-submit-btn" class="btn btn-lg btn-primary btn-lg w-100 mt-4 mb-0">Sign in</button>
-          </div>
-          <div id="spinner1" style="display: none;">
-            <!-- Add your spinner HTML or image here -->
-            <div class="spinner-border" role="status">
-                <span class="sr-only">Loading...</span>
-            </div>
-        </div>
-        </form>
-      </div>
-      <div class="card-footer text-center pt-0 px-lg-2 px-1">
-        <p class="mb-4 text-sm mx-auto">
-          Don't have an account?
-          <p><a href="#ex2" class="text-primary text-gradient font-weight-bold" rel="modal:open">Register</a></p>
-        </p>
-
-      </div>
-    </div>
-
-  
-    
-    <a href="#" rel="modal:close">Close</a>
-    
-  
-  </div>
-  <div id="ex2" class="modal">
-    
-    
-    <div class="card card-plain">
-      <div class="card-header pb-0 text-start">
-        
-        <h4 class="font-weight-bolder">Register</h4>
-        <p id="error2" style="color: red"></p>
-        <p class="mb-0">Enter your email and password to sign in</p>
-      </div>
-      <div class="card-body">
-        <form id="register-form" role="form">
-          {% csrf_token %}
-          <div class="mb-3">
-            <input type="text" class="form-control" id = "user_name" name = "user_name" placeholder="Username" aria-label="Name">
-          </div>
-          <div class="mb-3">
-            <input type="text" class="form-control" id="phone_number2" name = "phone_number" placeholder="Phone_number" aria-label="phone_number">
-          </div>
-          <div class="mb-3">
-            <input type="password" class="form-control" id="password1" name="password1" placeholder="Password" aria-label="Password">
-          </div>
-          <div class="mb-3">
-            <input type="password" class="form-control" id="password2" name="password2" placeholder="Confirm Password" aria-label="Password">
-          </div>
-          
-          <div class="text-center">
-            <button type="button" id="register-submit-btn" class="btn bg-gradient-dark w-100 my-4 mb-2">Sign up</button>
-          </div>
-          <div id="spinner2" style="display: none;">
-            <!-- Add your spinner HTML or image here -->
-            <div class="spinner-border" role="status">
-                <span class="sr-only">Loading...</span>
-            </div>
-        </div>
-          <p class="text-sm mt-3 mb-0">Already have an account? <p><a href="#ex1" class="text-primary text-gradient font-weight-bold" rel="modal:open">Log In</a></p>
-
-        </form>
-      </div>
-    
-      
-    </div>
-  
-    
-    <a href="#" rel="modal:close">Close</a>
-  </div>
 
   <script>
   var balloon = "{% static 'assets/balloon.png' %}";
@@ -632,7 +633,7 @@
  
     
   
-  <script src="{% static 'js/newphaser.js' %}"></script>
+  <script src="{% static 'js/phasergame.js' %}"></script>
   
   
   <script>
