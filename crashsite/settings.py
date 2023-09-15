@@ -40,7 +40,9 @@ DEBUG = False
 ALLOWED_HOSTS = ["*"]
 
 
-CSRF_TRUSTED_ORIGINS = ["https://django-crash-production.up.railway.app"]
+# CSRF_TRUSTED_ORIGINS = ["https://django-crash-production.up.railway.app"]
+CSRF_TRUSTED_ORIGINS = ["https://django-crash-testing.up.railway.app"]
+
 
 CORS_ALLOW_ALL_ORIGINS = False
 
