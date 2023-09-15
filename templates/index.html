@@ -16,6 +16,7 @@
   <!-- Font Awesome Icons -->
   <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
   
+  
   <!-- CSS Files -->
   <link id="pagestyle" href="{% static 'css/argon-dashboard.css' %}" rel="stylesheet" />
   
@@ -51,110 +52,16 @@
       /* Apply the 3x2 layout for medium and larger screens */
       
   }
-  #ex1.modal {
-    background: transparent;
-  }
-  #ex2.modal {
-    background: transparent;
-  }
+ 
+  
+
+ 
 </style>
 
 
 <body class="g-sidenav-show   bg-gray-100">
  
-  <div id="ex1" class="modal">
   
-    
-    <div class="card card-plain">
-      
-      <div class="card-header pb-0 text-start">
-        
-        <h4 class="font-weight-bolder">Sign In</h4>
-        <p id="error1" style="color: red"></p>
-        <p class="mb-0">Enter your phone_number and password to sign in</p>
-      </div>
-      <div class="card-body">
-        <form id='login-form' role="form">
-          {% csrf_token %}
-          <div class="mb-3">
-            <input type="text" id = "phone_number1" class="form-control form-control-lg" placeholder="Phone Number" aria-label="Phone_number">
-          </div>
-          <div class="mb-3">
-            <input type="password" id = "password" class="form-control form-control-lg" placeholder="Password" aria-label="Password">
-          </div>
-         
-          <div class="text-center">
-            <button type="button" id="login-submit-btn" class="btn btn-lg btn-primary btn-lg w-100 mt-4 mb-0">Sign in</button>
-          </div>
-          <div id="spinner1" style="display: none;">
-            <!-- Add your spinner HTML or image here -->
-            <div class="spinner-border" role="status">
-                <span class="sr-only">Loading...</span>
-            </div>
-        </div>
-        </form>
-      </div>
-      <div class="card-footer text-center pt-0 px-lg-2 px-1">
-        <p class="mb-4 text-sm mx-auto">
-          Don't have an account?
-          <p><a href="#ex2" class="text-primary text-gradient font-weight-bold" rel="modal:open">Register</a></p>
-        </p>
-
-      </div>
-    </div>
-
-  
-    
-    <a href="#" rel="modal:close">Close</a>
-    
-  
-  </div>
-  <div id="ex2" class="modal">
-    
-    
-    <div class="card card-plain">
-      <div class="card-header pb-0 text-start">
-        
-        <h4 class="font-weight-bolder">Register</h4>
-        <p id="error2" style="color: red"></p>
-        
-      </div>
-      <div class="card-body">
-        <form id="register-form" role="form">
-          {% csrf_token %}
-          <div class="mb-3">
-            <input type="text" class="form-control" id = "user_name" name = "user_name" placeholder="Username" aria-label="Name">
-          </div>
-          <div class="mb-3">
-            <input type="text" class="form-control" id="phone_number2" name = "phone_number" placeholder="Phone_number" aria-label="phone_number">
-          </div>
-          <div class="mb-3">
-            <input type="password" class="form-control" id="password1" name="password1" placeholder="Password" aria-label="Password">
-          </div>
-          <div class="mb-3">
-            <input type="password" class="form-control" id="password2" name="password2" placeholder="Confirm Password" aria-label="Password">
-          </div>
-          
-          <div class="text-center">
-            <button type="button" id="register-submit-btn" class="btn bg-gradient-dark w-100 my-4 mb-2">Sign up</button>
-          </div>
-          <div id="spinner2" style="display: none;">
-            <!-- Add your spinner HTML or image here -->
-            <div class="spinner-border" role="status">
-                <span class="sr-only">Loading...</span>
-            </div>
-        </div>
-          <p class="text-sm mt-3 mb-0">Already have an account? <p><a href="#ex1" class="text-primary text-gradient font-weight-bold" rel="modal:open">Log In</a></p>
-
-        </form>
-      </div>
-    
-      
-    </div>
-  
-    
-    <a href="#" rel="modal:close">Close</a>
-  </div>
   {{ room_name|json_script:"room-name" }}
   <div class="min-height-300 bg-primary position-absolute w-100"></div>
   <aside class="sidenav bg-white navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-4 " id="sidenav-main">
@@ -284,11 +191,35 @@
               </div>
               <div class="row">
                 <div class="col-md-8">
+              
               <div class="game-container" id="game-container"></div>
                 </div>
               
              
             <div class="col-md-4">
+              <p> Choose balloon: </p>
+              <div class="balloon-container">
+                
+                <!-- Balloon 1 -->
+                <div id="balloon1" class="balloon" onclick="handleBalloonClick('group_1')">
+                    <img src="{% static 'assets/balloon1.png' %}" alt="Balloon 1">
+                </div>
+    
+                <!-- Balloon 2 -->
+                <div id="balloon2" class="balloon" onclick="handleBalloonClick('group_2')">
+                    <img src="{% static 'assets/balloon2.png' %}" alt="Balloon 2">
+                </div>
+    
+                <!-- Balloon 3 -->
+                <div id="balloon3" class="balloon" onclick="handleBalloonClick('group_3')">
+                    <img src="{% static 'assets/balloon3.png' %}" alt="Balloon 3">
+                </div>
+    
+                <!-- Balloon 4 -->
+                <div id="balloon4" class="balloon" onclick="handleBalloonClick('group_4')">
+                    <img src="{% static 'assets/balloon4.png' %}" alt="Balloon 4">
+                </div>
+            </div>
               <form id="bet-form" method='post'>
                 {% csrf_token %}
                     
@@ -377,6 +308,13 @@
                   
                       const formData = new FormData();
                       formData.append('bet_amount', selectedAmountInput.value);
+                      if (window.roomName){
+                        formData.append('group_name', window.roomName);
+                      }
+                      else {
+                        formData.append('group_name', 'group_1');
+                      }
+                      
                       
                       const csrfToken = betForm.querySelector('[name=csrfmiddlewaretoken]').value;
                   
@@ -451,8 +389,106 @@
       </div>
     </div>
   </div>
-<script>
+  <div id="ex1" class="modal">
+  
+    
+    <div class="card card-plain" style="width: auto; height: auto;">
+      
+      <div class="card-header pb-0 text-start">
+        
+        <h4 class="font-weight-bolder">Sign In</h4>
+        <p id="error1" style="color: red"></p>
+        <p class="mb-0">Enter your phone_number and password to sign in</p>
+      </div>
+      <div class="card-body">
+        <form id='login-form' role="form">
+          {% csrf_token %}
+          <div class="mb-3">
+            <input type="text" id = "phone_number1" class="form-control form-control-lg" placeholder="Phone Number" aria-label="Phone_number">
+          </div>
+          <div class="mb-3">
+            <input type="password" id = "password" class="form-control form-control-lg" placeholder="Password" aria-label="Password">
+          </div>
+         
+          <div class="text-center">
+            <button type="button" id="login-submit-btn" class="btn btn-lg btn-primary btn-lg w-100 mt-4 mb-0">Sign in</button>
+          </div>
+          <div id="spinner1" style="display: none;">
+            <!-- Add your spinner HTML or image here -->
+            <div class="spinner-border" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
+        </form>
+      </div>
+      <div class="card-footer text-center pt-0 px-lg-2 px-1">
+        <p class="mb-4 text-sm mx-auto">
+          Don't have an account?
+          <p><a href="#ex2" class="text-primary text-gradient font-weight-bold" rel="modal:open">Register</a></p>
+        </p>
+
+      </div>
+    </div>
+
+  
+    
+    <a href="#" rel="modal:close">Close</a>
+    
+  
+  </div>
+  <div id="ex2" class="modal">
+    
+    
+    <div class="card card-plain">
+      <div class="card-header pb-0 text-start">
+        
+        <h4 class="font-weight-bolder">Register</h4>
+        <p id="error2" style="color: red"></p>
+        <p class="mb-0">Enter your email and password to sign in</p>
+      </div>
+      <div class="card-body">
+        <form id="register-form" role="form">
+          {% csrf_token %}
+          <div class="mb-3">
+            <input type="text" class="form-control" id = "user_name" name = "user_name" placeholder="Username" aria-label="Name">
+          </div>
+          <div class="mb-3">
+            <input type="text" class="form-control" id="phone_number2" name = "phone_number" placeholder="Phone_number" aria-label="phone_number">
+          </div>
+          <div class="mb-3">
+            <input type="password" class="form-control" id="password1" name="password1" placeholder="Password" aria-label="Password">
+          </div>
+          <div class="mb-3">
+            <input type="password" class="form-control" id="password2" name="password2" placeholder="Confirm Password" aria-label="Password">
+          </div>
+          
+          <div class="text-center">
+            <button type="button" id="register-submit-btn" class="btn bg-gradient-dark w-100 my-4 mb-2">Sign up</button>
+          </div>
+          <div id="spinner2" style="display: none;">
+            <!-- Add your spinner HTML or image here -->
+            <div class="spinner-border" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
+          <p class="text-sm mt-3 mb-0">Already have an account? <p><a href="#ex1" class="text-primary text-gradient font-weight-bold" rel="modal:open">Log In</a></p>
+
+        </form>
+      </div>
+    
+      
+    </div>
+  
+    
+    <a href="#" rel="modal:close">Close</a>
+  </div>
+
+  <script>
   var balloon = "{% static 'assets/balloon.png' %}";
+
+
+
+  
   var pumpdown = "{% static 'assets/pump1.png' %}";
   var pumpup = "{% static 'assets/pump2.png' %}";
   var space = "{% static 'assets/space.png' %}";
@@ -464,6 +500,7 @@
 
 
   </script>
+ 
   <!--   Core JS Files   -->
   <script>
   const body = document.getElementsByTagName('body')[0];
@@ -577,6 +614,9 @@
   
   
   </script>
+  <script type="text/javascript">
+    DJANGO_STATIC_URL = '{{ STATIC_URL }}';
+</script>
   
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
@@ -585,16 +625,14 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.css" />
  
-
- 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/phaser/3.60.0/phaser.min.js"></script>
 
   <script src="{% static 'js/updatehtml.js' %}"></script>
-  
+  <script src = "{% static 'js/phaserfourballoons.js' %}"></script>
  
     
-
-  <script src="{% static 'js/phasergame.js' %}"></script>
+  
+  <script src="{% static 'js/newphaser.js' %}"></script>
   
   
   <script>

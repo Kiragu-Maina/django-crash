@@ -14,8 +14,43 @@ from asgiref.sync import async_to_sync
 from django.db import transaction
 from decimal import Decimal
 from django.core.cache import cache
-from .gamemanager import GameManager
+from .tasks import start_game
 
+
+class RealtimeUpdatesConsumer(AsyncWebsocketConsumer):
+    async def connect(self):
+        
+        self.group_name = "realtime_group"
+        await self.channel_layer.group_add(self.group_name, self.channel_name)
+        await self.accept()
+        cached_multiplier = cache.get(f'group_1_game_multiplier')
+        if cached_multiplier is not None:
+        # Send the cached_multiplier to the connected user
+            await self.send(text_data=json.dumps({
+                'type': 'ongoing_synchronizer',
+                'cached_multiplier': cached_multiplier
+            }))
+        
+   
+
+    async def disconnect(self, close_code):
+        await self.channel_layer.group_discard(self.group_name, self.channel_name)
+        
+    async def realtime_update(self, event):
+        print('game new update')
+        updated_item = event['data']
+        await self.send(text_data=json.dumps(updated_item))
+        
+    async def restart_game(self, event):
+        print('restart_game called')
+        start_game.delay()
+       
+
+    
+
+    async def receive(self, text_data):
+        # Do nothing with received data
+        pass
 class GameConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         if self.scope["user"].is_anonymous:
@@ -25,58 +60,25 @@ class GameConsumer(AsyncWebsocketConsumer):
             self.username = self.scope["user"].user_name        
             print(f"User {self.username} connected to game room")
         
-        self.room_group_name = 'realtime_group'
+        self.group_name = self.scope['url_route']['kwargs']['group_name']
 
-        # Join room group
-        await self.channel_layer.group_add(self.room_group_name, self.channel_name)
-
+        # Add the user to the group
+        await self.channel_layer.group_add(
+            self.group_name,
+            self.channel_name
+        )        
         await self.accept()
-        self.game_manager = GameManager.get_instance()
-        cached_multiplier = cache.get('game_multiplier')
-        if cached_multiplier is not None:
-        # Send the cached_multiplier to the connected user
-            await self.send(text_data=json.dumps({
-                'type': 'ongoing_synchronizer',
-                'cached_multiplier': cached_multiplier
-            }))
+     
         
    
     
-    async def heartbeat(self):
-        print('heartbeat called')
-        while True:
-            response_received = asyncio.Event()
-
-            async def wait_for_response():
-                try:
-                    while not response_received.is_set():
-                        await self.receive_json()
-                        response_received.set()  # Set the event when response is received
-                except asyncio.TimeoutError:
-                    pass
-
-            response_task = asyncio.create_task(wait_for_response())
-
-            await asyncio.sleep(5)  # Wait for 5 seconds
-            await self.send(text_data=json.dumps({'type': 'heartbeat'}))
-            print('heartbeat sent')
-
-            try:
-                await asyncio.wait_for(response_received.wait(), timeout=5)
-                print('Response received within timeout')
-            except asyncio.TimeoutError:
-                print('Response not received within timeout. Initiating disconnect...')
-                # await self.disconnect('server_initiated')
-
-            response_task.cancel()  # Clean up the response handling task
-            print('Response handler task canceled')
-
+  
         
 
     async def disconnect(self, close_code):
         # Leave room group
         
-        await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
+        await self.channel_layer.group_discard(self.group_name, self.channel_name)
 
         # Remove this consumer from the GameManager instance
         # self.game_manager.remove_consumer(self)
@@ -105,16 +107,20 @@ class GameConsumer(AsyncWebsocketConsumer):
     async def handle_multiplier_validation(self, data):
         sent_game_id = data.get('game_id')
         sent_multiplier = data.get('multiplier')
-        cached_multiplier = cache.get('game_multiplier')
+        print('sent_multiplier',sent_multiplier)
+        cached_multiplier = cache.get(f'{self.group_name}_game_multiplier')
         print('cached_multiplier', cached_multiplier)
+        cashout_window = cache.get(f'{self.group_name}_cashout_window_state')
+        print(cashout_window)
 
-        if (cache.get('cashout_window_state')):
+        if (cache.get(f'{self.group_name}_cashout_window_state')):
             
                 if sent_multiplier <= cached_multiplier:
                     return True
-        
-        print("Received game ID or multiplier or window closed doesn't match the current game.")
-        return False
+        else:
+            
+            print("Window closed or received multiplier doesn't match the current game.")
+            return False
 
     @database_sync_to_async
     def update_cashout(self, data):
@@ -123,9 +129,12 @@ class GameConsumer(AsyncWebsocketConsumer):
         
             try:
                 new_transaction = Transactions.objects.filter(user=user).order_by('created_at').last()
-                games_game_id = Games.objects.order_by('created_at').last()
+                games_game_id = Games.objects.filter(group_name= self.group_name).order_by('created_at').last()
+                
+                print('placed_bet_game_id', new_transaction.game_id)
+                print('game_id for respective grp', games_game_id.game_id)
 
-                if data.get('game_id') == new_transaction.game_id == games_game_id.game_id:
+                if new_transaction.game_id == games_game_id.game_id:
                     if not new_transaction.game_played:
                         new_transaction.multiplier = data.get('multiplier')
                         new_transaction.won = new_transaction.bet * float(data.get('multiplier'))
@@ -182,16 +191,11 @@ class GameConsumer(AsyncWebsocketConsumer):
                 
             }
         )
-    async def start_game(self, event):
-        print('start_game called')
-        self.game_play = asyncio.create_task(self.game_manager.start_game()) 
-        # self.send(text_data=json.dumps(response_data))
-    async def stop_game(self, event):
-        print('stop_game called')
-        await self.game_manager.stop_game() 
+
     async def game_update(self, event):
         print('game update')
         updated_item = event['data']
+        print(updated_item)
         await self.send(text_data=json.dumps(updated_item))
     
     async def handle_crash_instruction(self, data):

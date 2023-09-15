@@ -1,4 +1,4 @@
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.views.generic import TemplateView
 from django.views import View
 from .models import Transactions, BettingWindow, CashoutWindow, Games, Bank
@@ -24,8 +24,8 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.db import transaction
 from decimal import Decimal
-# from .tasks import run_management_command
-from django.core.management import call_command
+
+
 # views.py
 
 from django.views.decorators.csrf import csrf_exempt
@@ -34,6 +34,7 @@ from django.views import View
 import asyncio
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer # Import your GameManager module
+from .tasks import start_game, stop_game
 
 @method_decorator(csrf_exempt, name='dispatch')
 class StartGameView(View):
@@ -154,7 +155,7 @@ class Home(TemplateView):
     decorators = [csrf_protect, transaction.atomic]
     @method_decorator(decorators)
     def post(self, request, *args, **kwargs):
-        betting_window_state, game_id = self.get_betting_window_state()
+        betting_window_state, game_id = self.get_betting_window_state(request.POST.get('group_name'))
         if betting_window_state:
             
             if self.request.user.is_authenticated:
@@ -196,24 +197,24 @@ class Home(TemplateView):
             }
             return JsonResponse(response_data, status=400)
     
-    def get_betting_window_state(self):
+    def get_betting_window_state(self, group_name):
         cached_state = cache.get('betting_window_state')
-        cached_game_id = cache.get('game_id')
+        cached_game_id = cache.get(f'{group_name}_game_id')
         
         if cached_state is not None and cached_game_id is not None:
             return cached_state, cached_game_id
         
-        betting_window, game_id = self.database_fetch_betting_window_state()
+        betting_window, game_id = self.database_fetch_betting_window_state(group_name)
         
         cache.set('betting_window_state', betting_window, timeout=3600)
         cache.set('game_id', game_id, timeout=3600)
         
         return betting_window, game_id
     
-    def database_fetch_betting_window_state(self):
+    def database_fetch_betting_window_state(self, group_name):
         betting_window_object = BettingWindow.objects.first()
         betting_window = betting_window_object.is_open
-        game_id_object = Games.objects.order_by('created_at').first()
+        game_id_object = Games.objects.filter(group_name= group_name).order_by('created_at').last()
         game_id = game_id_object.game_id
         
         return betting_window, game_id
@@ -323,44 +324,28 @@ class WithdrawView(TemplateView):
 class AdminView(TemplateView):
     template_name = 'admin.html'
 
-   
-    async def start_game(self):
-        channel_layer = get_channel_layer()
-        await channel_layer.group_send(
-            "realtime_group",
-            {
-                "type": "start.game",
-            }
-        )  # Adjust the delay as needed
+    def start_game(self):
+        start_game.delay()
+        return HttpResponse('Starting games...')
 
+    def stop_game(self):
+        all_games_manager = cache.set('all_games_manager', 5)
+        
     
-    async def stop_game(self):
-        channel_layer = get_channel_layer()
-        await channel_layer.group_send(
-            "realtime_group",
-            {
-                "type": "stop.game",
-            }
-        )  # Adjust the delay as needed
+        all_games_manager = int(all_games_manager) + 1
+        stop_game.delay()
+        return HttpResponse('Stopping games...')
 
-   
-    async def post(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         action = request.POST.get('action')
 
         if action == 'start':
-            # Check if a task is already running
-            await self.start_game()
+            response = self.start_game()
             print('started')
-    
         elif action == 'stop':
-            await self.stop_game()
+            response = self.stop_game()
             print('stopped')
+        else:
+            response = HttpResponse('Invalid action')
 
-        return render(request, self.template_name)
-    
-    async def get(self, request, *args, **kwargs):
-       
-        
-        
-        # Return a response indicating that the game is running
-        return render(request, self.template_name)
+        return response

@@ -108,6 +108,7 @@ class CashoutWindow(models.Model):
 
 class Games(models.Model):
     game_id = models.CharField(max_length=200)
+    group_name = models.CharField(max_length=200,default='')
     hash = models.CharField(max_length=255, unique=True) 
     server_seed = models.CharField(max_length=255, unique=True)
     salt = models.CharField(max_length=255, unique=True)

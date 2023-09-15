@@ -128,6 +128,26 @@ AUTH_USER_MODEL = 'crash.User'
 #         "LOCATION": "redis://127.0.0.1:6379/1",
 #         },
 #         }
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+        },
+    },
+    "root": {
+        "handlers": ["console"],
+        "level": "WARNING",
+    },
+     "loggers": {
+        "django": {
+            "handlers": ["console"],
+            "level": os.getenv("DJANGO_LOG_LEVEL", "INFO"),
+            "propagate": False,
+        },
+    },
+}
 
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
