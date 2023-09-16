@@ -28,7 +28,7 @@ class Example extends Phaser.Scene
         console.log('create called');
         const scene = this;
         let backg = scene.add.image(400, 300, 'bg');
-        backg.setScale(2,2);
+        backg.setScale(2.5, 3);
 
         const loading_game = scene.add.text(400, 28, 'Game loading....').setColor('#00ff00').setFontSize(32).setShadow(2, 2).setOrigin(0.5, 0);
         
@@ -137,7 +137,7 @@ class Example extends Phaser.Scene
                         else if (data.type == "start_synchronizer") {
                                 window.allowballoonchange = true;
                                 showballoons = true;
-                                start_with_balloon = true;
+                                
                             
                             // Start the synchronizer countdown
                                console.log('start_synchronizer');
@@ -155,7 +155,7 @@ class Example extends Phaser.Scene
                                
     
                                 backg = scene.add.image(400, 300, 'bg').setPipeline('Light2D');
-                                backg.setScale.setScale(2,2);
+                                backg.setScale(2.5, 3);
                                 console.log(data.count);
                                 const delay = 1000;  // Delay in milliseconds
                                 const updateInterval =1;
@@ -346,7 +346,8 @@ class Example extends Phaser.Scene
                                     if (data.type === "crash_instruction") {
                                         // Handle crash instruction, e.g., trigger the crash action in the game
                                         console.log(data)
-                                        groupSocket.close();
+                                        start_with_balloon = true;
+                                       
                                         
                                         const crashpoint = data.crash
                                         if (backg) {
@@ -375,7 +376,7 @@ class Example extends Phaser.Scene
                                     
                                         // Create a new background image with the new texture
                                         poppedbackground = scene.add.image(400, 300, 'popped');
-                                        poppedbackground.setScale(2,2)
+                                        poppedbackground.setScale(2.5, 3)
                                         switch (window.roomName) {
                                             case 'group_1':
                                                 // No tint (default color)
@@ -412,7 +413,8 @@ class Example extends Phaser.Scene
                                         window.allowballoonchange = false;
             
                                         crashInstructionProcessed = true;
-                                        start_with_balloon = true;
+                                        groupSocket.close();
+                                        
                                         
             
                                     }
@@ -435,7 +437,7 @@ class Example extends Phaser.Scene
                                            
                 
                                             backg = scene.add.image(400, 300, 'bg').setPipeline('Light2D');
-                                            backg.setScale(2,2);
+                                            backg.setScale(2.5, 3);
                                             
                                             
                                             
@@ -563,7 +565,7 @@ class Example extends Phaser.Scene
                         balloons.getChildren().forEach((balloon) => {
                             changeBalloonColor(balloon, window.roomName);
                             balloon.setOrigin(0.5, 1); // Set the anchor point to the bottom center
-                            balloon.setScale(0.1);
+                            
                             balloon.x = centerX; // Set the initial x position to the center
                             balloon.y = centerY+10; // Set the initial y position to the bottom
                         });
