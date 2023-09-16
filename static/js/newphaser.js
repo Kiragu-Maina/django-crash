@@ -28,7 +28,7 @@ class Example extends Phaser.Scene
         console.log('create called');
         const scene = this;
         let backg = scene.add.image(400, 300, 'bg');
-        backg.setScale(2.5, 3);
+        backg.setScale(2.7, 3.5);
 
         const loading_game = scene.add.text(400, 28, 'Game loading....').setColor('#00ff00').setFontSize(32).setShadow(2, 2).setOrigin(0.5, 0);
         
@@ -155,7 +155,7 @@ class Example extends Phaser.Scene
                                
     
                                 backg = scene.add.image(400, 300, 'bg').setPipeline('Light2D');
-                                backg.setScale(2.5, 3);
+                                backg.setScale(2.7, 3.5);
                                 console.log(data.count);
                                 const delay = 1000;  // Delay in milliseconds
                                 const updateInterval =1;
@@ -189,7 +189,7 @@ class Example extends Phaser.Scene
                                                 balloon.setTint(balloonColors[i]); // Set the balloon color based on the array
                                                 balloon.setInteractive();
                                                 balloon.setData('group', groupName); // Store the group name as data
-                                                
+                                                balloon.setScale(0.25);
                                                 
                                                 balloon.on('pointerdown', function () {
                                                     var group = this.getData('group');
@@ -376,7 +376,7 @@ class Example extends Phaser.Scene
                                     
                                         // Create a new background image with the new texture
                                         poppedbackground = scene.add.image(400, 300, 'popped');
-                                        poppedbackground.setScale(2.5, 3)
+                                        poppedbackground.setScale(2.7, 3.5);
                                         switch (window.roomName) {
                                             case 'group_1':
                                                 // No tint (default color)
@@ -437,7 +437,7 @@ class Example extends Phaser.Scene
                                            
                 
                                             backg = scene.add.image(400, 300, 'bg').setPipeline('Light2D');
-                                            backg.setScale(2.5, 3);
+                                            backg.setScale(2.7, 3.5);
                                             
                                             
                                             
@@ -565,6 +565,7 @@ class Example extends Phaser.Scene
                         balloons.getChildren().forEach((balloon) => {
                             changeBalloonColor(balloon, window.roomName);
                             balloon.setOrigin(0.5, 1); // Set the anchor point to the bottom center
+                            balloon.setScale(0.25);
                             
                             balloon.x = centerX; // Set the initial x position to the center
                             balloon.y = centerY+10; // Set the initial y position to the bottom
