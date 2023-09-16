@@ -1,110 +1,48 @@
-from channels.testing import ChannelsLiveServerTestCase
+import json
+import concurrent.futures
 from selenium import webdriver
-from selenium.webdriver.common.action_chains import ActionChains
-from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.support.wait import WebDriverWait
-from pathlib import Path
-import os
 
-BASE_DIR = Path(__file__).resolve().parent.parent
+# Load user data from the JSON file
+with open('users.json', 'r') as json_file:
+    users = json.load(json_file)
 
+# Function to simulate user interaction
+def simulate_user(user):
+    phone_number = user['phone_number']
+    password = user['password']
 
-class ChatTests(ChannelsLiveServerTestCase):
-    serve_static = True  # emulate StaticLiveServerTestCase
+    # Initialize WebDriver for each user
+    driver = webdriver.Chrome()
+    
+    try:
+        # Navigate to your website
+        driver.get('https://your-website.com')
 
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        try:
-            # print(os.path.join(BASE_DIR, "chromedriver"))
-            # NOTE: Requires "chromedriver" binary to be installed in $PATH
-            cls.driver = webdriver.Chrome()
-        except:
-            super().tearDownClass()
-            raise
+        # Simulate user interactions (login, perform actions, etc.)
+        # Example: Fill in login form and submit
+        driver.find_element_by_id('phone_number_input').send_keys(phone_number)
+        driver.find_element_by_id('password_input').send_keys(password)
+        driver.find_element_by_id('login_button').click()
 
-    @classmethod
-    def tearDownClass(cls):
-        cls.driver.quit()
-        super().tearDownClass()
+        # Perform other interactions as needed
 
-    def test_when_chat_message_posted_then_seen_by_everyone_in_same_room(self):
-        try:
-            self._enter_chat_room("room_1")
+    except Exception as e:
+        print(f"Error for user {phone_number}: {str(e)}")
+    finally:
+        # Close the browser when done
+        driver.quit()
 
-            self._open_new_window()
-            self._enter_chat_room("room_1")
+# Number of concurrent users
+num_users = 20
 
-            self._switch_to_window(0)
-            self._post_message("hello")
-            WebDriverWait(self.driver, 2).until(
-                lambda _: "hello" in self._chat_log_value,
-                "Message was not received by window 1 from window 1",
-            )
-            self._switch_to_window(1)
-            WebDriverWait(self.driver, 2).until(
-                lambda _: "hello" in self._chat_log_value,
-                "Message was not received by window 2 from window 1",
-            )
-        finally:
-            self._close_all_new_windows()
+# Create a ThreadPoolExecutor to run concurrent sessions
+with concurrent.futures.ThreadPoolExecutor(max_workers=num_users) as executor:
+    # Start sessions for each user
+    futures = [executor.submit(simulate_user, user) for user in users]
 
-    def test_when_chat_message_posted_then_not_seen_by_anyone_in_different_room(self):
-        try:
-            self._enter_chat_room("room_1")
+    # Wait for all sessions to complete
+    concurrent.futures.wait(futures)
 
-            self._open_new_window()
-            self._enter_chat_room("room_2")
-
-            self._switch_to_window(0)
-            self._post_message("hello")
-            WebDriverWait(self.driver, 2).until(
-                lambda _: "hello" in self._chat_log_value,
-                "Message was not received by window 1 from window 1",
-            )
-
-            self._switch_to_window(1)
-            self._post_message("world")
-            WebDriverWait(self.driver, 2).until(
-                lambda _: "world" in self._chat_log_value,
-                "Message was not received by window 2 from window 2",
-            )
-            self.assertTrue(
-                "hello" not in self._chat_log_value,
-                "Message was improperly received by window 2 from window 1",
-            )
-        finally:
-            self._close_all_new_windows()
-
-    # === Utility ===
-
-    def _enter_chat_room(self, room_name):
-        self.driver.get(self.live_server_url + "/chat/")
-        ActionChains(self.driver).send_keys(room_name, Keys.ENTER).perform()
-        WebDriverWait(self.driver, 2).until(
-            lambda _: room_name in self.driver.current_url
-        )
-
-    def _open_new_window(self):
-        self.driver.execute_script('window.open("about:blank", "_blank");')
-        self._switch_to_window(-1)
-
-    def _close_all_new_windows(self):
-        while len(self.driver.window_handles) > 1:
-            self._switch_to_window(-1)
-            self.driver.execute_script("window.close();")
-        if len(self.driver.window_handles) == 1:
-            self._switch_to_window(0)
-
-    def _switch_to_window(self, window_index):
-        self.driver.switch_to.window(self.driver.window_handles[window_index])
-
-    def _post_message(self, message):
-        ActionChains(self.driver).send_keys(message, Keys.ENTER).perform()
-
-    @property
-    def _chat_log_value(self):
-        return self.driver.find_element(
-            by=By.CSS_SELECTOR, value="#chat-log"
-        ).get_property("value")
+# All sessions are now complete
+print("All sessions are complete.")

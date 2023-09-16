@@ -14,7 +14,7 @@ from asgiref.sync import async_to_sync
 from django.db import transaction
 from decimal import Decimal
 from django.core.cache import cache
-from .tasks import start_game
+from .tasks import start_game, stop_game
 
 
 class RealtimeUpdatesConsumer(AsyncWebsocketConsumer):
@@ -23,13 +23,24 @@ class RealtimeUpdatesConsumer(AsyncWebsocketConsumer):
         self.group_name = "realtime_group"
         await self.channel_layer.group_add(self.group_name, self.channel_name)
         await self.accept()
-        cached_multiplier = cache.get(f'group_1_game_multiplier')
-        if cached_multiplier is not None:
-        # Send the cached_multiplier to the connected user
-            await self.send(text_data=json.dumps({
-                'type': 'ongoing_synchronizer',
-                'cached_multiplier': cached_multiplier
-            }))
+       
+        
+        group_game_multipliers = {
+            'group_1': 'group_1_game_multiplier',
+            'group_2': 'group_2_game_multiplier',
+            'group_3': 'group_3_game_multiplier',
+            'group_4': 'group_4_game_multiplier',
+        }
+        
+        for group, cache_key in group_game_multipliers.items():
+            cached_multiplier = cache.get(cache_key)
+            if cached_multiplier is not None:
+                await self.send(text_data=json.dumps({
+                    'type': 'ongoing_synchronizer',
+                    'cached_multiplier': cached_multiplier
+                }))
+                break
+        
         
    
 
@@ -42,9 +53,50 @@ class RealtimeUpdatesConsumer(AsyncWebsocketConsumer):
         await self.send(text_data=json.dumps(updated_item))
         
     async def restart_game(self, event):
-        print('restart_game called')
-        start_game.delay()
-       
+    
+        game_status = cache.get('game_status')
+        if not game_status == "stopped":
+            print('restart_game called')
+            stop_game.delay()
+            time.sleep(0.5)
+            start_game.delay()
+    
+    @database_sync_to_async
+    def update_game_on_crash(self, group_name, game_id):
+        
+        with transaction.atomic():
+            try:
+                users_transactions = Transactions.objects.filter(group_name=group_name, game_id=game_id)
+
+                for new_transaction in users_transactions:
+                    if not new_transaction.game_played:
+                        new_transaction.game_played = True
+                        new_transaction.save()
+
+                        # Update the user's bank record
+                        user_bank = Bank.objects.get(user=new_transaction.user)
+                        user_bank.losses_by_user += Decimal(new_transaction.bet)
+                        user_bank.save()
+                        
+            except Transactions.DoesNotExist:
+                # Handle the case where there are no transactions for the given conditions.
+                print("Transaction does not exist.")
+                pass
+            except Bank.DoesNotExist:
+                # Handle the case where there is no bank record for a user.
+                print("Bank does not exist.")
+                pass
+            except Exception as e:
+                print("An error occurred:", str(e))
+                
+    async def game_crashed(self, event):
+        data = event['data']
+        group_name = data['group_name']       
+        game_id = data['game_id']
+        await self.update_game_on_crash(group_name, game_id)
+        
+        
+        
 
     
 
@@ -139,11 +191,13 @@ class GameConsumer(AsyncWebsocketConsumer):
                         new_transaction.multiplier = data.get('multiplier')
                         new_transaction.won = new_transaction.bet * float(data.get('multiplier'))
                         new_transaction.game_played = True
+                        new_transaction.group_name = self.group_name
                         new_transaction.save()
 
                         try:
                             bank_instance = Bank.objects.select_for_update().get(user=user)
                             bank_instance.balance += Decimal(new_transaction.won)
+                            bank_instance.profit_to_user += Decimal(new_transaction.won)
                             bank_instance.save()
                         except Bank.DoesNotExist:
                             response_data = {'type':'cashout', 'status': 'error', 'message': 'no_bank'}
@@ -291,3 +345,29 @@ class BalanceUpdateConsumer(AsyncWebsocketConsumer):
         updated_item = event['data']
         await self.send(text_data=json.dumps(updated_item))
 
+class AdminUpdatesConsumer(AsyncWebsocketConsumer):
+    async def connect(self):
+        
+        self.group_name = "admin_updates"
+        await self.channel_layer.group_add(self.group_name, self.channel_name)
+        await self.accept()
+        
+        
+   
+
+    async def disconnect(self, close_code):
+        await self.channel_layer.group_discard(self.group_name, self.channel_name)
+        
+    async def pot_update(self, event):
+        print('pot new update')
+        updated_item = event['data']
+        await self.send(text_data=json.dumps(updated_item))
+        
+    
+       
+
+    
+
+    async def receive(self, text_data):
+        # Do nothing with received data
+        pass

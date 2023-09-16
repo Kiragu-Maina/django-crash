@@ -17189,3 +17189,16 @@ tr:hover {
   #ex2.modal {
     background: transparent;
   }
+  #ex3.modal {
+    background: transparent;
+  }
+  #ex4.modal {
+    background: transparent;
+  }
+  .custom-dialog-style {
+    /* Add your custom styles for the dialog here */
+    border-radius: 10px; /* Example: Curvy borders for the dialog */
+    background-color: rgba(255, 255, 255, 0.9); /* Example: Light background color */
+    color: #333; /* Example: Text color */
+    padding: 10px; /* Example: Padding for the dialog content */
+}

@@ -4,6 +4,7 @@ var selectedBalloon = null; // Keep track of the currently selected balloon
 
 // JavaScript function to handle balloon clicks and pass group names
 function handleBalloonClick(groupName) {
+    console.log('handle balloon clicked called')
     if (window.allowballoonchange) {
         if (selectedBalloon) {
             // Remove the "highlighted" class from the previously selected balloon

@@ -18,7 +18,7 @@
   
   
   <!-- CSS Files -->
-  <link id="pagestyle" type="text/css" href="{% static 'css/argon-dashboard.css' %}" rel="stylesheet" />
+  <link id="pagestyle" href="{% static 'css/argon-dashboard.css' %}" rel="stylesheet" />
   
 </head>
 <style>
@@ -142,13 +142,13 @@
             {% if user.is_authenticated %}
             <li class="nav-item d-flex align-items-center">
              
-                  <a href="{% url 'deposit' %}" class="nav-link text-white font-weight-bold px-3">
+              <a class="nav-link"  href="#ex3" rel="modal:open">
                       <i class="fa fa-money me-sm-1"></i> <!-- Changed the icon to fa-money -->
                       <span class="nav-link text-white font-weight-bold px-0">Deposit</span>
                   </a>
               </li>
               <li class="nav-item d-flex align-items-center">
-                  <a href="{% url 'withdraw' %}" class="nav-link text-white font-weight-bold px-3">
+                <a class="nav-link"  href="#ex4" rel="modal:open">
                       <i class="fa fa-credit-card me-sm-1"></i> <!-- Changed the icon to fa-credit-card -->
                       <span class="nav-link text-white font-weight-bold px-0">Withdraw</span>
                   </a>
@@ -180,99 +180,6 @@
       </div>
     </nav>
     <!-- End Navbar -->
-    <div id="ex1" class="modal">
-  
-    
-      <div class="card card-plain" style="width: auto; height: auto;">
-        
-        <div class="card-header pb-0 text-start">
-          
-          <h4 class="font-weight-bolder">Sign In</h4>
-          <p id="error1" style="color: red"></p>
-          <p class="mb-0">Enter your phone_number and password to sign in</p>
-        </div>
-        <div class="card-body">
-          <form id='login-form' role="form">
-            {% csrf_token %}
-            <div class="mb-3">
-              <input type="text" id = "phone_number1" class="form-control form-control-lg" placeholder="Phone Number" aria-label="Phone_number">
-            </div>
-            <div class="mb-3">
-              <input type="password" id = "password" class="form-control form-control-lg" placeholder="Password" aria-label="Password">
-            </div>
-           
-            <div class="text-center">
-              <button type="button" id="login-submit-btn" class="btn btn-lg btn-primary btn-lg w-100 mt-4 mb-0">Sign in</button>
-            </div>
-            <div id="spinner1" style="display: none;">
-              <!-- Add your spinner HTML or image here -->
-              <div class="spinner-border" role="status">
-                  <span class="sr-only">Loading...</span>
-              </div>
-          </div>
-          </form>
-        </div>
-        <div class="card-footer text-center pt-0 px-lg-2 px-1">
-          <p class="mb-4 text-sm mx-auto">
-            Don't have an account?
-            <p><a href="#ex2" class="text-primary text-gradient font-weight-bold" rel="modal:open">Register</a></p>
-          </p>
-  
-        </div>
-      </div>
-  
-    
-      
-      <a href="#" rel="modal:close">Close</a>
-      
-    
-    </div>
-    <div id="ex2" class="modal">
-      
-      
-      <div class="card card-plain">
-        <div class="card-header pb-0 text-start">
-          
-          <h4 class="font-weight-bolder">Register</h4>
-          <p id="error2" style="color: red"></p>
-          <p class="mb-0">Enter your email and password to sign in</p>
-        </div>
-        <div class="card-body">
-          <form id="register-form" role="form">
-            {% csrf_token %}
-            <div class="mb-3">
-              <input type="text" class="form-control" id = "user_name" name = "user_name" placeholder="Username" aria-label="Name">
-            </div>
-            <div class="mb-3">
-              <input type="text" class="form-control" id="phone_number2" name = "phone_number" placeholder="Phone_number" aria-label="phone_number">
-            </div>
-            <div class="mb-3">
-              <input type="password" class="form-control" id="password1" name="password1" placeholder="Password" aria-label="Password">
-            </div>
-            <div class="mb-3">
-              <input type="password" class="form-control" id="password2" name="password2" placeholder="Confirm Password" aria-label="Password">
-            </div>
-            
-            <div class="text-center">
-              <button type="button" id="register-submit-btn" class="btn bg-gradient-dark w-100 my-4 mb-2">Sign up</button>
-            </div>
-            <div id="spinner2" style="display: none;">
-              <!-- Add your spinner HTML or image here -->
-              <div class="spinner-border" role="status">
-                  <span class="sr-only">Loading...</span>
-              </div>
-          </div>
-            <p class="text-sm mt-3 mb-0">Already have an account? <p><a href="#ex1" class="text-primary text-gradient font-weight-bold" rel="modal:open">Log In</a></p>
-  
-          </form>
-        </div>
-      
-        
-      </div>
-    
-      
-      <a href="#" rel="modal:close">Close</a>
-    </div>
    
     <div class="container-fluid py-4">
       <div class="row mt-4">
@@ -290,7 +197,7 @@
               
              
             <div class="col-md-4">
-              <p> Choose balloon: </p>
+              
               <div class="balloon-container">
                 
                 <!-- Balloon 1 -->
@@ -319,16 +226,16 @@
                       <div class="row">
                           <!-- Six 2x3 buttons for amounts -->
                           
+                              <button type="button" class="amount-btn" data-amount="10">10</button>
+                          
+                          
+                              <button type="button" class="amount-btn" data-amount="20">20</button>
+                    
+                          
                               <button type="button" class="amount-btn" data-amount="50">50</button>
                           
                           
                               <button type="button" class="amount-btn" data-amount="100">100</button>
-                    
-                          
-                              <button type="button" class="amount-btn" data-amount="200">200</button>
-                          
-                          
-                              <button type="button" class="amount-btn" data-amount="300">300</button>
                           
                           
                               <button type="button" class="amount-btn" data-amount="500">500</button>
@@ -448,29 +355,30 @@
         </div>
       
       
-          <div class="col-lg-4"> <!-- Adjusted the column width to 5 to accommodate both columns within a 12-column grid -->
-              <div class="card">
-                  <div class="card-header pb-0 p-3">
-                      <h6 class="mb-0">Bets</h6>
-                  </div>
-                  <div class="card-body p-3">
-                    <table class='bet-table' style="background-color: #333; color: black;">
-                          <thead>
-                              <tr style="">
-                                  <th>User</th>
-                                  <th>Bet</th>
-                                  <th>@</th>
-                                  <th>Cashed_Out</th>
-
-                              </tr>
-                          </thead>
-                          <tbody id='bet-table-body'>
-                            
+          <div class="col-lg-4">
+    <div class="card">
+        <div class="card-header pb-0 p-3">
+            <h6 class="mb-0">Bets</h6>
+        </div>
+        <div class="card-body p-3">
+            <table class='bet-table' style="background-color: #333; color: black;">
+                <thead>
+                    <tr>
+                        <th style="font-size: 0.6em;">User</th>
+                        <th style="font-size: 0.6em;">Bet</th>
+                        <th style="font-size: 0.6em;">@</th>
+                        <th style="font-size: 0.6em;">Cashed_Out</th>
+                        <th style="font-size: 0.6em;">Balloon</th>
+                    </tr>
+                </thead>
+                <tbody id='bet-table-body'>
+                    <!-- Your table body content here -->
                 </tbody>
-                      </table>
-                  </div>
-              </div>
-          </div>
+            </table>
+        </div>
+    </div>
+</div>
+
       </div>
   
   
@@ -483,9 +391,183 @@
     </div>
   </div>
   
+  <div id="ex1" class="modal">
+  
+    
+    <div class="card card-plain" style="width: auto; height: auto;">
+      
+      <div class="card-header pb-0 text-start">
+        
+        <h4 class="font-weight-bolder">Sign In</h4>
+        <p id="error1" style="color: red"></p>
+        <p class="mb-0">Enter your phone_number and password to sign in</p>
+      </div>
+      <div class="card-body">
+        <form id='login-form' role="form">
+          {% csrf_token %}
+          <div class="mb-3">
+            <input type="text" id = "phone_number1" class="form-control form-control-lg" placeholder="Phone Number" aria-label="Phone_number">
+          </div>
+          <div class="mb-3">
+            <input type="password" id = "password" class="form-control form-control-lg" placeholder="Password" aria-label="Password">
+          </div>
+         
+          <div class="text-center">
+            <button type="button" id="login_submit_btn" class="btn btn-lg btn-primary btn-lg w-100 mt-4 mb-0">Sign in</button>
+          </div>
+          <div id="spinner1" style="display: none;">
+            <!-- Add your spinner HTML or image here -->
+            <div class="spinner-border" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
+        </form>
+      </div>
+      <div class="card-footer text-center pt-0 px-lg-2 px-1">
+        <p class="mb-4 text-sm mx-auto">
+          Don't have an account?
+          <p><a href="#ex2" class="text-primary text-gradient font-weight-bold" rel="modal:open">Register</a></p>
+        </p>
+
+      </div>
+    </div>
+
+  
+    
+    <a href="#" rel="modal:close">Close</a>
+    
+  
+  </div>
+  <div id="ex2" class="modal">
+    
+    
+    <div class="card card-plain">
+      <div class="card-header pb-0 text-start">
+        
+        <h4 class="font-weight-bolder">Register</h4>
+        <p id="error2" style="color: red"></p>
+        <p class="mb-0">Enter your email and password to sign in</p>
+      </div>
+      <div class="card-body">
+        <form id="register-form" role="form">
+          {% csrf_token %}
+          <div class="mb-3">
+            <input type="text" class="form-control" id = "user_name" name = "user_name" placeholder="Username" aria-label="Name">
+          </div>
+          <div class="mb-3">
+            <input type="text" class="form-control" id="phone_number2" name = "phone_number" placeholder="Phone_number" aria-label="phone_number">
+          </div>
+          <div class="mb-3">
+            <input type="password" class="form-control" id="password1" name="password1" placeholder="Password" aria-label="Password">
+          </div>
+          <div class="mb-3">
+            <input type="password" class="form-control" id="password2" name="password2" placeholder="Confirm Password" aria-label="Password">
+          </div>
+          
+          <div class="text-center">
+            <button type="button" id="register_submit_btn" class="btn bg-gradient-dark w-100 my-4 mb-2">Sign up</button>
+          </div>
+          <div id="spinner2" style="display: none;">
+            <!-- Add your spinner HTML or image here -->
+            <div class="spinner-border" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
+          <p class="text-sm mt-3 mb-0">Already have an account? <p><a href="#ex1" class="text-primary text-gradient font-weight-bold" rel="modal:open">Log In</a></p>
+
+        </form>
+      </div>
+    
+      
+    </div>
+  
+    
+    <a href="#" rel="modal:close">Close</a>
+  </div>
+  <div id="ex3" class="modal">
+  
+    
+    <div class="card card-plain" style="width: auto; height: auto;">
+      
+      <div class="card-header pb-0 text-start">
+        
+        <p id="error3" style="color: red"></p>
+        <p class="mb-0">Enter amount to deposit</p>
+      </div>
+      <div class="card-body">
+        <form id='deposit-form' role="form">
+          {% csrf_token %}
+          <div class="mb-3">
+            <input type="text" id = "deposit_amount" class="form-control form-control-lg" >
+          </div>
+          
+         
+          <div class="text-center">
+            <button type="button" id="deposit_btn" class="btn btn-lg btn-primary btn-lg w-100 mt-4 mb-0">Deposit</button>
+          </div>
+          <div id="spinner3" style="display: none;">
+            <!-- Add your spinner HTML or image here -->
+            <div class="spinner-border" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
+        </form>
+      </div>
+      
+    </div>
+
+  
+    
+    <a href="#" rel="modal:close">Close</a>
+    
+  
+  </div>
+  <div id="ex4" class="modal">
+  
+    
+    <div class="card card-plain" style="width: auto; height: auto;">
+      
+      <div class="card-header pb-0 text-start">
+        
+        <p id="error4" style="color: red"></p>
+        <p class="mb-0">Enter amount to withdraw</p>
+      </div>
+      <div class="card-body">
+        <form id='withdraw-form' role="form">
+          {% csrf_token %}
+          <div class="mb-3">
+            <input type="text" id = "withdraw_amount" class="form-control form-control-lg" >
+          </div>
+          
+         
+          <div class="text-center">
+            <button type="button" id="withdraw_btn" class="btn btn-lg btn-primary btn-lg w-100 mt-4 mb-0">Withdraw</button>
+          </div>
+          <div id="spinner4" style="display: none;">
+            <!-- Add your spinner HTML or image here -->
+            <div class="spinner-border" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
+        </form>
+      </div>
+      
+    </div>
+
+  
+    
+    <a href="#" rel="modal:close">Close</a>
+    
+  
+  </div>
 
   <script>
   var balloon = "{% static 'assets/balloon.png' %}";
+  var balloon1 = "{% static 'assets/balloon1.png' %}";
+  var balloon2 = "{% static 'assets/balloon2.png' %}";
+  var balloon3 = "{% static 'assets/balloon3.png' %}";
+  var balloon4 = "{% static 'assets/balloon4.png' %}";
+
 
 
 
@@ -620,11 +702,14 @@
 </script>
   
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js" integrity="sha256-lSjKY0/srUM9BE3dPm+c4fBo1dky2v27Gdjm2uoZaL0=" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
 {% comment %} <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script> {% endcomment %}
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.min.js" integrity="sha384-+sLIOodYLS7CIrQpBjl+C7nPvqq+FbNUBDunl/OZv93DB7Ln/533i8e/mZXLi/P+" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.css" />
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+
  
   <script src="https://cdnjs.cloudflare.com/ajax/libs/phaser/3.60.0/phaser.min.js"></script>
 
@@ -633,7 +718,7 @@
  
     
   
-  <script src="{% static 'js/phasergame.js' %}"></script>
+  <script src="{% static 'js/newphaser.js' %}"></script>
   
   
   <script>
@@ -665,7 +750,7 @@
       $(document).ready(function () {
         const error = document.getElementById("error")
 
-          $('#login-submit-btn').click(function () {
+          $('#login_submit_btn').click(function () {
             $("#login_submit_btn").hide();
           $("#spinner1").show();
               var phone_number = $('#phone_number1').val();
@@ -710,7 +795,7 @@
                   }
               });
           });
-          $('#register-submit-btn').click(function () {
+          $('#register_submit_btn').click(function () {
             $("#register_submit_btn").hide();
            $("#spinner2").show();
             var phone_number = $('#phone_number2').val();
@@ -755,6 +840,101 @@
                     }
                     $("#register_submit_btn").show();
                     $("#spinner2").hide();
+                }
+            });
+        });
+        $('#deposit_btn').click(function () {
+          $("#deposit_btn").hide();
+        $("#spinner3").show();
+            var deposit_amount = $('#deposit_amount').val();
+
+            
+            var csrf_token = $("input[name=csrfmiddlewaretoken]").val();  // Get the CSRF token
+
+            // Prepare the data to be sent
+            var data = {
+                deposit_amount: deposit_amount,
+                
+                csrfmiddlewaretoken: csrf_token
+            };
+
+            // Send an AJAX POST request to the server
+            $.ajax({
+                url: '{% url "deposit" %}',  // Replace with your actual login URL
+                type: 'POST',
+                data: data,
+                success: function (response) {
+                    // Handle the response from the server, e.g., redirect or show a success message
+                    console.log('here');
+                    console.log(response);
+                    $("#error3").html('deposit successful');
+                    $("#spinner3").hide();
+                    $("#deposit_btn").show();
+                    
+                },
+                error: function (xhr, status, error) {
+                    // Handle errors, e.g., display an error message
+                    try {
+                      var errorResponse = JSON.parse(xhr.responseText);
+                      console.log(errorResponse)
+                      var errorMessage = errorResponse.errors.__all__[0];
+                      console.log(errorMessage);
+                      $("#error3").html(errorMessage);
+                    } catch (e) {
+                        // Handle JSON parsing error or other issues
+                        console.error(e);
+                        $("#error3").html("An error occurred.");
+                    }
+                    $("#deposit_btn").show();
+                  $("#spinner3").hide();
+                }
+            });
+        });
+        $('#withdraw_btn').click(function () {
+          $("#withdraw_btn").hide();
+        $("#spinner4").show();
+            var withdraw_amount = $('#withdraw_amount').val();
+
+            
+            var csrf_token = $("input[name=csrfmiddlewaretoken]").val();  // Get the CSRF token
+
+            // Prepare the data to be sent
+            var data = {
+                withdraw_amount: withdraw_amount,
+                
+                csrfmiddlewaretoken: csrf_token
+            };
+
+            // Send an AJAX POST request to the server
+            $.ajax({
+                url: '{% url "withdraw" %}',  // Replace with your actual login URL
+                type: 'POST',
+                data: data,
+                success: function (response) {
+                    // Handle the response from the server, e.g., redirect or show a success message
+                    console.log('here');
+                    console.log(response);
+                    $("#error4").html('Withdrawal successful');
+                    $("#spinner4").hide();
+                    $("#withdraw_btn").show();
+                    
+                    
+                },
+                error: function (xhr, status, error) {
+                    // Handle errors, e.g., display an error message
+                    try {
+                      var errorResponse = JSON.parse(xhr.responseText);
+                      console.log(errorResponse)
+                      var errorMessage = errorResponse.errors.__all__[0];
+                      console.log(errorMessage);
+                      $("#error4").html(errorMessage);
+                    } catch (e) {
+                        // Handle JSON parsing error or other issues
+                        console.error(e);
+                        $("#error4").html("An error occurred.");
+                    }
+                    $("#withdraw_btn").show();
+                  $("#spinner4").hide();
                 }
             });
         });

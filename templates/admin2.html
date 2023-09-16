@@ -1,0 +1,701 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    {%load static%}
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="apple-touch-icon" sizes="76x76" href="{% static 'img/apple-icon.png' %}">
+  <link rel="icon" type="image/png" href="{% static 'img/favicon.png' %}">
+  <title>
+    
+  </title>
+  <!--     Fonts and icons     -->
+
+  <!-- Font Awesome Icons -->
+  <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  
+  
+  <!-- CSS Files -->
+  <link id="pagestyle" href="{% static 'css/argon-dashboard.css' %}" rel="stylesheet" />
+  
+</head>
+<style>
+    /* Table styles */
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+    
+    th, td {
+        padding: 10px;
+        border: 1px solid #ddd;
+    }
+
+    th {
+        background-color: #f2f2f2;
+    }
+
+    /* Optional hover effect */
+    tr:hover {
+        background-color: #f5f5f5;
+    }
+    .amount-btn {
+      width: 20%;
+      padding: 1px;
+      margin-left: 10px;
+      margin-right:5px; /* Limited padding between buttons */
+    }
+    
+    @media (min-width: 768px) {
+      /* Apply the 3x2 layout for medium and larger screens */
+      
+  }
+ 
+  .button {
+    border-radius: 10px; /* Adjust the border-radius as needed for the desired curve */
+    padding: 10px 20px; /* Adjust padding for button size */
+    font-size: 16px; /* Adjust font size as needed */
+    cursor: pointer; /* Change cursor on hover */
+}
+
+#submit_start_btn {
+    background-color: green; /* Green color for Start Game */
+    color: white; /* Text color */
+    border: none; /* Remove button border */
+}
+
+#submit_stop_btn {
+    background-color: red; /* Red color for Stop Game */
+    color: white; /* Text color */
+    border: none; /* Remove button border */
+}
+
+ 
+</style>
+
+
+<body class="g-sidenav-show   bg-gray-100">
+ 
+  
+  {{ room_name|json_script:"room-name" }}
+  <div class="min-height-300 bg-primary position-absolute w-100"></div>
+  <aside class="sidenav bg-white navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-4 " id="sidenav-main">
+    <div class="sidenav-header">
+      <i class="fas fa-times p-3 cursor-pointer text-secondary opacity-5 position-absolute end-0 top-0 d-none d-xl-none" aria-hidden="true" id="iconSidenav"></i>
+      <a class="navbar-brand m-0" href="  " target="_blank">
+        <img src="{% static 'img/logo-ct-dark.png' %}" class="navbar-brand-img h-100" alt="main_logo">
+        <span class="ms-1 font-weight-bold">{{username}}</span>
+      </a>
+    </div>
+    <hr class="horizontal dark mt-0">
+    <div class="collapse navbar-collapse  w-auto " id="sidenav-collapse-main">
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <a class="nav-link active" href="./pages/dashboard.html">
+            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="ni ni-tv-2 text-primary text-sm opacity-10"></i>
+            </div>
+            <span class="nav-link-text ms-1">Crash</span>
+          </a>
+        </li>
+       
+       
+        <li class="nav-item mt-3">
+          <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Account pages</h6>
+        </li>
+        <div>
+        
+        {% if user.is_authenticated %}
+        <li class="nav-item">
+          <a class="nav-link " href="{%url 'logout'%}">
+            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="ni ni-collection text-info text-sm opacity-10"></i>
+            </div>
+            <span class="nav-link-text ms-1">Log out</span>
+          </a>
+        </li>
+       
+        {% else %}
+        
+        <li class="nav-item">
+          <a class="nav-link"  href="#ex1" rel="modal:open">
+          
+            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="ni ni-single-copy-04 text-warning text-sm opacity-10"></i>
+            </div>
+            <span class="nav-link-text ms-1">Sign In</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link " href="#ex2" rel="modal:open">
+            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="ni ni-collection text-info text-sm opacity-10"></i>
+            </div>
+            <span class="nav-link-text ms-1">Register</span>
+          </a>
+        </li>
+        {% endif %}
+        
+      </ul>
+    </div>
+    </div>
+    
+  </aside>
+  <main class="main-content position-relative border-radius-lg ">
+    <!-- Navbar -->
+    <nav class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl " id="navbarBlur" data-scroll="false">
+      <div class="container-fluid py-1 px-3">
+        
+        <div class="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4" id="navbar">
+          <div class="ms-md-auto pe-md-3 d-flex align-items-center">
+            <div class="input-group">
+              
+              <span class="d-sm-inline d-none"></span>
+            </div>
+          </div>
+          <ul class="navbar-nav  justify-content-end">
+            {% if user.is_authenticated %}
+            
+            <li class="nav-item d-flex align-items-center">
+             
+                  <a href="{% url 'deposit' %}" class="nav-link text-white font-weight-bold px-3">
+                      <i class="fa fa-money me-sm-1"></i> <!-- Changed the icon to fa-money -->
+                      <span class="nav-link text-white font-weight-bold px-0">Deposit</span>
+                  </a>
+              </li>
+              <li class="nav-item d-flex align-items-center">
+                  <a href="{% url 'withdraw' %}" class="nav-link text-white font-weight-bold px-3">
+                      <i class="fa fa-credit-card me-sm-1"></i> <!-- Changed the icon to fa-credit-card -->
+                      <span class="nav-link text-white font-weight-bold px-0">Withdraw</span>
+                  </a>
+              </li>
+              <li class="nav-item d-flex align-items-center">
+                <i class="fa fa-money nav-icon me-sm-1"></i> <!-- Font Awesome icon for Pot -->
+                <span class="nav-link text-white font-weight-bold px-0" id='pot'>Pot: {{ pot_amount }}</span>
+            </li>
+            <li class="nav-item d-flex align-items-center">
+                <i class="fa fa-file-invoice-dollar nav-icon me-sm-1"></i>
+                <span class="nav-link text-white font-weight-bold px-0" id='revenue'>Revenue: {{ revenue }}</span>
+            </li>
+            <li class="nav-item d-flex align-items-center">
+                <i class="fa fa-line-chart nav-icon me-sm-1"></i> <!-- Font Awesome icon for Profit -->
+                <span class="nav-link text-white font-weight-bold px-0" id='profit'>Profit: {{ profit }}</span>
+            </li>
+            
+          {% else %}
+              <li class="nav-item d-flex align-items-center">
+                  <a href="#ex1" rel="modal:open" class="nav-link text-white font-weight-bold px-2">
+                      <i class="fa fa-user me-sm-1"></i>
+                      <span class="nav-link text-white font-weight-bold px-0">Sign In</span>
+                      
+                  </a>
+              </li>
+              <li class="nav-item d-flex align-items-center">
+                  <a  href="#ex2" rel="modal:open" class="nav-link text-white font-weight-bold px-2">
+                      <i class="fa fa-user-plus me-sm-1"></i> <!-- Changed the icon to fa-user-plus -->
+                      <span class="nav-link text-white font-weight-bold px-0">Register</span>
+                      
+                  </a>
+              </li>
+          {% endif %}
+          
+            
+           
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <!-- End Navbar -->
+   
+    <div class="container-fluid py-4">
+      <div class="row mt-4">
+        <div class="col-lg-8 mb-lg-7 mb-7">
+          <div class="card">
+              <div class="card-header pb-0 pt-3 bg-transparent">
+                  <h6 class="text-capitalize">Game Control Panel</h6>
+                 
+                <div class="button-container">
+                    <div id='game_management-form'>
+                        
+                        <button class="button" id="submit_start_btn" name="action" value="start">Start Game</button>
+                        <button class="button" id="submit_stop_btn" name="action" value="stop">Stop Game</button>
+                        <div id="spinner3" style="display: none;">
+                            <!-- Add your spinner HTML or image here -->
+                            <div class="spinner-border" role="status">
+                                <span class="sr-only">Loading...</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+                
+                <div class="status">
+                    <p id="status" style="color: red"></p>
+                </div>
+                
+            </div>
+             
+          </div>
+        </div>
+      
+      
+          <div class="col-lg-4">
+    <div class="card">
+        <div class="card-header pb-0 p-3">
+            <h6 class="mb-0">Bets</h6>
+        </div>
+        <div class="card-body p-3">
+            <table class='bet-table' style="background-color: #333; color: black;">
+                <thead>
+                    <tr>
+                        <th style="font-size: 0.6em;">Amount in POT</th>
+                        <th style="font-size: 0.6em;">User_cash</th>
+                        
+                        <th style="font-size: 0.6em;">Float_Cash</th>
+                        <th style="font-size: 0.6em;">Profit</th>
+                    </tr>
+                </thead>
+                <tbody id='bet-table-body'>
+                    <!-- Your table body content here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+      </div>
+  
+  
+    
+      
+        
+        
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div id="ex1" class="modal">
+  
+    
+    <div class="card card-plain" style="width: auto; height: auto;">
+      
+      <div class="card-header pb-0 text-start">
+        
+        <h4 class="font-weight-bolder">Sign In</h4>
+        <p id="error1" style="color: red"></p>
+        <p class="mb-0">Enter your phone_number and password to sign in</p>
+      </div>
+      <div class="card-body">
+        <form id='login-form' role="form">
+          {% csrf_token %}
+          <div class="mb-3">
+            <input type="text" id = "phone_number1" class="form-control form-control-lg" placeholder="Phone Number" aria-label="Phone_number">
+          </div>
+          <div class="mb-3">
+            <input type="password" id = "password" class="form-control form-control-lg" placeholder="Password" aria-label="Password">
+          </div>
+         
+          <div class="text-center">
+            <button type="button" id="login-submit-btn" class="btn btn-lg btn-primary btn-lg w-100 mt-4 mb-0">Sign in</button>
+          </div>
+          <div id="spinner1" style="display: none;">
+            <!-- Add your spinner HTML or image here -->
+            <div class="spinner-border" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
+        </form>
+      </div>
+      <div class="card-footer text-center pt-0 px-lg-2 px-1">
+        <p class="mb-4 text-sm mx-auto">
+          Don't have an account?
+          <p><a href="#ex2" class="text-primary text-gradient font-weight-bold" rel="modal:open">Register</a></p>
+        </p>
+
+      </div>
+    </div>
+
+  
+    
+    <a href="#" rel="modal:close">Close</a>
+    
+  
+  </div>
+  <div id="ex2" class="modal">
+    
+    
+    <div class="card card-plain">
+      <div class="card-header pb-0 text-start">
+        
+        <h4 class="font-weight-bolder">Register</h4>
+        <p id="error2" style="color: red"></p>
+        <p class="mb-0">Enter your email and password to sign in</p>
+      </div>
+      <div class="card-body">
+        <form id="register-form" role="form">
+          {% csrf_token %}
+          <div class="mb-3">
+            <input type="text" class="form-control" id = "user_name" name = "user_name" placeholder="Username" aria-label="Name">
+          </div>
+          <div class="mb-3">
+            <input type="text" class="form-control" id="phone_number2" name = "phone_number" placeholder="Phone_number" aria-label="phone_number">
+          </div>
+          <div class="mb-3">
+            <input type="password" class="form-control" id="password1" name="password1" placeholder="Password" aria-label="Password">
+          </div>
+          <div class="mb-3">
+            <input type="password" class="form-control" id="password2" name="password2" placeholder="Confirm Password" aria-label="Password">
+          </div>
+          
+          <div class="text-center">
+            <button type="button" id="register-submit-btn" class="btn bg-gradient-dark w-100 my-4 mb-2">Sign up</button>
+          </div>
+          <div id="spinner2" style="display: none;">
+            <!-- Add your spinner HTML or image here -->
+            <div class="spinner-border" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
+          <p class="text-sm mt-3 mb-0">Already have an account? <p><a href="#ex1" class="text-primary text-gradient font-weight-bold" rel="modal:open">Log In</a></p>
+
+        </form>
+      </div>
+    
+      
+    </div>
+  
+    
+    <a href="#" rel="modal:close">Close</a>
+  </div>
+  <script>
+      
+    $(document).ready(function () {
+      const error = document.getElementById("error")
+
+        $('#login-submit-btn').click(function () {
+          $("#login_submit_btn").hide();
+        $("#spinner1").show();
+            var phone_number = $('#phone_number1').val();
+
+            var password = $('#password').val();
+            var csrf_token = $("input[name=csrfmiddlewaretoken]").val();  // Get the CSRF token
+
+            // Prepare the data to be sent
+            var data = {
+                username: phone_number,
+                password: password,
+                csrfmiddlewaretoken: csrf_token
+            };
+
+            // Send an AJAX POST request to the server
+            $.ajax({
+                url: '{% url "login" %}',  // Replace with your actual login URL
+                type: 'POST',
+                data: data,
+                success: function (response) {
+                    // Handle the response from the server, e.g., redirect or show a success message
+                    console.log('here');
+                    console.log(response);
+                    location.reload();
+                    
+                },
+                error: function (xhr, status, error) {
+                    // Handle errors, e.g., display an error message
+                    try {
+                      var errorResponse = JSON.parse(xhr.responseText);
+                      console.log(errorResponse)
+                      var errorMessage = errorResponse.errors.__all__[0];
+                      console.log(errorMessage);
+                      $("#error1").html(errorMessage);
+                    } catch (e) {
+                        // Handle JSON parsing error or other issues
+                        console.error(e);
+                        $("#error1").html("An error occurred.");
+                    }
+                    $("#login_submit_btn").show();
+                  $("#spinner1").hide();
+                }
+            });
+        });
+        $('#register-submit-btn').click(function () {
+          $("#register_submit_btn").hide();
+         $("#spinner2").show();
+          var phone_number = $('#phone_number2').val();
+          var username = $('#user_name').val();
+
+          var password1 = $('#password1').val();
+          var password2 = $('#password2').val();
+          var csrf_token = $("input[name=csrfmiddlewaretoken]").val();  // Get the CSRF token
+
+          // Prepare the data to be sent
+          var data = {
+              user_name: username,
+              phone_number: phone_number,
+              password1: password1,
+              password2: password2,
+
+              csrfmiddlewaretoken: csrf_token
+          };
+
+          // Send an AJAX POST request to the server
+          $.ajax({
+              url: '{% url "register" %}',  // Replace with your actual login URL
+              type: 'POST',
+              data: data,
+              success: function (response) {
+                  // Handle the response from the server, e.g., redirect or show a success message
+                  console.log(response);
+                  location.reload();
+                  
+              },
+              error: function (xhr, status, error) {
+                  try {
+                    var errorResponse = JSON.parse(xhr.responseText);
+                    console.log(errorResponse)
+                    var errorMessage = errorResponse.errors.__all__[0];
+                    console.log(errorMessage);
+                    $("#error2").html(errorMessage);
+                  } catch (e) {
+                      // Handle JSON parsing error or other issues
+                      console.error(e);
+                      $("#error2").html("An error occurred.");
+                  }
+                  $("#register_submit_btn").show();
+                  $("#spinner2").hide();
+              }
+          });
+      });
+      $('#submit_start_btn').click(function () {
+        $("#submit_start_btn").hide();
+      $("#spinner3").show();
+          var action = 'start';
+
+          
+          var csrf_token = $("input[name=csrfmiddlewaretoken]").val();  // Get the CSRF token
+
+          // Prepare the data to be sent
+          var data = {
+              action: action,
+              
+              csrfmiddlewaretoken: csrf_token
+          };
+
+          // Send an AJAX POST request to the server
+          $.ajax({
+              url: '{% url "adminpage" %}',  // Replace with your actual login URL
+              type: 'POST',
+              data: data,
+              success: function (response) {
+                  // Handle the response from the server, e.g., redirect or show a success message
+                  console.log('here');
+                  console.log(response);
+                  $("#status").html(response);
+                  $("#spinner3").hide();
+                  $("#submit_stop_btn").show();
+                  
+              },
+              error: function (xhr, status, error) {
+                  // Handle errors, e.g., display an error message
+                  try {
+                    var errorResponse = JSON.parse(xhr.responseText);
+                    console.log(errorResponse)
+                    var errorMessage = errorResponse.errors.__all__[0];
+                    console.log(errorMessage);
+                    $("#error3").html(errorMessage);
+                    
+                  } catch (e) {
+                      // Handle JSON parsing error or other issues
+                      console.error(e);
+                      $("#error3").html("An error occurred.");
+                  }
+                  $("#submit_start_btn").show();
+                $("#spinner3").hide();
+              }
+          });
+      });
+      $('#submit_stop_btn').click(function () {
+        $("#submit_stop_btn").hide();
+      $("#spinner3").show();
+          var action = 'stop';
+
+          
+          var csrf_token = $("input[name=csrfmiddlewaretoken]").val();  // Get the CSRF token
+
+          // Prepare the data to be sent
+          var data = {
+              action: action,
+              
+              csrfmiddlewaretoken: csrf_token
+          };
+
+          // Send an AJAX POST request to the server
+          $.ajax({
+              url: '{% url "adminpage" %}',  // Replace with your actual login URL
+              type: 'POST',
+              data: data,
+              success: function (response) {
+                  // Handle the response from the server, e.g., redirect or show a success message
+                  console.log('here');
+                  console.log(response);
+                  $("#status").html(response);
+                  $("#spinner3").hide();
+                  $("#submit_start_btn").show();
+                  
+              },
+              error: function (xhr, status, error) {
+                  // Handle errors, e.g., display an error message
+                  try {
+                    var errorResponse = JSON.parse(xhr.responseText);
+                    console.log(errorResponse)
+                    var errorMessage = errorResponse.errors.__all__[0];
+                    console.log(errorMessage);
+                    $("#error3").html(errorMessage);
+                  } catch (e) {
+                      // Handle JSON parsing error or other issues
+                      console.error(e);
+                      $("#error3").html("An error occurred.");
+                  }
+                  $("#submit_start_btn").show();
+                  $("#submit_stop_btn").show();
+                $("#spinner3").hide();
+              }
+          });
+      });
+    
+    });
+</script>
+<script>
+    const body = document.getElementsByTagName('body')[0];
+    const hr = document.querySelectorAll('div:not(.sidenav) > hr');
+    const sidebar = document.querySelector('.sidenav');
+    const sidebarWhite = document.querySelectorAll('.sidenav.bg-white');
+    const hr_card = document.querySelectorAll('div:not(.bg-gradient-dark) hr');
+    const text_btn = document.querySelectorAll('button:not(.btn) > .text-dark');
+    const text_span = document.querySelectorAll('span.text-dark, .breadcrumb .text-dark');
+    const text_span_white = document.querySelectorAll('span.text-white');
+    const text_strong = document.querySelectorAll('strong.text-dark');
+    const text_strong_white = document.querySelectorAll('strong.text-white');
+    const text_nav_link = document.querySelectorAll('a.nav-link.text-dark');
+    const secondary = document.querySelectorAll('.text-secondary');
+    const bg_gray_100 = document.querySelectorAll('.bg-gray-100');
+    const bg_gray_600 = document.querySelectorAll('.bg-gray-600');
+    const btn_text_dark = document.querySelectorAll('.btn.btn-link.text-dark, .btn .ni.text-dark');
+    const btn_text_white = document.querySelectorAll('.btn.btn-link.text-white, .btn .ni.text-white');
+    const card_border = document.querySelectorAll('.card.border');
+    const card_border_dark = document.querySelectorAll('.card.border.border-dark');
+    const svg = document.querySelectorAll('g');
+    const navbarBrand = document.querySelector('.navbar-brand-img');
+    const navbarBrandImg = navbarBrand.src;
+    const navLinks = document.querySelectorAll('.navbar-main .nav-link, .navbar-main .breadcrumb-item, .navbar-main .breadcrumb-item a, .navbar-main h6');
+    const cardNavLinksIcons = document.querySelectorAll('.card .nav .nav-link i');
+    const cardNavSpan = document.querySelectorAll('.card .nav .nav-link span');
+  
+  
+    
+      body.classList.add('dark-version');
+      if (navbarBrandImg.includes('logo-ct-dark.png')) {
+        var navbarBrandImgNew = navbarBrandImg.replace("logo-ct-dark", "logo-ct");
+        navbarBrand.src = navbarBrandImgNew;
+      }
+      for (var i = 0; i < cardNavLinksIcons.length; i++) {
+        if (cardNavLinksIcons[i].classList.contains('text-dark')) {
+          cardNavLinksIcons[i].classList.remove('text-dark');
+          cardNavLinksIcons[i].classList.add('text-white');
+        }
+      }
+      for (var i = 0; i < cardNavSpan.length; i++) {
+        if (cardNavSpan[i].classList.contains('text-sm')) {
+          cardNavSpan[i].classList.add('text-white');
+        }
+      }
+      for (var i = 0; i < hr.length; i++) {
+        if (hr[i].classList.contains('dark')) {
+          hr[i].classList.remove('dark');
+          hr[i].classList.add('light');
+        }
+      }
+      for (var i = 0; i < hr_card.length; i++) {
+        if (hr_card[i].classList.contains('dark')) {
+          hr_card[i].classList.remove('dark');
+          hr_card[i].classList.add('light');
+        }
+      }
+      for (var i = 0; i < text_btn.length; i++) {
+        if (text_btn[i].classList.contains('text-dark')) {
+          text_btn[i].classList.remove('text-dark');
+          text_btn[i].classList.add('text-white');
+        }
+      }
+      for (var i = 0; i < text_span.length; i++) {
+        if (text_span[i].classList.contains('text-dark')) {
+          text_span[i].classList.remove('text-dark');
+          text_span[i].classList.add('text-white');
+        }
+      }
+      for (var i = 0; i < text_strong.length; i++) {
+        if (text_strong[i].classList.contains('text-dark')) {
+          text_strong[i].classList.remove('text-dark');
+          text_strong[i].classList.add('text-white');
+        }
+      }
+      for (var i = 0; i < text_nav_link.length; i++) {
+        if (text_nav_link[i].classList.contains('text-dark')) {
+          text_nav_link[i].classList.remove('text-dark');
+          text_nav_link[i].classList.add('text-white');
+        }
+      }
+      for (var i = 0; i < secondary.length; i++) {
+        if (secondary[i].classList.contains('text-secondary')) {
+          secondary[i].classList.remove('text-secondary');
+          secondary[i].classList.add('text-white');
+          secondary[i].classList.add('opacity-8');
+        }
+      }
+      for (var i = 0; i < bg_gray_100.length; i++) {
+        if (bg_gray_100[i].classList.contains('bg-gray-100')) {
+          bg_gray_100[i].classList.remove('bg-gray-100');
+          bg_gray_100[i].classList.add('bg-gray-600');
+        }
+      }
+      for (var i = 0; i < btn_text_dark.length; i++) {
+        btn_text_dark[i].classList.remove('text-dark');
+        btn_text_dark[i].classList.add('text-white');
+      }
+      for (var i = 0; i < sidebarWhite.length; i++) {
+        sidebarWhite[i].classList.remove('bg-white');
+      }
+      for (var i = 0; i < svg.length; i++) {
+        if (svg[i].hasAttribute('fill')) {
+          svg[i].setAttribute('fill', '#fff');
+        }
+      }
+      for (var i = 0; i < card_border.length; i++) {
+        card_border[i].classList.add('border-dark');
+      }
+      
+    
+    
+    </script>
+  
+    
+  <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js" integrity="sha256-lSjKY0/srUM9BE3dPm+c4fBo1dky2v27Gdjm2uoZaL0=" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+{% comment %} <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script> {% endcomment %}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.min.js" integrity="sha384-+sLIOodYLS7CIrQpBjl+C7nPvqq+FbNUBDunl/OZv93DB7Ln/533i8e/mZXLi/P+" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.css" />
+<script src="{% static 'js/adminupdates.js' %}"></script>
+
+
+  
+  
+ 
+  
+
+</body>
+
+</html>

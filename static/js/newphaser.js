@@ -108,12 +108,13 @@ class Example extends Phaser.Scene
                 let chooseballoontext;
                 let ballooncount;
                 let start_with_balloon = true;
-                let balloongroup;
+                let showballoons = true;
+
                 
 
                 wsSocket.onmessage = async function (e) {
                     console.log('received message');
-
+                    
                     if(loading_game){
                       loading_game.destroy();
                     }
@@ -134,9 +135,11 @@ class Example extends Phaser.Scene
 
                         else if (data.type == "start_synchronizer") {
                                 window.allowballoonchange = true;
+                                showballoons = true;
                             
                             // Start the synchronizer countdown
                                console.log('start_synchronizer');
+                               
                                 if (counterText) {
                                     counterText.destroy();
                                 }
@@ -153,15 +156,73 @@ class Example extends Phaser.Scene
                                 console.log(data.count);
                                 const delay = 1000;  // Delay in milliseconds
                                 const updateInterval =1;
-                                const crashPoint = 15; // Adjust this value as needed
-                                chooseballoontext = scene.add.dynamicBitmapText(400, 200, 'desyrel').setOrigin(0.5, 0);
+                                const crashPoint = 10; // Adjust this value as needed
+                                // chooseballoontext = scene.add.dynamicBitmapText(400, 100, 'desyrel').setOrigin(0.5, 0);
+                                var balloons_selected = [];
+                                var selectedBalloon = null;
+                                var balloonColors = [0x54deff, 0xff0000, 0x00ff00, 0x800080]; // Blue, Red, Green, Purple
                                 
                                 
-                                    let count = 15;
+                                    let count = 10;
                                     // Define the minimum countdown value (0 seconds)
                                     const minCountdown = 0;
 
                                     while (count >= minCountdown) {
+                                        if (chooseballoontext) {
+                                            chooseballoontext.destroy();
+                                        }
+                                        chooseballoontext = scene.add.dynamicBitmapText(400, 100, 'desyrel').setOrigin(0.5, 0);
+
+                                        chooseballoontext.setText(`Choose balloon in ${count}`);
+                                        
+                                        if (showballoons) {
+                                            showballoons = false;
+                                            
+                                            
+                                            for (var i = 0; i < 4; i++) {
+                                                var xPosition = 150 + i * 150; // Adjust the x position as needed
+                                                var groupName = 'group_' + (i + 1); // Create group names 'group_1', 'group_2', ...
+                                                var balloon = scene.add.image(xPosition, 300, 'balloon');
+                                                balloon.setTint(balloonColors[i]); // Set the balloon color based on the array
+                                                balloon.setInteractive();
+                                                balloon.setData('group', groupName); // Store the group name as data
+                                                balloon.setScale(0.1);
+                                                
+                                                balloon.on('pointerdown', function () {
+                                                    var group = this.getData('group');
+                                                    if (selectedBalloon !== null) {
+                                                        selectedBalloon.removeTick(); // Remove the tick from the previously selected balloon
+                                                    }
+                                                    this.addTick(); // Add a tick below the clicked balloon
+                                                    selectedBalloon = this; // Set the selected balloon
+                                                    handleBalloonClick(group); // Call the function with the group name
+                                                });
+                                                
+                                                balloon.addTick = function () {
+                                                    // Add a tick (e.g., a line) below the balloon
+                                                    var tick = scene.add.line(0, 0, 0, 20, 0, 0, 0xffffff);
+                                                    tick.setStrokeStyle(3, 0xffffff);
+                                                    tick.x = this.x;
+                                                    tick.y = this.y + this.displayHeight / 2 + 10;
+                                                    tick.setOrigin(0, 0);
+                                                    this.tick = tick;
+                                                };
+                                                
+                                                balloon.removeTick = function () {
+                                                    // Remove the tick from the balloon
+                                                    if (this.tick) {
+                                                        this.tick.destroy();
+                                                        this.tick = null;
+                                                    }
+                                                };
+                                                
+                                                balloons_selected.push(balloon);
+                                            }
+                                        }
+
+                                        
+                                        
+                                        
                                         await new Promise(resolve => setTimeout(resolve, delay));
                                         
                                         // Decrease the countdown by the update interval
@@ -173,13 +234,17 @@ class Example extends Phaser.Scene
                                         }
 
                                         // Update the text with the remaining countdown time
-                                        chooseballoontext.setText('Choose balloon in ' + count + 's');
+                                        // chooseballoontext.setText('Choose balloon in ' + count + 's');
                                         if (count === 0) {
+                                            for (var i = 0; i < balloons_selected.length; i++) {
+                                                balloons_selected[i].destroy();
+                                            }
+                                            
                                             break;
                                         }
                                     }
+                                
                                 chooseballoontext.destroy();
-
                                 game_id = data.game_id
                                 
 
@@ -187,6 +252,7 @@ class Example extends Phaser.Scene
                                 crashInstructionProcessed = false;
                                 cashoutclicked = false;
                                 start = true;
+                                
                                
                                 startgame_official();
                                
@@ -205,28 +271,67 @@ class Example extends Phaser.Scene
                     }
                     async function startgame_official(){
                         if(start_with_balloon){
+                            window.allowballoonchange = true;
+                            betButton.disabled = false;
 
                             start_with_balloon = false
-                        if(window.roomName){
-                            roomName = window.roomName;
-                            console.log(roomName);
                             
-                       
-
+                          
+                         
+                            async function fetchRoomNameAndInitializeWebSocket() {
+                                try {
+                                    const response = await fetch('balloon_chosen', {
+                                        method: 'GET',
+                                    });
+                                    const data = await response.json();
+                                    console.log(data);
+                            
+                                    if (data.group_name) {
+                                        roomName = data.group_name;
+                                        window.roomName = data.group_name;
+                                        handleBalloonClick(window.roomName);
+                                    } else {
+                                        roomName = window.roomName;
+                                    }
+                            
+                                    console.log(roomName);
+                            
+                                    // Initialize WebSocket after obtaining roomName
+                                    groupSocket = new WebSocket(
+                                        'wss://'
+                                        + window.location.host
+                                        + '/ws/real_time_updates/'
+                                        + roomName
+                                        + '/'
+                                    );
+                                    continuation_of_start_game_official();
+                                } catch (error) {
+                                    console.error('Error:', error);
+                                }
+                            }
+                            
+                            if (window.roomName) {
+                                fetchRoomNameAndInitializeWebSocket();
+                            } else {
+                                window.roomName = 'group_1';
+                                roomName = 'group_1';
+                            
+                                // Initialize WebSocket with the default roomName
+                                groupSocket = new WebSocket(
+                                    'wss://'
+                                    + window.location.host
+                                    + '/ws/real_time_updates/'
+                                    + roomName
+                                    + '/'
+                                );
+                                continuation_of_start_game_official();
+                            }
                         }
-                        else{
-                            window.roomName = 'group_1';
-                            roomName = 'group_1';
-
-                        }
-                        groupSocket = new WebSocket(
-                                'wss://'
-                                + window.location.host
-                                + '/ws/real_time_updates/'
-                                + roomName
-                                + '/'
-                            );
-                            console.log("connected to room");
+                    }
+                            
+                    async function continuation_of_start_game_official(){
+                        window.allowballoonchange = false;
+                            
                             
                             groupSocket.onmessage = async function (e) {
                                 
@@ -278,7 +383,7 @@ class Example extends Phaser.Scene
                                                 poppedbackground.setTint(0x00ff00); // Green tint
                                                 break;
                                             case 'group_4':
-                                                poppedbackground.setTint(0xffffff); // White tint
+                                                poppedbackground.setTint(0x800080); // White tint
                                                 break;
                                             default:
                                                 console.log('Invalid group name: ' + roomName);
@@ -300,10 +405,10 @@ class Example extends Phaser.Scene
                                         console.log('bet_amount reset');
                                         start_initial = true;
                                         start = true;
-                                        window.allowballoonchange = false
+                                        window.allowballoonchange = false;
             
                                         crashInstructionProcessed = true;
-                                        start_with_balloon = true
+                                        start_with_balloon = true;
                                         
             
                                     }
@@ -364,11 +469,18 @@ class Example extends Phaser.Scene
                                     }
                                     
                                 }
+                            }
                         
 
-                    }
-                }
+                    
+                
                     async function countAndDisplayInitial(count){
+                        if(count>15){
+                            
+                            groupSocket.close();
+                            return
+                                
+                         }
                        
                         if(bet_allowed_text){
                             
@@ -381,7 +493,7 @@ class Example extends Phaser.Scene
                         countdownText = scene.add.dynamicBitmapText(400, 400, 'desyrel', '').setOrigin(0.5, 0);
                         bet_allowed_text = scene.add.dynamicBitmapText(400, 200, 'desyrel', '').setOrigin(0.5, 0);
                         countdownText.setText(`Game starts in ${count}`);
-                       
+                        
                         if(count>5){
                             
                             bet_allowed_text.setText('Place your bet');
@@ -430,7 +542,7 @@ class Example extends Phaser.Scene
                                     balloon.setTint(0x00ff00); // Green tint
                                     break;
                                 case 'group_4':
-                                    balloon.setTint(0xffffff); // White tint
+                                    balloon.setTint(0x800080); // White tint
                                     break;
                                 default:
                                     console.log('Invalid group name: ' + roomName);
@@ -692,7 +804,7 @@ class Example extends Phaser.Scene
                                 // Schedule the text to be cleared after 5 minutes
                                 setTimeout(() => {
                                     crashText.destroy();
-                                }, 2000); // 5 minutes in milliseconds                          
+                                }, 5000); // 5 minutes in milliseconds                          
      
 
                 }

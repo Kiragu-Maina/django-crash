@@ -1,7 +1,7 @@
 from django.http import JsonResponse, HttpResponse
 from django.views.generic import TemplateView
 from django.views import View
-from .models import Transactions, BettingWindow, CashoutWindow, Games, Bank
+from .models import Transactions, BettingWindow, CashoutWindow, Games, Bank, OwnersBank
 from .utils import ServerSeedGenerator
 
 from django.contrib.messages.views import SuccessMessageMixin
@@ -35,6 +35,7 @@ import asyncio
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer # Import your GameManager module
 from .tasks import start_game, stop_game
+from django.contrib.auth.decorators import permission_required
 
 @method_decorator(csrf_exempt, name='dispatch')
 class StartGameView(View):
@@ -158,9 +159,20 @@ class Home(TemplateView):
         betting_window_state, game_id = self.get_betting_window_state(request.POST.get('group_name'))
         if betting_window_state:
             
+            
             if self.request.user.is_authenticated:
                 bet_amount = request.POST.get('bet_amount')
+                print(bet_amount)
+                group_name = request.POST.get('group_name')
                 user = self.request.user
+                  # Check if a transaction with the same game_id exists
+                if Transactions.objects.filter(game_id=game_id, user=user).exists():
+                    raise ValidationError("A transaction with this game_id already exists.")
+                    response_data = {
+                    'status': 'error',
+                    'message': 'A transaction with this game_id already exists',
+                        }
+                    return JsonResponse(response_data, status=200)
                 
                 try:
                     bank_instance = Bank.objects.select_for_update().get(user=user)
@@ -173,7 +185,12 @@ class Home(TemplateView):
                 except Bank.DoesNotExist:
                     return JsonResponse({'status': 'error', 'message': 'no_bank'}, status=400)
                 
-                bet_instance = Transactions(user=user, bet=bet_amount, multiplier=0, won=0, game_id=game_id)
+               
+               
+                     
+
+                # Create and save the transaction instance
+                bet_instance = Transactions(user=user, bet=bet_amount, multiplier=0, won=0, game_id=game_id, group_name=group_name)
                 bet_instance.save()
                 
                 response_data = {
@@ -315,37 +332,129 @@ class CashoutView(View):
     
     
     
-class DepositView(TemplateView):
-    template_name = 'deposit.html'
-    
-class WithdrawView(TemplateView):
-    template_name = 'withdraw.html'
-    
-class AdminView(TemplateView):
-    template_name = 'admin.html'
-
-    def start_game(self):
-        start_game.delay()
-        return HttpResponse('Starting games...')
-
-    def stop_game(self):
-        all_games_manager = cache.set('all_games_manager', 5)
+class DepositView(View):
+    decorators = [csrf_protect, login_required, transaction.atomic]
+    @method_decorator(decorators)
+    def post(self, request, *args, **kwargs):
         
+       
+        deposit_amount = request.POST.get('deposit_amount')
+        
+        user = request.user
+        amount_to_add = Decimal(deposit_amount)
+
+        
+
+        try:
+            bank_instance = Bank.objects.select_for_update().get(user=user)
+            bank_instance.balance += amount_to_add
+            bank_instance.save()
+            response_data = {
+                        'status': 'success',
+                        'message': 'Deposit successful'
+                    }
+        except Bank.DoesNotExist:
+            response_data =  {'status': 'error', 'message': 'no_bank'}
+
+                    
+                
+        return JsonResponse(response_data, status=400 if response_data['status'] == 'error' else 200)
     
+class WithdrawView(View):
+    decorators = [csrf_protect, login_required, transaction.atomic]
+    @method_decorator(decorators)
+    def post(self, request, *args, **kwargs):
+        
+       
+        withdraw_amount = request.POST.get('withdraw_amount')
+        
+        user = request.user
+        amount_to_subtract = Decimal(withdraw_amount)
+
+        
+
+        try:
+            bank_instance = Bank.objects.select_for_update().get(user=user)
+            bank_instance.balance -= amount_to_subtract
+            bank_instance.save()
+            response_data = {
+                        'status': 'success',
+                        'message': 'Withdrawal successful'
+                    }
+        except Bank.DoesNotExist:
+            response_data =  {'status': 'error', 'message': 'no_bank'}
+
+                    
+                
+        return JsonResponse(response_data, status=400 if response_data['status'] == 'error' else 200)
+ 
+# @method_decorator(permission_required('crash.customadminpermission', raise_exception=True), name='dispatch')
+@method_decorator(login_required, name='dispatch')
+class AdminView(TemplateView):
+    template_name = 'admin2.html'
+
+    def start_game_action(self):
+        game_status = cache.set('game_status', 'started')
+        start_game.delay()
+        return HttpResponse('Game Started...')
+
+    def stop_game_action(self):
+        all_games_manager = cache.set('all_games_manager', 5)
+        game_status = cache.set('game_status', 'stopped')
+
         all_games_manager = int(all_games_manager) + 1
         stop_game.delay()
-        return HttpResponse('Stopping games...')
+        return HttpResponse('Game stopped...')
 
     def post(self, request, *args, **kwargs):
         action = request.POST.get('action')
 
         if action == 'start':
-            response = self.start_game()
-            print('started')
+            response = self.start_game_action()
+            print('Game started')
         elif action == 'stop':
-            response = self.stop_game()
-            print('stopped')
+            response = self.stop_game_action()
+            print('Game stopped')
         else:
             response = HttpResponse('Invalid action')
 
         return response
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        try:
+            user = self.request.user
+            owners_bank = OwnersBank.objects.get(user=user)
+            pot_amount = owners_bank.total_cash
+            profit = owners_bank.profit_to_owner
+            revenue = owners_bank.total_real
+            
+            context['pot_amount'] = pot_amount
+            context['profit'] = profit
+            context['revenue'] = revenue
+            
+        except OwnersBank.DoesNotExist:
+            print("OwnersBank record does not exist for the user:", self.request.user)
+        
+        return context
+        
+        
+@method_decorator(login_required, name='dispatch')
+class BalloonChosenView(View):
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        transaction_instance = Transactions.objects.filter(user=user).order_by('created_at').last()
+        games_instance = Games.objects.filter(group_name=transaction_instance.group_name).order_by('created_at').last()
+        if transaction_instance.game_id == games_instance.game_id:
+            print(transaction_instance.group_name)
+            response = {
+                'group_name': transaction_instance.group_name
+                
+            }
+        else:
+            response = {
+                'group_name': ''
+                
+            }
+        
+        return JsonResponse(response)

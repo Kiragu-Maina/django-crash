@@ -152,7 +152,21 @@ class GameManager:
         # Send crash instruction and print message
         await self.bettingcashoutmanager.close_cashout_window()
         await self.send_instruction({"type": "crash_instruction", "crash": self.crash_point})
+        channel_layer = get_channel_layer()
         print(f"Crash for {self.group_name} occurred at {self.crash_point} seconds")
+        data = {
+            'group_name':self.group_name,
+            'game_id':self.current_game_id,
+        }
+        await channel_layer.group_send(
+                "realtime_group",  
+                {
+                    "type": "game.crashed",
+                    "data":data,
+                    
+                }
+            )
+        
 
         # Wait for 5 seconds before running again
         
@@ -170,7 +184,7 @@ class GameManager:
         if all_games_manager == 4:
             print('multiplier', all_games_manager)
             cache.set('all_games_manager', 0)
-            channel_layer = get_channel_layer()
+            
         
             await channel_layer.group_send(
                 "realtime_group",  
@@ -293,7 +307,7 @@ class BettingCashoutManager:
         
         await self.set_window_state(BettingWindow, True)
         
-        for count in range(30, 0, -1):
+        for count in range(20, 0, -1):
             await self.send_instruction({"type": "count_initial", "count": count })
             
             await asyncio.sleep(1)  # Allow betting for 15 seconds

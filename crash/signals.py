@@ -1,22 +1,43 @@
 from django.db.models.signals import post_save
 from django.dispatch import Signal, receiver
-from .models import Transactions, User, Bank, Clients, Games
+from .models import Transactions, User, Bank, Clients, Games, OwnersBank
 
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
-
+from decimal import Decimal
 
 
 @receiver(post_save, sender=Transactions)
 def transaction_saved(sender, instance, **kwargs):
     # Construct the data that you want to send to the WebSocket consumer
     print('signals called')
+    if instance.game_played == True:
+        if instance.won > 0:
+            data_type ="table_update"
+            
+        elif instance.won == 0:
+            data_type ="lose_update"
+        else:
+            data_type ="lose_update"
+    else:
+        data_type = "bet_placed_update"
+        
+    if str(instance.group_name) == 'group_1':
+        balloon = 'blue'
+    elif str(instance.group_name) == 'group_2':
+        balloon = 'red'
+    elif str(instance.group_name) == 'group_3':
+        balloon = 'green'
+    elif str(instance.group_name) == 'group_4':
+        balloon = 'purple'
+        
     data = {
         "user": str(instance.user),
         "bet": instance.bet,
         "multiplier": str(instance.multiplier),
         "won": str(instance.won),
-        "type":"table_update",
+        "balloon":balloon,
+        "type":data_type,
     }
     print(data)
     # Call the update_table method in the WebSocket consumer
@@ -48,21 +69,22 @@ def bank_updated(sender, instance, **kwargs):
     }
     user = instance.user
     client = Clients.objects.filter(user=user).first()
-    channel_name = client.channel_name
-    print(channel_name)
-    
-    
+    if client is not None:
+        channel_name = client.channel_name
+        print(channel_name)
+        
+        
 
-    # Send the update to the user's channel
-    channel_layer = get_channel_layer()
-    async_to_sync(channel_layer.send)(
-        f"{channel_name}",  # Use a unique channel name per user
-        {
-            "type": "balance.update",
-            "data": data,
-            
-        }
-    )
+        # Send the update to the user's channel
+        channel_layer = get_channel_layer()
+        async_to_sync(channel_layer.send)(
+            f"{channel_name}",  # Use a unique channel name per user
+            {
+                "type": "balance.update",
+                "data": data,
+                
+            }
+        )
     
 @receiver(post_save, sender=Games)
 def game_updated(sender, instance, **kwargs):
@@ -79,6 +101,40 @@ def game_updated(sender, instance, **kwargs):
         "table_updates",
         {
             "type": "table.update",
+            "data": data,
+        }
+    )
+    
+@receiver(post_save, sender=Bank)
+def update_owners_bank(sender, instance, **kwargs):
+    # Whenever a Bank instance is saved, update the OwnersBank balance
+    owner_username = 'admin'  # Replace with the actual owner's username
+    owners_bank, created = OwnersBank.objects.get_or_create(user=User.objects.get(user_name=owner_username))
+    
+    if not created:
+        owners_bank.update_balance()
+    
+@receiver(post_save, sender=OwnersBank)
+def game_updated(sender, instance, **kwargs):
+    print('Owner update')
+    
+    
+    data = {
+        "type": "new_update",
+        "user":str(instance.user),   
+        "users_cash":str(instance.users_cash),
+        "float_cash":str(instance.float_cash),
+        "total_cash":str(instance.total_cash),
+        "revenue":str(instance.total_real),
+        "profit":str(instance.profit_to_owner),
+    }
+    
+
+    channel_layer = get_channel_layer()
+    async_to_sync(channel_layer.group_send)(
+        "admin_updates",
+        {
+            "type": "pot.update",
             "data": data,
         }
     )
