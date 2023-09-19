@@ -4,14 +4,14 @@ from .utils import ServerSeedGenerator
 import time
 from asyncio import Queue
 import uuid
-from .models import BettingWindow, CashoutWindow, Transactions, Games
+from .models import BettingWindow, CashoutWindow, Transactions, Games, GameSets
 from django.core.cache import cache
 from channels.db import database_sync_to_async
 import autobahn
 import channels
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
-
+from django.db import transaction
 
 
 class GameManager:
@@ -35,7 +35,7 @@ class GameManager:
         self.bettingcashoutmanager = BettingCashoutManager()
         self.game_lock = asyncio.Lock()
         self.group_name = group_name 
-        
+        self.game_set_id = None
         
 
 
@@ -60,6 +60,7 @@ class GameManager:
             return existing_instance
 
     async def stop_game(self):
+        cache.delete(f"{self.game_set_id}_all_games_manager")
         self.game_play = False
         
     async def start_game(self):
@@ -89,27 +90,30 @@ class GameManager:
             print('15 seconds should start counting from here')
             await self.notify_users_game_start(game_id)
             
-            await self.bettingcashoutmanager.allow_betting_period(self.group_name, game_id, self.generated_hash, self.server_seed, self.salt)
+            self.game_play = await self.bettingcashoutmanager.allow_betting_period(self, self.group_name, game_id, self.generated_hash, self.server_seed, self.salt)
             
     
             print('back after 15 seconds')
+            if self.game_play == False:
+                print(self.game_play)
+                break
            
             self.game_multiplier = asyncio.create_task(self.update_game_state_in_cache())
             await self.game_logic()
     async def notify_users_game_start(self, game_id):
         print('notify users called')
         data = {'type':'start_synchronizer','game_id':game_id, 'count':15}
-        
-        channel_layer = get_channel_layer()
-        
-        await channel_layer.group_send(
-            "realtime_group",  
-            {
-                "type": "realtime.update",
-                "data": data,
-            }
-        )
-        print('sent')
+        if self.group_name == 'group_1':
+            channel_layer = get_channel_layer()
+            
+            await channel_layer.group_send(
+                "realtime_group",  
+                {
+                    "type": "realtime.update",
+                    "data": data,
+                }
+            )
+            print('sent', self.group_name)
 
         
 
@@ -137,12 +141,10 @@ class GameManager:
             count += update_interval
             countofron = round(count, 2)
             self.current_multiplier = countofron
-            all_games_manager = cache.get('all_games_manager')
-            if all_games_manager == 5:
-                self.game_running = False
-                self.game_play = False
+            if cache.get('kill') == True:
+                await self.stop_game()
                 return
-            
+           
             
             
             
@@ -171,30 +173,37 @@ class GameManager:
         # Wait for 5 seconds before running again
         
         await asyncio.sleep(5)
-        all_games_manager = cache.get('all_games_manager')
+        self.game_set_id = cache.get('game_set_id')
+        all_games_manager = cache.get(f"{self.game_set_id}_all_games_manager")
         if all_games_manager is None:
             all_games_manager = 0
     
         all_games_manager = int(all_games_manager) + 1
     
-        cache.set('all_games_manager', all_games_manager)
+        cache.set(f"{self.game_set_id}_all_games_manager", all_games_manager)
         self.game_running = False
         self.game_play = False
         
         if all_games_manager == 4:
             print('multiplier', all_games_manager)
-            cache.set('all_games_manager', 0)
+            cache.delete(f"{self.game_set_id}_all_games_manager")
             
         
-            await channel_layer.group_send(
-                "realtime_group",  
-                {
-                    "type": "restart.game",
-                    
-                }
-            )
-        elif all_games_manager == 5:
-            return
+            await self.update_game_set()
+            
+    @database_sync_to_async
+    def update_game_set(self):
+        
+        with transaction.atomic():
+            try:
+                gameset_instance = GameSets(game_set_id = self.game_set_id)
+                gameset_instance.save()
+                        
+           
+            
+            except Exception as e:
+                print("An error occurred:", str(e))
+        
             
             
             
@@ -206,6 +215,7 @@ class GameManager:
     async def update_game_state_in_cache(self):
        
         while self.game_running:
+            while self.game_play:
                 # Update and cache the game state here
                 cache.set(f'{self.group_name}_game_multiplier', self.current_multiplier, timeout=1)
                 await asyncio.sleep(0.05)  # Adjust the update frequency as needed
@@ -292,7 +302,7 @@ class BettingCashoutManager:
             
             cache.set(cashout_window_key, is_open, timeout=3600)
 
-    async def allow_betting_period(self, group_name, game_id, generated_hash, server_seed, salt):
+    async def allow_betting_period(self, gamemanager, group_name, game_id, generated_hash, server_seed, salt):
         
         self.group_name = group_name
        
@@ -307,11 +317,16 @@ class BettingCashoutManager:
         
         await self.set_window_state(BettingWindow, True)
         
-        for count in range(30, 0, -1):
+        for count in range(20, 0, -1):
             await self.send_instruction({"type": "count_initial", "count": count })
+            if cache.get('kill') == True:
+                await gamemanager.stop_game()                
+                return False
+           
             
             await asyncio.sleep(1)  # Allow betting for 15 seconds
         await self.set_window_state(BettingWindow, False)
+        return True
 
     async def open_cashout_window(self, group_name):
         print('open cashout window called')

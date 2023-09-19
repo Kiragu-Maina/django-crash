@@ -38,7 +38,7 @@ class Example extends Phaser.Scene
         async function main(scene) {
             try {
                 
-                const wsSocket = new WebSocket("wss://" + window.location.host + "/ws/realtime/");
+                const wsSocket = new WebSocket("ws://" + window.location.host + "/ws/realtime/");
                 // const wsSocket = new WebSocket('ws://'
                 // + window.location.host
                 // + '/ws/real_time_updates/'
@@ -80,10 +80,8 @@ class Example extends Phaser.Scene
                 // const counterText = scene.add.dynamicBitmapText(400, 200, 'desyrel', '0.00').setOrigin(0.5, 0);
                 
                 
-                let crashInstructionProcessed = false;
-                let countAndDisplayTimer;   
-                let continueCounting = true;
-                const delayTime = 10;    
+               
+                
                 let counterText;
                 let countdownText;
                 let crashText;
@@ -137,7 +135,6 @@ class Example extends Phaser.Scene
                         else if (data.type == "start_synchronizer") {
                                 window.allowballoonchange = true;
                                 showballoons = true;
-                                
                             
                             // Start the synchronizer countdown
                                console.log('start_synchronizer');
@@ -152,7 +149,9 @@ class Example extends Phaser.Scene
                                     // Destroy the existing background image
                                     poppedbackground.destroy();
                                 }
-                               
+                               if (groupSocket){
+                                groupSocket.close();
+                               }
     
                                 backg = scene.add.image(400, 300, 'bg').setPipeline('Light2D');
                                 backg.setScale(2.7, 3.5);
@@ -189,7 +188,7 @@ class Example extends Phaser.Scene
                                                 balloon.setTint(balloonColors[i]); // Set the balloon color based on the array
                                                 balloon.setInteractive();
                                                 balloon.setData('group', groupName); // Store the group name as data
-                                                balloon.setScale(0.25);
+                                                balloon.setScale(0.3);
                                                 
                                                 balloon.on('pointerdown', function () {
                                                     var group = this.getData('group');
@@ -252,12 +251,12 @@ class Example extends Phaser.Scene
                                 
 
                                     
-                                crashInstructionProcessed = false;
+                                
                                 cashoutclicked = false;
                                 start = true;
                                 
                                
-                                startgame_official();
+                                await startgame_official();
                                
                                 
                                
@@ -273,7 +272,7 @@ class Example extends Phaser.Scene
                        
                     }
                     async function startgame_official(){
-                        if(start_with_balloon){
+                       
                             window.allowballoonchange = true;
                             betButton.disabled = false;
 
@@ -281,56 +280,35 @@ class Example extends Phaser.Scene
                             
                           
                          
-                            async function fetchRoomNameAndInitializeWebSocket() {
-                                try {
-                                    const response = await fetch('balloon_chosen', {
-                                        method: 'GET',
-                                    });
-                                    const data = await response.json();
-                                    console.log(data);
-                            
-                                    if (data.group_name) {
-                                        roomName = data.group_name;
-                                        window.roomName = data.group_name;
-                                        handleBalloonClick(window.roomName);
-                                    } else {
-                                        roomName = window.roomName;
-                                    }
-                            
-                                    console.log(roomName);
-                            
-                                    // Initialize WebSocket after obtaining roomName
-                                    groupSocket = new WebSocket(
-                                        'wss://'
-                                        + window.location.host
-                                        + '/ws/real_time_updates/'
-                                        + roomName
-                                        + '/'
-                                    );
-                                    continuation_of_start_game_official();
-                                } catch (error) {
-                                    console.error('Error:', error);
-                                }
-                            }
                             
                             if (window.roomName) {
-                                fetchRoomNameAndInitializeWebSocket();
-                            } else {
-                                window.roomName = 'group_1';
-                                roomName = 'group_1';
-                            
-                                // Initialize WebSocket with the default roomName
+                                roomName = window.roomName
+                                handleBalloonClick(roomName)
                                 groupSocket = new WebSocket(
-                                    'wss://'
+                                    'ws://'
                                     + window.location.host
                                     + '/ws/real_time_updates/'
                                     + roomName
                                     + '/'
                                 );
-                                continuation_of_start_game_official();
+                                await continuation_of_start_game_official()
                             }
+                            else {
+                                
+                                roomName = 'group_1';
+                                handleBalloonClick(roomName)
+                                 groupSocket = new WebSocket(
+                                    'ws://'
+                                    + window.location.host
+                                    + '/ws/real_time_updates/'
+                                    + roomName
+                                    + '/'
+                                );
+                                await continuation_of_start_game_official()
+                            }
+                               
                         }
-                    }
+                    
                             
                     async function continuation_of_start_game_official(){
                         window.allowballoonchange = false;
@@ -346,14 +324,13 @@ class Example extends Phaser.Scene
                                     if (data.type === "crash_instruction") {
                                         // Handle crash instruction, e.g., trigger the crash action in the game
                                         console.log(data)
-                                        start_with_balloon = true;
-                                       
+                                        groupSocket.close();
                                         
                                         const crashpoint = data.crash
                                         if (backg) {
                                             // Destroy the existing background image
                                             backg.destroy();
-                                        }
+                                      }
                                         if (balloonsTween) {
                                             balloonsTween.stop(); // Stop the balloon animation
                                             balloonsTween = null; // Clear the tween reference
@@ -376,7 +353,7 @@ class Example extends Phaser.Scene
                                     
                                         // Create a new background image with the new texture
                                         poppedbackground = scene.add.image(400, 300, 'popped');
-                                        poppedbackground.setScale(2.7, 3.5);
+                                        poppedbackground.setScale(3.5, 3.5);
                                         switch (window.roomName) {
                                             case 'group_1':
                                                 // No tint (default color)
@@ -412,9 +389,8 @@ class Example extends Phaser.Scene
                                         start = true;
                                         window.allowballoonchange = false;
             
-                                        crashInstructionProcessed = true;
-                                        groupSocket.close();
                                         
+                                        start_with_balloon = true;
                                         
             
                                     }
@@ -451,7 +427,7 @@ class Example extends Phaser.Scene
                                         if (crashText) {
                                             crashText.destroy();
                                         }
-                                        countAndDisplayInitial(data.count);
+                                        await countAndDisplayInitial(data.count);
             
             
                                     }
@@ -501,7 +477,7 @@ class Example extends Phaser.Scene
                         bet_allowed_text = scene.add.dynamicBitmapText(400, 200, 'desyrel', '').setOrigin(0.5, 0);
                         countdownText.setText(`Game starts in ${count}`);
                         
-                        if(count>5){
+                        if(count>1){
                             
                             bet_allowed_text.setText('Place your bet');
                                
@@ -565,8 +541,7 @@ class Example extends Phaser.Scene
                         balloons.getChildren().forEach((balloon) => {
                             changeBalloonColor(balloon, window.roomName);
                             balloon.setOrigin(0.5, 1); // Set the anchor point to the bottom center
-                            balloon.setScale(0.25);
-                            
+                            balloon.setScale(0.5);
                             balloon.x = centerX; // Set the initial x position to the center
                             balloon.y = centerY+10; // Set the initial y position to the bottom
                         });
@@ -649,7 +624,7 @@ class Example extends Phaser.Scene
                             let y = 0;
                         
                             //  To change the total number of lights see the Game Config object
-                            const maxLights = 20;
+                            const maxLights = 3;
                         
                             //  Create a bunch of lights
                             for (let i = 0; i < maxLights; i++) {
@@ -689,7 +664,7 @@ class Example extends Phaser.Scene
                             counterText.destroy();
                         }
                        
-                        const delay = 100;  // Delay in milliseconds
+                        const delay = 50;  // Delay in milliseconds
                         const updateInterval = 0.01;
                         const crashPoint = 1000000; // Adjust this value as needed
                         counterText = scene.add.dynamicBitmapText(400, 200, 'desyrel').setOrigin(0.5, 0);
@@ -697,14 +672,35 @@ class Example extends Phaser.Scene
                         bet_allowed_text.setText(' Ongoing game,\n Wait for new game');
                         
                             let count = multiplier;
-                            while (count <= crashPoint) {
-                                await new Promise(resolve => setTimeout(resolve, delay));
-                                count += updateInterval;
-                                const counted = Math.round(count * 100) / 100;
-                                 // Assuming you have a context with 'self' available
-                                counterText.setText('x' + counted);
-                                 
+                            
+                            async function update() {
+                                while (count <= crashPoint) {
+                                    await new Promise(resolve => setTimeout(resolve, delay));
+                                    count += updateInterval;
+                                    const counted = Math.round(count * 100) / 100;
+                        
+                                    // Check if counterText is still valid before setting text
+                                    try {
+                                        if (!counterText) {
+                                            throw new Error("counterText is null.");
+                                        }
+                        
+                                        counterText.setText('x' + counted);
+                                        
+                                    } catch (error) {
+                                        console.error(`error is ${error.message}`);
+                                        break;
+                                    }
+                        
+                                    // Schedule the next update
+                                    
+                                }
                             }
+                        
+                            // Start the asynchronous update loop
+                            update();
+                        }
+                        
                           
                         
                  
@@ -716,40 +712,75 @@ class Example extends Phaser.Scene
                         
                         
                     
-                    }
-                    async function countAndDisplay() {
-                        // Destroy the existing counterText if it exists
-                        if (counterText) {
-                            counterText.destroy();
-                        }
-                        if(bet_allowed_text){
-                            
-                            bet_allowed_text.destroy();
-                               
-                        }
-                        const delay = 50;  // Delay in milliseconds
-                        const updateInterval = 0.01;
-                        const crashPoint = 1000000; // Adjust this value as needed
-                        counterText = scene.add.dynamicBitmapText(400, 200, 'desyrel').setOrigin(0.5, 0);
-                        
+                        async function countAndDisplay() {
+                            // Destroy the existing counterText if it exists
+                            console.log('countAndDisplay called');
+                            if (counterText) {
+                                counterText.destroy();
+                            }
+                            if (bet_allowed_text) {
+                                bet_allowed_text.destroy();
+                            }
+                            const delay = 100;  // Delay in milliseconds
+                            const updateInterval = 0.01;
+                            const crashPoint = 1000000; // Adjust this value as needed
+                            counterText = scene.add.dynamicBitmapText(400, 200, 'desyrel').setOrigin(0.5, 0);
                         
                             let count = 1;
-                            while (count <= crashPoint) {
-                                await new Promise(resolve => setTimeout(resolve, delay));
-                                count += updateInterval;
-                                const counted = Math.round(count * 100) / 100;
-                                 // Assuming you have a context with 'self' available
-                                counterText.setText('x' + counted);
-                                await updateCashoutButtonText(counterText); 
+                           
+                            let counted;
+                          
+                            async function update() {
+                                while (count <= crashPoint) {
+                                    await new Promise(resolve => setTimeout(resolve, delay));
+                                    count += updateInterval;
+                                    counted = Math.round(count * 100) / 100;
+                                    
+                                    
+
+                                    if (count < window.multiplier){
+                                        count = window.multiplier
+                                        counted = count.toFixed(2);
+                                        
+                                        }
+                                   
+                                        
+                                    
+                        
+                                    // Check if counterText is still valid before setting text
+                                    try {
+                                        if (!counterText) {
+                                            throw new Error("counterText is null.");
+                                        }
+                        
+                                        counterText.setText('x' + counted);
+                                        await updateCashoutButtonText(counterText);
+                                    } catch (error) {
+                                        console.error(`error is ${error.message}`);
+                                        break;
+                                    }
+                        
+                                    // Schedule the next update
+                                    
+                                }
                             }
+                        
+                            // Start the asynchronous update loop
+                            update();
+                        }
+                        
+                        
+                                    
+                        
+                                    // Schedule the next update
+                        
+                            // Start the asynchronous update loop
                           
                         
                         
                         
-                            
                         
-                        
-                    }
+                    
                         
                     async function cashout(){
                         console.log('cashout called')
@@ -797,7 +828,7 @@ class Example extends Phaser.Scene
                     function CountingComplete( crashpoint) {
                         
                         
-                                clearTimeout(countAndDisplayTimer);
+                               
                                 if (counterText) {
                                     counterText.destroy();
                                 }
@@ -809,11 +840,7 @@ class Example extends Phaser.Scene
                                 crashText = scene.add.dynamicBitmapText(400, 200, 'desyrel').setOrigin(0.5, 0);
                                 crashText.setText('Popped at x' + crashpoint);
                                 
-                                // Schedule the text to be cleared after 5 minutes
-                                setTimeout(() => {
-                                    crashText.destroy();
-                                }, 5000); // 5 minutes in milliseconds                          
-     
+                              
 
                 }
                     function drawgraph(scene, wsSocket){

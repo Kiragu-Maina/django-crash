@@ -15,22 +15,24 @@ class ServerSeedGenerator:
     def generate_hash(self):
         self.generated_hash = hashlib.sha256(self.server_seed.encode()).hexdigest()
         return self.generated_hash
-
+    
+    
     def crash_point_from_hash(self):
-        hash_input = hmac.new(self.server_seed.encode(), self.salt.encode(), hashlib.sha256).hexdigest()
-        hs = int(100 / 4)
+            # Calculate HMAC with generated_hash and salt
+            hash_input = hmac.new(bytes.fromhex(self.generated_hash), self.salt.encode(), hashlib.sha256).hexdigest()
+            hs = int(100 / 3)
 
-        def divisible(hash_val, divisor):
-            return int(hash_val, 16) % divisor == 0
+            def divisible(hash_val, divisor):
+                return int(hash_val, 16) % divisor == 0
 
-        if divisible(hash_input, hs):
-            self.crash_point = 1
-        else:
-            h = int(hash_input[:int(52 / 4)], 16)
-            e = 2 ** 52
-            self.crash_point = math.floor((100 * e - h) / (e - h)) / 100.0
-       
-        return self.crash_point
+            if divisible(hash_input, hs):
+                self.crash_point = 1
+            else:
+                h = int(hash_input[:int(52 / 4)], 16)
+                e = 2 ** 52
+                self.crash_point = math.floor((100 * e - h) / (e - h)) / 100.0
+
+            return self.crash_point
 
     def get_generated_hash(self):
         self.generated_hash = self.generate_hash()

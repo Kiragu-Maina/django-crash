@@ -70,7 +70,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     REQUIRED_FIELDS = ['user_name']
 
     def __str__(self):
-        return self.user_name
+       
+        return str(self.phone_number)
 
     @staticmethod
     def has_perm(perm, obj=None, **kwargs):
@@ -96,7 +97,7 @@ class Transactions(models.Model):
     multiplier = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     won = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     
-    game_id = models.CharField(max_length=200, unique=True)
+    game_id = models.CharField(max_length=200)
     created_at = models.DateTimeField(auto_now=True)
     updated_at = models.DateTimeField(auto_now=True)
     game_played = models.BooleanField(default=False)
@@ -114,6 +115,10 @@ class Bank(models.Model):
     balance = models.DecimalField(max_digits=10, decimal_places=2, default=50000)
     profit_to_user = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     losses_by_user = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    
+class GameSets(models.Model):
+    created_at = models.DateTimeField(auto_now=True)
+    game_set_id = models.CharField(max_length=200)
 
 class OwnersBank(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -173,6 +178,7 @@ class Games(models.Model):
     salt = models.CharField(max_length=255, unique=True)
     created_at = models.DateTimeField(auto_now=True)
     updated_at = models.DateTimeField(auto_now=True)
+    crash_point = models.CharField(max_length=255, default='')
     
     
 class Clients(models.Model):
@@ -180,5 +186,4 @@ class Clients(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
-    def __str__(self):
-        return self.channel_name
+    

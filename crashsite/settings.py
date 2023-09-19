@@ -66,6 +66,8 @@ INSTALLED_APPS = [
      "cloudinary_storage",
     "cloudinary", 
     'channels',
+    'pipeline',
+    'django_celery_beat',
     
 
     
@@ -91,6 +93,7 @@ CLOUDINARY_STORAGE = {
 
 MIDDLEWARE = [
     'django.middleware.gzip.GZipMiddleware',
+    'pipeline.middleware.MinifyHTMLMiddleware',
     'django_grip.GripMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -183,6 +186,51 @@ REST_FRAMEWORK = {
     ],
 }
 
+PIPELINE = {
+    'PIPELINE_ENABLED': True,
+    'PIPELINE_COLLECTOR_ENABLED':True,
+     'STYLESHEETS': {
+        'sheets': {
+            'source_filenames': (
+              'static/css/argon-dashboard.css',
+              
+        
+            ),
+            'output_filename': 'css/sheets.css',
+            'extra_context': {
+                'media': 'screen,projection',
+            },
+        },
+    },
+    'JAVASCRIPT': {
+        'scripts': {
+            'source_filenames': (
+              'js/adminupdates.js',
+              'js/argon-dashboard.js',
+              'js/betplacement.js',
+              'js/darkenbody.js',
+              'js/loginregister.js',
+              
+              'js/main.js',
+               'js/phaserfourballoons.js',
+              'js/updatehtml.js',
+              
+              'js/phaserconfig.js'
+              'js/newphaser.js',
+              
+             
+            ),
+            'output_filename': 'js/scripts.js',
+        }
+    }
+}
+
+PIPELINE.update({
+    'YUGLIFY_BINARY': os.path.join(BASE_DIR, 'node_modules/.bin/yuglify'),
+})
+PIPELINE['JS_COMPRESSOR'] = 'pipeline.compressors.yuglify.YuglifyCompressor'
+PIPELINE['CSS_COMPRESSOR'] = 'pipeline.compressors.yuglify.YuglifyCompressor'
+
 
 
 
@@ -256,8 +304,10 @@ STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
+STATICFILES_STORAGE = 'pipeline.storage.PipelineManifestStorage'
 
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'pipeline.finders.PipelineFinder',
 )

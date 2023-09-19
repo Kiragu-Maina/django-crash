@@ -14,6 +14,7 @@ from django.contrib.auth import login, logout
 from django.shortcuts import redirect, render
 import random
 import string
+import time
 from .backends import PhoneUsernameAuthenticationBackend as EoP
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_protect
@@ -36,6 +37,14 @@ from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer # Import your GameManager module
 from .tasks import start_game, stop_game
 from django.contrib.auth.decorators import permission_required
+import subprocess
+import logging
+from asgiref.sync import sync_to_async
+
+
+
+# Configure the logger
+logger = logging.getLogger(__name__)
 
 @method_decorator(csrf_exempt, name='dispatch')
 class StartGameView(View):
@@ -76,6 +85,7 @@ class UserRegistrationView(SuccessMessageMixin, CreateView):
         messages.error(self.request, 'There was an error with your registration. Please check the form and try again.')
         return JsonResponse({'success': False, 'errors': form.errors}, status=400)
 
+@method_decorator(csrf_exempt, name='dispatch')
 class UserLoginView(FormView):
     form_class = UserLoginForm
     template_name = 'sign-in.html'
@@ -87,6 +97,7 @@ class UserLoginView(FormView):
         return JsonResponse({'success': True, 'redirect_url': reverse_lazy('home')}, status=200)
 
     def form_invalid(self, form):
+        print(form.errors)
         messages.error(self.request, 'Invalid phone number or password. Please try again.')
         return JsonResponse({'success': False, 'errors': form.errors}, status=400)
 
@@ -138,12 +149,25 @@ class Home(TemplateView):
         else:
             self.username = generate_random_string(8)
             
+        last_seven_crash_points = Games.objects.exclude(crash_point='').order_by('-id')[:10]
+        
+        random_colors = ['#{:02x}{:02x}{:02x}'.format(random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)) for _ in range(len(last_seven_crash_points))]
+
+
+        # Create a dictionary to store items and their random colors
+        last_seven_dict = {}
+
+        # Update each item in last_seven_crash_points with its random color
+        for i, crash_point_data in enumerate(last_seven_crash_points):
+            last_seven_dict[crash_point_data] = random_colors[i]
+                
+            
         self.request.session['username'] = self.username
         items = self.model.objects.all()
 
        
         context = super().get_context_data(**kwargs)
-       
+        context['last_seven_dict'] = last_seven_dict
         context['items'] = items
         context['username'] = self.username
         context['balance'] = self.bank_balance
@@ -153,9 +177,13 @@ class Home(TemplateView):
        
 
         return context
-    decorators = [csrf_protect, transaction.atomic]
+    
+@method_decorator(csrf_exempt, name='dispatch')
+class PlaceBet(View):
+    decorators = [csrf_exempt, transaction.atomic]
     @method_decorator(decorators)
     def post(self, request, *args, **kwargs):
+        
         betting_window_state, game_id = self.get_betting_window_state(request.POST.get('group_name'))
         if betting_window_state:
             
@@ -190,7 +218,7 @@ class Home(TemplateView):
                      
 
                 # Create and save the transaction instance
-                bet_instance = Transactions(user=user, bet=bet_amount, multiplier=0, won=0, game_id=game_id, group_name=group_name)
+                bet_instance = Transactions(user=user, bet=bet_amount, multiplier=0, won=0, game_id=game_id, bet_placed=True, group_name=group_name)
                 bet_instance.save()
                 
                 response_data = {
@@ -389,37 +417,58 @@ class WithdrawView(View):
         return JsonResponse(response_data, status=400 if response_data['status'] == 'error' else 200)
  
 # @method_decorator(permission_required('crash.customadminpermission', raise_exception=True), name='dispatch')
-@method_decorator(login_required, name='dispatch')
+# @method_decorator(login_required, name='dispatch')
 class AdminView(TemplateView):
     template_name = 'admin2.html'
 
-    def start_game_action(self):
-        game_status = cache.set('game_status', 'started')
-        start_game.delay()
-        return HttpResponse('Game Started...')
 
-    def stop_game_action(self):
-        all_games_manager = cache.set('all_games_manager', 5)
-        game_status = cache.set('game_status', 'stopped')
-
-        all_games_manager = int(all_games_manager) + 1
-        stop_game.delay()
-        return HttpResponse('Game stopped...')
-
-    def post(self, request, *args, **kwargs):
+    async def post(self, request, *args, **kwargs):
         action = request.POST.get('action')
 
         if action == 'start':
-            response = self.start_game_action()
-            print('Game started')
-        elif action == 'stop':
-            response = self.stop_game_action()
-            print('Game stopped')
-        else:
-            response = HttpResponse('Invalid action')
+            try:
+                # Find and terminate the 'rungame' process if it's running
+                subprocess.run(['pkill', '-f', 'rungame'])
 
-        return response
-    
+                # Start the game as an asynchronous subprocess
+                process = await asyncio.create_subprocess_exec(
+                    'python', 'manage.py', 'rungame',
+                    stdout=asyncio.subprocess.PIPE,
+                    stderr=asyncio.subprocess.PIPE,
+                )
+
+                # Log the stdout output asynchronously
+                async def log_output():
+                    async for line in process.stdout:
+                        logger.info(line.decode().strip())
+
+                # Start logging the output without waiting for it to complete
+                asyncio.create_task(log_output())
+
+                response_data = {'message': 'Game started successfully.'}
+                return JsonResponse(response_data, status=200)
+            except Exception as e:
+                response_data = {'error': f'Error starting the game: {str(e)}'}
+                print(response_data)
+                return JsonResponse(response_data, status=500)
+
+        elif action == 'stop':
+            try:
+                # Find and kill the 'rungame' process
+                subprocess.run(['pkill', '-f', 'rungame'])
+                response_data = {'message': 'Game stopped successfully.'}
+                return JsonResponse(response_data, status=200)
+            except Exception as e:
+                response_data = {'error': f'Error stopping the game: {str(e)}'}
+                return JsonResponse(response_data, status=500)
+
+
+        else:
+            response_data = {'error': 'Invalid action'}
+            return JsonResponse(response_data, status=400)
+        
+
+    @sync_to_async
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         try:
@@ -437,6 +486,10 @@ class AdminView(TemplateView):
             print("OwnersBank record does not exist for the user:", self.request.user)
         
         return context
+        
+    async def get(self, request, *args, **kwargs):
+        context = await self.get_context_data()
+        return render(request, self.template_name, context)
         
         
 @method_decorator(login_required, name='dispatch')

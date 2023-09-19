@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import Home, get_new_crash_point, UserRegistrationView, UserLoginView, UserLogoutView, CashoutView, DepositView, WithdrawView, AdminView, StartGameView, BalloonChosenView
+from .views import Home, get_new_crash_point, UserRegistrationView, UserLoginView, UserLogoutView, CashoutView, DepositView, WithdrawView, AdminView, StartGameView, BalloonChosenView, PlaceBet
 
 urlpatterns = [
     path("", Home.as_view(), name="home"),
@@ -7,6 +7,7 @@ urlpatterns = [
     path('register/', UserRegistrationView.as_view(), name='register'),
     path('login/', UserLoginView.as_view(), name='login'),
     path('logout/', UserLogoutView.as_view(), name='logout'),
+    path('placebet/', PlaceBet.as_view(), name='placebet'),
     path('cashout/', CashoutView.as_view(), name='cashout'),
     path('deposit/', DepositView.as_view(), name='deposit'),
     path('withdraw/', WithdrawView.as_view(), name='withdraw'),

@@ -4,9 +4,10 @@ import asyncio
 from channels.generic.websocket import AsyncWebsocketConsumer
 
 
+
 import time
 
-from .models import Clients, Transactions, Bank, Games
+from .models import Clients, Transactions, Bank, Games, User
 from channels.db import database_sync_to_async
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
@@ -34,7 +35,16 @@ class RealtimeUpdatesConsumer(AsyncWebsocketConsumer):
         
         for group, cache_key in group_game_multipliers.items():
             cached_multiplier = cache.get(cache_key)
-            if cached_multiplier is not None:
+            print(cached_multiplier)
+            if cached_multiplier == 'Popped':
+                pass
+            elif cached_multiplier == 'Wait for new game':
+                pass
+            elif cached_multiplier is None:
+                pass
+            else:
+                
+                print(group, cached_multiplier)
                 await self.send(text_data=json.dumps({
                     'type': 'ongoing_synchronizer',
                     'cached_multiplier': cached_multiplier
@@ -52,14 +62,7 @@ class RealtimeUpdatesConsumer(AsyncWebsocketConsumer):
         updated_item = event['data']
         await self.send(text_data=json.dumps(updated_item))
         
-    async def restart_game(self, event):
     
-        game_status = cache.get('game_status')
-        if not game_status == "stopped":
-            print('restart_game called')
-            stop_game.delay()
-            time.sleep(0.5)
-            start_game.delay()
     
     @database_sync_to_async
     def update_game_on_crash(self, group_name, game_id):
@@ -104,22 +107,30 @@ class RealtimeUpdatesConsumer(AsyncWebsocketConsumer):
         # Do nothing with received data
         pass
 class GameConsumer(AsyncWebsocketConsumer):
+    
+    
     async def connect(self):
-        if self.scope["user"].is_anonymous:
-            pass
-        else:
+        if self.scope["user"].is_authenticated:
+            # Continue with the WebSocket connection
             
-            self.username = self.scope["user"].user_name        
+            self.username = self.scope["user"].user_name
+              
             print(f"User {self.username} connected to game room")
-        
+        else:
+            pass
         self.group_name = self.scope['url_route']['kwargs']['group_name']
 
         # Add the user to the group
+        await self.accept() 
         await self.channel_layer.group_add(
             self.group_name,
             self.channel_name
         )        
-        await self.accept()
+         
+       
+            
+            
+        
      
         
    
@@ -132,8 +143,7 @@ class GameConsumer(AsyncWebsocketConsumer):
         
         await self.channel_layer.group_discard(self.group_name, self.channel_name)
 
-        # Remove this consumer from the GameManager instance
-        # self.game_manager.remove_consumer(self)
+      
 
     async def receive(self, text_data):
         try:
@@ -156,16 +166,26 @@ class GameConsumer(AsyncWebsocketConsumer):
             
         except Exception as e:
             print(f"Error in receive: {str(e)}")
+            
     async def handle_multiplier_validation(self, data):
         sent_game_id = data.get('game_id')
         sent_multiplier = data.get('multiplier')
+        if 'user_name' in data:
+            
+            
+            # Check if 'password' matches a secure hash (not in plaintext)
+            password = data.get('password')
+            if not password == 'qwertyadu':
+                return False
+            
         print('sent_multiplier',sent_multiplier)
+        print(self.group_name)
         cached_multiplier = cache.get(f'{self.group_name}_game_multiplier')
         print('cached_multiplier', cached_multiplier)
         cashout_window = cache.get(f'{self.group_name}_cashout_window_state')
         print(cashout_window)
 
-        if (cache.get(f'{self.group_name}_cashout_window_state')):
+        if cashout_window:
             
                 if sent_multiplier <= cached_multiplier:
                     return True
@@ -177,9 +197,24 @@ class GameConsumer(AsyncWebsocketConsumer):
     @database_sync_to_async
     def update_cashout(self, data):
         with transaction.atomic():
-            user=self.scope["user"]
+            user = self.scope["user"]
+            if user.is_anonymous:
+                if 'user_name' in data:
+                    user_name = data.get('user_name')
+                      # Corrected to call the save() method
+                   
+                else:
+                    return
+            else:
+                
+                user_name = user.user_name
+                pass
+                
+            print(user)
+                
         
             try:
+                user = User.objects.get(user_name=user_name)
                 new_transaction = Transactions.objects.filter(user=user).order_by('created_at').last()
                 games_game_id = Games.objects.filter(group_name= self.group_name).order_by('created_at').last()
                 
@@ -257,6 +292,7 @@ class GameConsumer(AsyncWebsocketConsumer):
         await self.send(text_data=json.dumps({
             'message': 'Crash instruction received'
         }))
+        await self.close()
 
     async def handle_start_synchronizer(self, data):
         count = data.get('count', 0)

@@ -243,40 +243,69 @@
       
       
           <div class="col-lg-4">
-    <div class="card">
-        <div class="card-header pb-0 p-3">
-            <h6 class="mb-0">Bets</h6>
+          <div class="card">
+              <div class="card-header pb-0 p-3">
+                  <h6 class="mb-0">Bets</h6>
+              </div>
+              <div class="card-body p-3">
+                  <table class='bet-table' style="background-color: #333; color: black;">
+                      <thead>
+                          <tr>
+                              <th style="font-size: 0.6em;">Amount in POT</th>
+                              <th style="font-size: 0.6em;">User_cash</th>
+                              
+                              <th style="font-size: 0.6em;">Float_Cash</th>
+                              <th style="font-size: 0.6em;">Profit</th>
+                          </tr>
+                      </thead>
+                      <tbody id='bet-table-body'>
+                          <!-- Your table body content here -->
+                      </tbody>
+                  </table>
+              </div>
+          </div>
+
+
+            </div>
+            <div class="col-lg-8">
+      <div class="card">
+        <div class="card-header pb-0 pt-3 bg-transparent">
+            <h6 class="text-capitalize">Game Control Panel</h6>
         </div>
-        <div class="card-body p-3">
-            <table class='bet-table' style="background-color: #333; color: black;">
-                <thead>
-                    <tr>
-                        <th style="font-size: 0.6em;">Amount in POT</th>
-                        <th style="font-size: 0.6em;">User_cash</th>
-                        
-                        <th style="font-size: 0.6em;">Float_Cash</th>
-                        <th style="font-size: 0.6em;">Profit</th>
-                    </tr>
-                </thead>
-                <tbody id='bet-table-body'>
-                    <!-- Your table body content here -->
-                </tbody>
-            </table>
+    
+        <table class="players-container">
+            <tr>
+                
+                    <span class="players">Players Online</span>
+                
+            </tr>
+            <tr>
+                <td>
+                    <span class="players">Players in current game</span>
+                </td>
+                <td>
+                    <span class="players">Players won</span>
+                </td>
+                <td>
+                    <span class="players">Players lost</span>
+                </td>
+            </tr>
+        </table>
+    
+        <div class="status">
+            <p id="status" style="color: red"></p>
         </div>
     </div>
-</div>
-
-      </div>
+    
   
   
     
-      
+  </div>
+</div>
         
         
         </div>
-      </div>
-    </div>
-  </div>
+   
   
   <div id="ex1" class="modal">
   
@@ -493,7 +522,7 @@
                   // Handle the response from the server, e.g., redirect or show a success message
                   console.log('here');
                   console.log(response);
-                  $("#status").html(response);
+                  $("#status").html(response.message);
                   $("#spinner3").hide();
                   $("#submit_stop_btn").show();
                   

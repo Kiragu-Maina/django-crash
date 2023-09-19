@@ -1,10 +1,12 @@
 from django.db.models.signals import post_save
 from django.dispatch import Signal, receiver
-from .models import Transactions, User, Bank, Clients, Games, OwnersBank
+from .models import Transactions, User, Bank, Clients, Games, OwnersBank, GameSets
 
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 from decimal import Decimal
+from .tasks import start_game, stop_game
+import time
 
 
 @receiver(post_save, sender=Transactions)
@@ -56,6 +58,7 @@ def create_user_bank_account(sender, instance, created, **kwargs):
     if created:
         Clients.objects.create(user=instance)
         Bank.objects.create(user=instance)
+    
         
         
 @receiver(post_save, sender=Bank)
@@ -90,11 +93,27 @@ def bank_updated(sender, instance, **kwargs):
 def game_updated(sender, instance, **kwargs):
     print('New Game signal received')
     # Construct the data for the WebSocket consumer
-    
-    data = {
-        "type": "new_game",
+    print(str(instance.crash_point))
+    if str(instance.crash_point) != '':
+        print('here')
+        data = {
+        "type": "multiplier_update",
         "game_hash": str(instance.hash),
-    }
+        
+        "group_name":str(instance.group_name),
+        "hash": str(instance.hash),
+        "server_seed":str(instance.server_seed),
+        "salt":str(instance.salt),
+        
+        "multiplier":str(instance.crash_point),
+            
+        }
+    else:
+    
+        data = {
+            "type": "new_game",
+            "game_hash": str(instance.hash),
+        }
 
     channel_layer = get_channel_layer()
     async_to_sync(channel_layer.group_send)(
@@ -138,3 +157,5 @@ def game_updated(sender, instance, **kwargs):
             "data": data,
         }
     )
+    
+
