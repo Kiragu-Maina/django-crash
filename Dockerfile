@@ -44,4 +44,4 @@ RUN python manage.py makemigrations && \
     python manage.py populate_users
 
 # Start the application using Daphne and Celery
-CMD ["sh", "-c", "daphne -b 0.0.0.0 -p $PORT crashsite.asgi:application & celery -A crashsite beat & celery -A crashsite worker --loglevel=info"]
+CMD ["sh", "-c", "daphne -b 0.0.0.0 -p $PORT crashsite.asgi:application & celery -A crashsite beat & celery -A crashsite worker --loglevel=ERROR"]
