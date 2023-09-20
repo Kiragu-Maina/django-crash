@@ -93,7 +93,7 @@ CLOUDINARY_STORAGE = {
 
 MIDDLEWARE = [
     'django.middleware.gzip.GZipMiddleware',
-    'pipeline.middleware.MinifyHTMLMiddleware',
+    
     'django_grip.GripMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
