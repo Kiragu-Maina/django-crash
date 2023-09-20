@@ -43,19 +43,27 @@ def transaction_saved(sender, instance, **kwargs):
             "balloon":balloon,
             "type":data_type,
         }
+        return data
         
-    transaction.on_commit(lambda: update_table(instance))
-    
-    # Call the update_table method in the WebSocket consumer
- # Send the update using Channels' channel layer
-    channel_layer = get_channel_layer()
-    async_to_sync(channel_layer.group_send)(
-        "table_updates",
-        {
-            "type": "table.update",
-            "data": data,
-        }
-    )
+    def send_data_to_websocket(data):
+        # Send the update using Channels' channel layer
+        channel_layer = get_channel_layer()
+        async_to_sync(channel_layer.group_send)(
+            "table_updates",
+            {
+                "type": "table.update",
+                "data": data,
+            }
+        )
+
+    # Define a function to be called when the transaction is successfully committed
+    def on_commit_callback():
+        data = update_table(instance)  # Call the update_table function
+        send_data_to_websocket(data)
+
+    # Use transaction.on_commit to ensure the callback is executed after the transaction
+    transaction.on_commit(on_commit_callback)
+
 
 @receiver(post_save, sender=User)
 def create_user_bank_account(sender, instance, created, **kwargs):
