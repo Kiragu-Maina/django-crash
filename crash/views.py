@@ -151,7 +151,7 @@ class Home(TemplateView):
         else:
             self.username = generate_random_string(8)
             
-        last_seven_crash_points = Games.objects.exclude(crash_point='').order_by('-id')[:10]
+        last_seven_crash_points = Games.objects.exclude(crash_point='').order_by('-id')[:8]
         
         random_colors = ['#{:02x}{:02x}{:02x}'.format(random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)) for _ in range(len(last_seven_crash_points))]
 

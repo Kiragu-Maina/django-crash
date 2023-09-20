@@ -130,7 +130,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
         if (data.multiplier) {
            
-            const maxVisibleTd = 10;
+            const maxVisibleTd = 8;
 
             const tdElements = tableBody.querySelectorAll('td');
 
