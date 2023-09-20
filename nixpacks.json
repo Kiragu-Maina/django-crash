@@ -15,14 +15,14 @@
           "curl",
           "default-jdk",
           "lsof",
-          "wget",
-          "npm"
+          "wget"
+          
         ]
       },
       "install": {
         "cmds": [
            "chmod +x closure-compiler.sh",
-           "npm install -g yuglify",
+          
             
           "python -m venv /opt/venv",
           ". /opt/venv/bin/activate",
