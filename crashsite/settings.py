@@ -189,19 +189,7 @@ REST_FRAMEWORK = {
 PIPELINE = {
     'PIPELINE_ENABLED': True,
     'PIPELINE_COLLECTOR_ENABLED':True,
-     'STYLESHEETS': {
-        'sheets': {
-            'source_filenames': (
-              'static/css/argon-dashboard.css',
-              
-        
-            ),
-            'output_filename': 'css/sheets.css',
-            'extra_context': {
-                'media': 'screen,projection',
-            },
-        },
-    },
+    
     'JAVASCRIPT': {
         'scripts': {
             'source_filenames': (
