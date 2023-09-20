@@ -4,7 +4,7 @@
 
 <head>
   {% load static %}
-  {% load pipeline %}
+ 
   
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -522,6 +522,9 @@ var space = "{% static 'assets/space.png' %}";
 
 
 var popped = "{% static 'assets/popped.png' %}";
+var desyrelpng = "{% static 'fonts/bitmap/desyrel.png' %}"
+var desyrelxml = "{% static 'fonts/bitmap/desyrel.xml' %}"
+
 
 var login = '{% url "login" %}';
 var register =  '{% url "login" %}';
@@ -548,7 +551,7 @@ var bet_placement = '{% url "placebet" %}';
   
 {% javascript 'scripts' %}
  
-  {% comment %} <script src="{% static 'js/betplacement.js' %}"></script>
+  <script src="{% static 'js/betplacement.js' %}"></script>
 
   <script src="{% static 'js/updatehtml.js' %}"></script>
   <script src = "{% static 'js/phaserfourballoons.js' %}"></script>
@@ -560,7 +563,7 @@ var bet_placement = '{% url "placebet" %}';
 
  
    
-    <script src="{% static 'js/loginregister.js' %}"></script> {% endcomment %}
+    <script src="{% static 'js/loginregister.js' %}"></script>
 </body>
 
 </html>

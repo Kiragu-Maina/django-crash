@@ -186,37 +186,37 @@ REST_FRAMEWORK = {
     ],
 }
 
-PIPELINE = {
-    'PIPELINE_ENABLED': True,
-    'PIPELINE_COLLECTOR_ENABLED':True,
+# PIPELINE = {
+#     'PIPELINE_ENABLED': True,
+#     'PIPELINE_COLLECTOR_ENABLED':True,
     
-    'JAVASCRIPT': {
-        'scripts': {
-            'source_filenames': (
-              'js/adminupdates.js',
-              'js/argon-dashboard.js',
-              'js/betplacement.js',
-              'js/darkenbody.js',
-              'js/loginregister.js',
+#     'JAVASCRIPT': {
+#         'scripts': {
+#             'source_filenames': (
+#               'js/adminupdates.js',
+#               'js/argon-dashboard.js',
+#               'js/betplacement.js',
+#               'js/darkenbody.js',
+#               'js/loginregister.js',
               
-              'js/main.js',
-               'js/phaserfourballoons.js',
-              'js/updatehtml.js',
+#               'js/main.js',
+#                'js/phaserfourballoons.js',
+#               'js/updatehtml.js',
               
-              'js/phaserconfig.js'
-              'js/newphaser.js',
+#               'js/phaserconfig.js'
+#               'js/newphaser.js',
               
              
-            ),
-            'output_filename': 'js/scripts.js',
-        }
-    }
-}
+#             ),
+#             'output_filename': 'js/scripts.js',
+#         }
+#     }
+# }
 
-PIPELINE.update({
-    'CLOSURE_BINARY': os.path.join(BASE_DIR, 'closure-compiler.sh'),
-})
-PIPELINE['JS_COMPRESSOR'] = 'pipeline.compressors.closure.ClosureCompressor'
+# PIPELINE.update({
+#     'CLOSURE_BINARY': os.path.join(BASE_DIR, 'closure-compiler.sh'),
+# })
+# PIPELINE['JS_COMPRESSOR'] = 'pipeline.compressors.closure.ClosureCompressor'
 
 
 

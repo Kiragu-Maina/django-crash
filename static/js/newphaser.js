@@ -18,7 +18,7 @@ class Example extends Phaser.Scene
         this.load.image('popped', popped);
        
         
-        this.load.bitmapFont('desyrel', 'https://labs.phaser.io/assets/fonts/bitmap/desyrel.png', 'https://labs.phaser.io/assets/fonts/bitmap/desyrel.xml');
+        this.load.bitmapFont('desyrel', desyrelpng, desyrelxml);
     }
 
    async create ()
