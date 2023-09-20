@@ -12,7 +12,7 @@ import time
 @receiver(post_save, sender=Transactions)
 def transaction_saved(sender, instance, **kwargs):
     # Construct the data that you want to send to the WebSocket consumer
-    print('signals called')
+
     if instance.game_played == True:
         if instance.won > 0:
             data_type ="table_update"
@@ -41,7 +41,7 @@ def transaction_saved(sender, instance, **kwargs):
         "balloon":balloon,
         "type":data_type,
     }
-    print(data)
+    
     # Call the update_table method in the WebSocket consumer
  # Send the update using Channels' channel layer
     channel_layer = get_channel_layer()
@@ -63,7 +63,7 @@ def create_user_bank_account(sender, instance, created, **kwargs):
         
 @receiver(post_save, sender=Bank)
 def bank_updated(sender, instance, **kwargs):
-    print('bank updated')
+    
     # Construct the data for the WebSocket consumer
     data = {
         "user": str(instance.user),
@@ -74,7 +74,7 @@ def bank_updated(sender, instance, **kwargs):
     client = Clients.objects.filter(user=user).first()
     if client is not None:
         channel_name = client.channel_name
-        print(channel_name)
+        
         if channel_name is not None:
         
         
@@ -92,11 +92,11 @@ def bank_updated(sender, instance, **kwargs):
     
 @receiver(post_save, sender=Games)
 def game_updated(sender, instance, **kwargs):
-    print('New Game signal received')
+   
     # Construct the data for the WebSocket consumer
-    print(str(instance.crash_point))
+    
     if str(instance.crash_point) != '':
-        print('here')
+       
         data = {
         "type": "multiplier_update",
         "game_hash": str(instance.hash),
@@ -136,8 +136,7 @@ def update_owners_bank(sender, instance, **kwargs):
     
 @receiver(post_save, sender=OwnersBank)
 def game_updated(sender, instance, **kwargs):
-    print('Owner update')
-    
+   
     
     data = {
         "type": "new_update",

@@ -26,6 +26,6 @@ def debug_task(self):
 app.conf.beat_schedule = {
     'monitor_prescriptions': {
         'task': 'crash.tasks.send_updates',
-        'schedule': 2,
+        'schedule': 5,
     },
 }

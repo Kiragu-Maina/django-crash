@@ -4,29 +4,17 @@ document.addEventListener('DOMContentLoaded', function() {
     const socket2 = new WebSocket('wss://' + window.location.host + '/ws/balance_updates/');  
     const errorText = document.getElementById("error-text");
     var type;
-    // Adjust the WebSocket URL
-    const updateQueue = []; // Queue to hold update tasks
-
-    // Function to process updates from the queue
-    // async function processUpdateQueue() {
-    //     while (updateQueue.length > 0) {
-    //         const updateData = updateQueue.shift(); // Dequeue an update task
-    //         if (updateData.type === "multiplier_update") {
-    //             console.log(updateData);
-    //             updateMultiplierAsync(updateData);
-    //         }
-    //     }
-    // }
+    
     socket.onmessage = async function (e) {
         const data = JSON.parse(e.data);
-        console.log(data)
+      
         if (data.type == "table_update") {
-                console.log('updated items', data);
+               
                 type = 'won'
                 updateTable(data, type);
             }
         else if (data.type == "bet_placed_update") {
-                console.log('updated items', data);
+            
                 type = 'placed'
                 updateTable(data, type);
                 switch (data.balloon) {
@@ -46,38 +34,35 @@ document.addEventListener('DOMContentLoaded', function() {
                         window.roomName = 'group_4';
                         break;
                     default:
-                        console.log('Invalid group name: ' + groupName);
+                      
                         return; // Exit the function if the group name is invalid
                 }
                 
             }
         else if (data.type == "lose_update") {
-                console.log('updated items', data);
+               
                 type = 'lost';
                 
-               await updateTableAsync(data, type);
+               await updateTable(data, type);
             }
         else if (data.type == "new_game") {
-            console.log(`newgame${data}`)
+           
             const tableBody1 = document.getElementById('bet-table-body');
             tableBody1.innerHTML = '';
             errorText.innerHTML = '';
             
         }
         else if (data.type == "multiplier_update") {
-            // Add the update task to the queue with a one-second delay
+            
             await new Promise(resolve => setTimeout(resolve, 1000));
-            // updateQueue.push(data);
+            
             updateMultiplier(data);
         
-            // // If the queue was empty, start processing updates
-            // if (updateQueue.length === 1) {
-            //     processUpdateQueue();
-            // }
+         
         }
         else if (data.type == 'all_games_updates'){
             await new Promise(resolve => setTimeout(resolve, 1000));
-            // updateQueue.push(data);
+           
             updateAllGames(data);
         }
         
@@ -87,7 +72,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const data = JSON.parse(e.data);
         if (data.type == "balance_update"){
         const updatedbalance = data
-        console.log('updated balance', updatedbalance);
+        
         await updateBalance(updatedbalance);
         }
         else if (data.type == "cashout"){
@@ -139,38 +124,16 @@ document.addEventListener('DOMContentLoaded', function() {
         
     }
     });
-    async function updateTableAsync(updatedItem, type) {
-        return new Promise((resolve) => {
-            requestAnimationFrame(() => {
-                updateTable(updatedItem, type).then(() => {
-                    resolve();
-                });
-            });
-        });
-    }
-
-    async function updateMultiplierAsync(updatedItem) {
-        return new Promise((resolve) => {
-            requestAnimationFrame(() => {
-                updatemultiplier(updatedItem);
-                resolve();
-            });
-        });
-    }
+   
     async function updateMultiplier(data) {
         const tableBody = document.getElementById('multiplier_row');
     
         if (data.multiplier) {
-            // Create a new td element for the multiplier
+           
             const maxVisibleTd = 10;
 
-            // Select the table row
-            
-            // Get all td elements within the row
             const tdElements = tableBody.querySelectorAll('td');
 
-          
-                // Batched removal loop
                 while (tdElements.length >= maxVisibleTd) {
                     
                         if (tdElements.length >= maxVisibleTd) {
@@ -226,8 +189,8 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Retrieve the multiplier based on the group_name
         
-        const group = window.roomName; // Get the group_name from window.roomName
-        console.log(group)
+        if (window.roomName){ // Get the group_name from window.roomName
+      
         switch (group) {
             case 'group_1':
                 window.multiplier = parseFloat(data.group_1);
@@ -245,8 +208,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 window.multiplier = 1.0; // Default multiplier if group_name is not found
                 break;
         }
+    }
+       
+
         
-        console.log(window.multiplier)
+        
           
         
         const newRow = document.createElement('tr');
@@ -271,7 +237,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     
     async function displayModal(groupName, serverSeed, salt, hash) {
-        console.log('displayModal called');
+        
         
         // Set modal content based on groupName
         let balloonColor = '';

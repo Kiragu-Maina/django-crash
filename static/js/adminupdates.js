@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', function() {
     socket.onmessage = async function (e) {
         const data = JSON.parse(e.data);
         if (data.type == "new_update") {
-                console.log('updated items', data);
+                
                 updateTable(data);
             }
         

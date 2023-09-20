@@ -391,7 +391,7 @@ class BettingCashoutManager:
         
         await self.set_window_state(BettingWindow, True)
         
-        for count in range(20, 0, -1):
+        for count in range(25, 0, -1):
             await self.send_instruction({"type": "count_initial", "count": count })
            
            
