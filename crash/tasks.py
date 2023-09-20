@@ -48,8 +48,8 @@ def send_updates():
             return
         if num == 0:
             num = 6 
-        
-        num -= 1
+        if num is not None:        
+            num -= 1
         for group, cache_key in group_game_multipliers.items():            
             
             data[group] = f'New game in {num}s'

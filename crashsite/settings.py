@@ -226,10 +226,10 @@ PIPELINE = {
 }
 
 PIPELINE.update({
-    'YUGLIFY_BINARY': os.path.join(BASE_DIR, 'node_modules/.bin/yuglify'),
+    'YUGLIFY_BINARY': os.path.join(BASE_DIR, 'closure-compiler.sh'),
 })
-PIPELINE['JS_COMPRESSOR'] = 'pipeline.compressors.yuglify.YuglifyCompressor'
-PIPELINE['CSS_COMPRESSOR'] = 'pipeline.compressors.yuglify.YuglifyCompressor'
+PIPELINE['JS_COMPRESSOR'] = 'pipeline.compressors.closure.ClosureCompressor'
+
 
 
 
