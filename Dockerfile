@@ -14,9 +14,27 @@ COPY . /app/
 RUN apt-get update && apt-get install -y \
     python3-dev \
     libpq-dev 
+
+# Create and activate a virtual environment
+RUN python -m venv venv
+RUN . venv/bin/activate
+
+ARG DATABASE_URL
+ARG PGDATABASE
+ARG PGHOST
+ARG PGPASSWORD
+ARG PGPORT
+ARG REDISHOST
+ARG REDISPASSWORD
+ARG REDISPORT
+ARG REDISUSER
+ARG REDIS_URL
+ARG SECRET_KEY
     
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
+
+
 
 # Run database migrations and collect static files
 RUN python manage.py makemigrations && \
