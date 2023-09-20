@@ -190,7 +190,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Retrieve the multiplier based on the group_name
         
         if (window.roomName){ // Get the group_name from window.roomName
-      
+            group = window.roomName
         switch (group) {
             case 'group_1':
                 window.multiplier = parseFloat(data.group_1);
