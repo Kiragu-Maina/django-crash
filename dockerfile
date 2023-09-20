@@ -13,7 +13,7 @@ COPY . /app/
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
     npm && \
-    npm install -g yuglify
+    npm install yuglify
 
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
