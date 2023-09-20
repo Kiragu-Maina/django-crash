@@ -75,19 +75,20 @@ def bank_updated(sender, instance, **kwargs):
     if client is not None:
         channel_name = client.channel_name
         print(channel_name)
+        if channel_name is not None:
         
         
 
-        # Send the update to the user's channel
-        channel_layer = get_channel_layer()
-        async_to_sync(channel_layer.send)(
-            f"{channel_name}",  # Use a unique channel name per user
-            {
-                "type": "balance.update",
-                "data": data,
-                
-            }
-        )
+            # Send the update to the user's channel
+            channel_layer = get_channel_layer()
+            async_to_sync(channel_layer.send)(
+                f"{channel_name}",  # Use a unique channel name per user
+                {
+                    "type": "balance.update",
+                    "data": data,
+                    
+                }
+            )
     
 @receiver(post_save, sender=Games)
 def game_updated(sender, instance, **kwargs):
