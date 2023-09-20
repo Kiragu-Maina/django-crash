@@ -14,7 +14,7 @@ class Command(BaseCommand):
             users = []
             for _ in range(num_users):
                 # Generate a 10-digit phone number starting with "01" or "07"
-                phone_number = fake.random_element(elements=('01', '07')) + fake.random_number(digits=8)
+                phone_number = fake.random_element(elements=('01', '07')) + str(fake.random_number(digits=8))
                 user_name = fake.unique.user_name()
                 password = fake.password()
                 user_to_json = {
@@ -25,7 +25,7 @@ class Command(BaseCommand):
                 # Your User model creation and saving code here
                 users.append(user_to_json)
 
-            with open('users.json', 'w') as json_file:
+            with open('media/users.json', 'w') as json_file:
                 json.dump(users, json_file)
 
         num_users = 100

@@ -1,4 +1,4 @@
-from django.http import JsonResponse, HttpResponse
+from django.http import JsonResponse, HttpResponse, FileResponse
 from django.views.generic import TemplateView
 from django.views import View
 from .models import Transactions, BettingWindow, CashoutWindow, Games, Bank, OwnersBank
@@ -41,6 +41,8 @@ import subprocess
 import logging
 from asgiref.sync import sync_to_async
 
+from django.conf import settings
+import os
 
 
 # Configure the logger
@@ -511,3 +513,17 @@ class BalloonChosenView(View):
             }
         
         return JsonResponse(response)
+    
+@login_required   
+def download_users_json(request):
+    # Path to the users.json file in the media directory
+    file_path = os.path.join(settings.MEDIA_ROOT, 'users.json')
+
+    # Check if the file exists
+    if os.path.exists(file_path):
+        with open(file_path, 'rb') as file:
+            response = HttpResponse(file.read(), content_type='application/json')
+            response['Content-Disposition'] = f'attachment; filename=users.json'
+            return response
+    else:
+        return HttpResponse('The file does not exist.', status=404)
