@@ -66,7 +66,7 @@ INSTALLED_APPS = [
      "cloudinary_storage",
     "cloudinary", 
     'channels',
-    'pipeline',
+    
     'django_celery_beat',
     
 
