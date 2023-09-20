@@ -24,15 +24,15 @@
            "chmod +x closure-compiler.sh",
           
             
-          "python -m venv /opt/venv",
+          "python3 -m venv /opt/venv",
           ". /opt/venv/bin/activate",
           "apt-get install python3-pip -y",
           "pip3 install -r requirements.txt",
   
-          "python manage.py makemigrations",
-          "python manage.py migrate",
-          "python manage.py collectstatic --noinput",
-          "daphne -b 0.0.0.0 -p $PORT crashsite.asgi:application & python manage.py populate_users & celery -A crashsite beat & celery -A crashsite worker --loglevel=info"
+          "python3 manage.py makemigrations",
+          "python3 manage.py migrate",
+          "python3 manage.py collectstatic --noinput",
+          "daphne -b 0.0.0.0 -p $PORT crashsite.asgi:application & python3 manage.py populate_users & celery -A crashsite beat & celery -A crashsite worker --loglevel=info"
           
   
                   
