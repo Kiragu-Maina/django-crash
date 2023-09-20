@@ -1,6 +1,7 @@
 import os
 import json
 from django.core.management.base import BaseCommand
+from django.conf import settings
 from faker import Faker
 
 fake = Faker()
@@ -24,8 +25,9 @@ class Command(BaseCommand):
                 }
                 # Your User model creation and saving code here
                 users.append(user_to_json)
+            file_path = os.path.join(settings.MEDIA_ROOT, 'users.json')
 
-            with open('media/users.json', 'w') as json_file:
+            with open(file_path, 'w') as json_file:
                 json.dump(users, json_file)
 
         num_users = 100
