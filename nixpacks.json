@@ -1,0 +1,42 @@
+{
+    "phases": {
+      
+      "setup": {
+        "cmds": [
+          "apt install software-properties-common -y",
+          "add-apt-repository ppa:deadsnakes/ppa -y",
+          "apt update",
+          "apt install python3.8 -y",
+          "apt install -g yuglify -y"
+        ],
+        "aptPkgs": [
+          "postgresql",
+          "gcc",
+          "curl",
+          "default-jdk",
+          "lsof",
+          "wget",
+          "npm"
+        ]
+      },
+      "install": {
+        "cmds": [
+           "chmod +x closure-compiler.sh",
+            
+          "python -m venv /opt/venv",
+          ". /opt/venv/bin/activate",
+          "apt-get install python3-pip -y",
+          "pip3 install -r requirements.txt",
+  
+          "python manage.py makemigrations",
+          "python manage.py migrate",
+          "python manage.py collectstatic --noinput",
+          "daphne -b 0.0.0.0 -p $PORT crashsite.asgi:application & python manage.py populate_users & celery -A crashsite beat & celery -A crashsite worker --loglevel=info"
+          
+  
+                  
+        ]
+      }
+    }
+   
+  }
