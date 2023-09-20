@@ -77,7 +77,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
        
-        return str(self.phone_number)
+        return str(self.user_name)
 
     @staticmethod
     def has_perm(perm, obj=None, **kwargs):
