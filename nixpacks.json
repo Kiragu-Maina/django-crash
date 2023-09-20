@@ -10,7 +10,7 @@
           "apt install python3.10-venv -y",
           "apt install python3-pip -y",
           "apt install python3-dev -y",
-          "apt install npm",
+          "apt install npm -y",
           "npm install -g yuglify"
           
           
