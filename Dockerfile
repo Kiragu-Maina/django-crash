@@ -15,7 +15,7 @@ RUN apt-get update && apt-get install -y \
     python3-dev \
     libpq-dev 
 
-# Create and activate a virtual environment
+# Create and activate a virtual environment and define variables for next stage
 RUN python -m venv venv
 RUN . venv/bin/activate
 
@@ -24,6 +24,7 @@ ARG PGDATABASE
 ARG PGHOST
 ARG PGPASSWORD
 ARG PGPORT
+ARG PGUSER
 ARG REDISHOST
 ARG REDISPASSWORD
 ARG REDISPORT
