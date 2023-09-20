@@ -1,5 +1,5 @@
 # Use a base image with Python
-FROM python:3.9-slim
+FROM python:3.8
 
 # Set environment variables
 ENV PYTHONUNBUFFERED 1
@@ -9,13 +9,12 @@ WORKDIR /app
 
 # Copy the application code to the container
 COPY . /app/
-ARG EnvironmentVariable
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
-    npm && \
-    npm install yuglify
-
+    python3-dev \
+    libpq-dev 
+    
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
