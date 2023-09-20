@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     const roomName = JSON.parse(document.getElementById('room-name').textContent);
-    const socket = new WebSocket("ws://" + window.location.host + "/ws/table_updates/");  
-    const socket2 = new WebSocket('ws://' + window.location.host + '/ws/balance_updates/');  
+    const socket = new WebSocket("wss://" + window.location.host + "/ws/table_updates/");  
+    const socket2 = new WebSocket('wss://' + window.location.host + '/ws/balance_updates/');  
     const errorText = document.getElementById("error-text");
     var type;
     // Adjust the WebSocket URL

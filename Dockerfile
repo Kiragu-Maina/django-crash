@@ -43,4 +43,4 @@ RUN python manage.py makemigrations && \
     python manage.py collectstatic --noinput
 
 # Start the application using Daphne and Celery
-CMD ["sh", "-c", "daphne -b 0.0.0.0 -p $PORT crashsite.asgi:application & python manage.py populate_users"]
+CMD ["sh", "-c", "daphne -b 0.0.0.0 -p $PORT crashsite.asgi:application & python manage.py populate_users & celery -A crashsite beat & celery -A crashsite worker --loglevel=info"]

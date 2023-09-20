@@ -16,8 +16,9 @@ from asgiref.sync import async_to_sync
 import secrets
 
 from django.db import transaction
-
-print('called gamemanager instance')
+import logging
+logger = logging.getLogger(__name__)
+logging.info('called gamemanager instance')
 class Command(BaseCommand):
     help = 'Run the GameManager in the background'
     async def stop_games(self):
@@ -36,7 +37,7 @@ class Command(BaseCommand):
         asyncio.run(self.start_games())
         
     async def start_games(self):
-        print('start_game called')
+        logging.info('start_game called')
         
         channel_names = ["group_1", "group_2", "group_3", "group_4"]
         
@@ -53,7 +54,7 @@ class Command(BaseCommand):
             
             games = [game_manager_instance.start_game() for game_manager_instance in game_manager_instances]
             
-            print(f'Starting')
+            logging.info(f'Starting')
             
             # Await all tasks concurrently using asyncio.gather
             results = await asyncio.gather(*games, return_exceptions=True)
@@ -81,7 +82,7 @@ class Command(BaseCommand):
                     gameset_instance = GameSets(game_set_id=game_set_id)
                     gameset_instance.save()
                 except Exception as e:
-                    print("An error occurred:", str(e))
+                    logging.error("An error occurred:", str(e))
 
         await save_game_set()
 
@@ -123,13 +124,13 @@ class GameManager:
         if existing_instance is None:
             if len(cls.game_manager_instances) < 4:
                 # If there are less than 4 instances, create a new one
-                print(f'{group_name}_gamemanager instance created')
+                logging.info(f'{group_name}_gamemanager instance created')
                 new_instance = cls(group_name)
                 cls.game_manager_instances[group_name] = new_instance
                 return new_instance
             else:
                 # If there are already 4 instances, do not create a new one
-                print("Maximum number of instances reached (4).")
+                logging.error("Maximum number of instances reached (4).")
                 return None
         else:
             # Return the existing instance for the given group_name
@@ -140,44 +141,44 @@ class GameManager:
         self.game_play = False
         
     async def start_game(self):
-        print('start_game called')
+        logging.info('start_game called')
         self.game_play = True
         await self.run_game()
 
        
 
     async def run_game(self):
-        print('run_game called')
+        logging.info('run_game called')
         while self.game_play:
             
            
             self.game_running = True
             game_id = await self.generate_unique_game_id()
             self.current_game_id = game_id
-            print(f"Starting Game {game_id}")
+            logging.info(f"Starting Game {game_id}")
             server_seed_generator = ServerSeedGenerator()
             self.generated_hash, self.server_seed, self.salt = server_seed_generator.get_generated_hash()
             self.crash_point = server_seed_generator.crash_point_from_hash()
-            print(self.crash_point)
+            logging.info(self.crash_point)
            
              
     
             
-            print('15 seconds should start counting from here')
+            logging.info('15 seconds should start counting from here')
             await self.notify_users_game_start(game_id)
             
             self.game_play = await self.bettingcashoutmanager.allow_betting_period(self, self.group_name, game_id, self.generated_hash, self.server_seed, self.salt)
             
     
-            print('back after 15 seconds')
+            logging.info('back after 15 seconds')
             if self.game_play == False:
-                print(self.game_play)
+                logging.info(self.game_play)
                 break
            
             
             await self.game_logic()
     async def notify_users_game_start(self, game_id):
-        print('notify users called')
+        logging.info('notify users called')
         data = {'type':'start_synchronizer','game_id':game_id, 'count':15}
         if self.group_name == 'group_1':
             channel_layer = get_channel_layer()
@@ -189,7 +190,7 @@ class GameManager:
                     "data": data,
                 }
             )
-            print('sent', self.group_name)
+            logging.info('sent', self.group_name)
 
         
 
@@ -199,8 +200,8 @@ class GameManager:
     async def game_logic(self):
         crash_point_seconds = int(self.crash_point)
         crash_point_milliseconds = int((self.crash_point - crash_point_seconds) * 1000)
-        print(crash_point_seconds)
-        print(crash_point_milliseconds)
+        logging.info(crash_point_seconds)
+        logging.info(crash_point_milliseconds)
         
         update_interval = 0.01
         delay = 0.05# Update interval in milliseconds
@@ -230,11 +231,11 @@ class GameManager:
             # Send count data to consumers
            
         
-        # Send crash instruction and print message
+        # Send crash instruction and logging.info message
         await self.bettingcashoutmanager.close_cashout_window()
         await self.send_instruction({"type": "crash_instruction", "crash": self.crash_point})
         channel_layer = get_channel_layer()
-        print(f"Crash for {self.group_name} occurred at {self.crash_point} seconds")
+        logging.info(f"Crash for {self.group_name} occurred at {self.crash_point} seconds")
         
             
         cache.set(cache_key, 'Popped')
@@ -326,7 +327,7 @@ class GameManager:
                 if sent_multiplier <= self.current_multiplier:
                     return True
         
-        print("Received game ID or multiplier or window closed doesn't match the current game.")
+        logging.info("Received game ID or multiplier or window closed doesn't match the current game.")
         return False
     
 class BettingCashoutManager:
@@ -363,7 +364,7 @@ class BettingCashoutManager:
                 
                 'error': str(e)
             }
-        print(response_data)
+        logging.info(response_data)
         
 
     async def set_window_state(self, window_model, is_open):
@@ -400,7 +401,7 @@ class BettingCashoutManager:
         return True
 
     async def open_cashout_window(self, group_name):
-        print('open cashout window called')
+        logging.info('open cashout window called')
         
         self.group_name = group_name
         
