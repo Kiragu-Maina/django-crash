@@ -14,7 +14,7 @@ urlpatterns = [
     path('adminpage/', AdminView.as_view(), name='adminpage'),
     path('start_game/', StartGameView.as_view(), name='start_game'),
     path('balloon_chosen/', BalloonChosenView.as_view(), name='balloon_chosen' ),
-    path('download-users-json/', views.download_users_json, name='download_users_json'),
+    path('download-users-json/', download_users_json, name='download_users_json'),
 
     
     
