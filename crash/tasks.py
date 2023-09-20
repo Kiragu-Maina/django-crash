@@ -37,7 +37,10 @@ def send_updates():
             
             all_groups_wait_for_new_game += 1
         elif cached_multiplier is None:
+            cache.set(cache_key, 'Wait for new game')
             all_groups_wait_for_new_game += 1
+            data[group] = 'Wait for new game'
+            
         else:
             data[group] = cached_multiplier
             
