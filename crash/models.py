@@ -23,7 +23,7 @@ class CustomUserManager(BaseUserManager):
         if not phone_number:
             raise ValueError("The phone number field must be set")
         phone_number = self.normalize_phone_number(phone_number)
-        if not normalized_phone_number:
+        if not phone_number:
             raise ValueError("Invalid phone number format")
         
         user = self.model(phone_number=phone_number, user_name=user_name, **extra_fields)
