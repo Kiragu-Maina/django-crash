@@ -490,7 +490,7 @@ class Example extends Phaser.Scene
                             counterText.destroy();
                         }
                         if (countdownText){
-                            countdown.destroy();
+                            countdownText.destroy();
                         }
                         switch(type){
                             case 'connected':
