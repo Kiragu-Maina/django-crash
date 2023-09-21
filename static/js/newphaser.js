@@ -540,7 +540,7 @@ class Example extends Phaser.Scene
                                 async function update() {
                                 while (start_initial){
                                     while (counting <= count) {
-                                        while (counting >= 0){
+                                        while (counting >= 1){
                                         await new Promise(resolve => setTimeout(resolve, 1000));
                                         counting -= 1;
                                         if (countdownText){
