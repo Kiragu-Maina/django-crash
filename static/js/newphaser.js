@@ -312,6 +312,7 @@ class Example extends Phaser.Scene
                     
                             
                     async function continuation_of_start_game_official(){
+                        start_initial = true;
                         window.allowballoonchange = false;
                             
                          
@@ -401,6 +402,16 @@ class Example extends Phaser.Scene
                                         
                                     
                                     else if (data.type == "count_initial"){
+                                        start_initial = false;
+                                        if(bet_allowed_text){
+                            
+                                            bet_allowed_text.destroy();
+                                               
+                                        }
+                                        
+                                        if (countdownText){
+                                            countdownText.destroy();
+                                        }
                                         
                                             
                                         await countAndDisplayInitial("connected", data.count);
@@ -427,7 +438,7 @@ class Example extends Phaser.Scene
             
             
                                     }
-                                    
+                                }
                                 
                                                                 // Optionally, you can handle WebSocket errors and close events
                                     groupSocket.onerror = function (error) {
@@ -449,7 +460,7 @@ class Example extends Phaser.Scene
                                     // Perform other actions or await other events as necessary
                                     await countAndDisplayInitial("disconnected", 15);
                                 }
-                            }
+                            
                         
 
                     
@@ -494,6 +505,7 @@ class Example extends Phaser.Scene
                         }
                         switch(type){
                             case 'connected':
+                               
                                 countdownText = scene.add.dynamicBitmapText(400, 400, 'desyrel', '').setOrigin(0.5, 0);
                                 bet_allowed_text = scene.add.dynamicBitmapText(400, 200, 'desyrel', '').setOrigin(0.5, 0);
                                 countdownText.setText(`Game starts in ${count}`);
@@ -517,6 +529,7 @@ class Example extends Phaser.Scene
                                 async function update() {
                                 while (start_initial){
                                     while (counting <= count) {
+                                        while (counting >= 0){
                                         await new Promise(resolve => setTimeout(resolve, 1000));
                                         counting -= 1;
                                         
@@ -542,6 +555,7 @@ class Example extends Phaser.Scene
                                         // Schedule the next update
                                         
                                     }
+                                }
                                 }
                             }
                     
