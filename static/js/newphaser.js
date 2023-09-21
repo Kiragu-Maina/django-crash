@@ -403,7 +403,7 @@ class Example extends Phaser.Scene
                                     else if (data.type == "count_initial"){
                                         
                                             
-                                        await countAndDisplayInitial(type="connected", data.count);
+                                        await countAndDisplayInitial("connected", data.count);
             
             
                                     }
@@ -447,7 +447,7 @@ class Example extends Phaser.Scene
                                     // You can send messages using groupSocket.send() if needed
 
                                     // Perform other actions or await other events as necessary
-                                    await countAndDisplayInitial(type="disconnected", 15);
+                                    await countAndDisplayInitial("disconnected", 15);
                                 }
                             }
                         
