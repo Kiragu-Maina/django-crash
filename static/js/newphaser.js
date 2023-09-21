@@ -515,9 +515,20 @@ class Example extends Phaser.Scene
                                     bet_allowed_text.setText('Place your bet');
                                        
                                 }
+                                
                                 else {
                                     if(bet_allowed_text){
                                     
+                                        bet_allowed_text.destroy();
+                                           
+                                    }
+                                }
+                                if(count == 1){
+                                    if (countdownText){
+                                        countdownText.destroy();
+                                    }
+                                    if(bet_allowed_text){
+                        
                                         bet_allowed_text.destroy();
                                            
                                     }
@@ -532,7 +543,14 @@ class Example extends Phaser.Scene
                                         while (counting >= 0){
                                         await new Promise(resolve => setTimeout(resolve, 1000));
                                         counting -= 1;
-                                        
+                                        if (countdownText){
+                                            countdownText.destroy();
+                                        }
+                                        if(bet_allowed_text){
+                            
+                                            bet_allowed_text.destroy();
+                                               
+                                        }
                             
                                         countdownText = scene.add.dynamicBitmapText(400, 400, 'desyrel', '').setOrigin(0.5, 0);
                                         bet_allowed_text = scene.add.dynamicBitmapText(400, 200, 'desyrel', '').setOrigin(0.5, 0);
@@ -550,7 +568,18 @@ class Example extends Phaser.Scene
                                                 
                                             }
                                         }
-                                        break;
+                                        if(count == 1){
+                                            if (countdownText){
+                                                countdownText.destroy();
+                                            }
+                                            if(bet_allowed_text){
+                                
+                                                bet_allowed_text.destroy();
+                                                   
+                                            }
+                                        }
+
+                                        
                             
                                         // Schedule the next update
                                         
