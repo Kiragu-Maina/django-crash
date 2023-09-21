@@ -18,16 +18,17 @@ class Example extends Phaser.Scene
         this.load.image('popped', popped);
        
         
-        this.load.bitmapFont('desyrel', 'https://labs.phaser.io/assets/fonts/bitmap/desyrel.png', 'https://labs.phaser.io/assets/fonts/bitmap/desyrel.xml');
+        this.load.bitmapFont('desyrel', desyrelpng, desyrelxml);
     }
 
    async create ()
     {
         
         
-        console.log('create called');
+       
         const scene = this;
         let backg = scene.add.image(400, 300, 'bg');
+        backg.setScale(2.7, 3.5);
 
         const loading_game = scene.add.text(400, 28, 'Game loading....').setColor('#00ff00').setFontSize(32).setShadow(2, 2).setOrigin(0.5, 0);
         
@@ -37,8 +38,8 @@ class Example extends Phaser.Scene
         async function main(scene) {
             try {
                 
-                const wsSocket = new WebSocket("ws://" + window.location.host + "/ws/realtime/");
-                // const wsSocket = new WebSocket('ws://'
+                const wsSocket = new WebSocket("wss://" + window.location.host + "/ws/realtime/");
+                // const wsSocket = new WebSocket('wss://'
                 // + window.location.host
                 // + '/ws/real_time_updates/'
                 // + 'group_1'
@@ -79,10 +80,8 @@ class Example extends Phaser.Scene
                 // const counterText = scene.add.dynamicBitmapText(400, 200, 'desyrel', '0.00').setOrigin(0.5, 0);
                 
                 
-                let crashInstructionProcessed = false;
-                let countAndDisplayTimer;   
-                let continueCounting = true;
-                const delayTime = 10;    
+               
+                
                 let counterText;
                 let countdownText;
                 let crashText;
@@ -113,21 +112,21 @@ class Example extends Phaser.Scene
                 
 
                 wsSocket.onmessage = async function (e) {
-                    console.log('received message');
-
+                    
+                    
                     if(loading_game){
                       loading_game.destroy();
                     }
                         const data = JSON.parse(e.data);
-                        console.log(data.type);
+                     
                         if (data.type == "ongoing_synchronizer") {
                             // Use the current multiplier to render the ongoing graph
                             const currentMultiplier = data.cached_multiplier; // Assuming the currentMultiplier is provided in the data
                             // Use currentMultiplier to render the ongoing graph
-                            console.log('ongoing synchronizer');
+                           
                             countAndDisplayOngoing(currentMultiplier);
                            
-                            console.log(data)
+                           
                         }
                         
                         
@@ -138,7 +137,8 @@ class Example extends Phaser.Scene
                                 showballoons = true;
                             
                             // Start the synchronizer countdown
-                               console.log('start_synchronizer');
+                               
+                               
                                 if (counterText) {
                                     counterText.destroy();
                                 }
@@ -149,123 +149,80 @@ class Example extends Phaser.Scene
                                     // Destroy the existing background image
                                     poppedbackground.destroy();
                                 }
-                               
+                               if (groupSocket){
+                                groupSocket.close();
+                               }
     
                                 backg = scene.add.image(400, 300, 'bg').setPipeline('Light2D');
-                                console.log(data.count);
+                                backg.setScale(2.7, 3.5);
+                               
                                 const delay = 1000;  // Delay in milliseconds
                                 const updateInterval =1;
-                                const crashPoint = 15; // Adjust this value as needed
-                                chooseballoontext = scene.add.dynamicBitmapText(400, 200, 'desyrel').setOrigin(0.5, 0);
+                                const crashPoint = 10; // Adjust this value as needed
+                                // chooseballoontext = scene.add.dynamicBitmapText(400, 100, 'desyrel').setOrigin(0.5, 0);
+                                var balloons_selected = [];
+                                var selectedBalloon = null;
+                                var balloonColors = [0x54deff, 0xff0000, 0x00ff00, 0x800080]; // Blue, Red, Green, Purple
                                 
                                 
-                                    let count = 15;
+                                    let count = 10;
                                     // Define the minimum countdown value (0 seconds)
                                     const minCountdown = 0;
 
                                     while (count >= minCountdown) {
+                                        if (chooseballoontext) {
+                                            chooseballoontext.destroy();
+                                        }
+                                        chooseballoontext = scene.add.dynamicBitmapText(400, 100, 'desyrel').setOrigin(0.5, 0);
+
+                                        chooseballoontext.setText(`Choose balloon in ${count}`);
+                                        
                                         if (showballoons) {
                                             showballoons = false;
-                                        
-                                            // Use jQuery to create a modal and add balloons inside it
-                                            var $modal = $('<div id="balloonModal">');
-                                        
-                                            // Add CSS styles to position the balloons horizontally
-                                            $modal.css({
-                                                'display': 'flex',
-                                                'justify-content': 'space-between',
-                                                'align-items': 'center',
-                                                'border-radius': '15px', // Adjust the border-radius for curvy borders
-                                                'background-color': 'rgba(0, 0, 0, 0.7)', // Adjust the alpha value for transparency
-                                                'padding': '20px', // Add some padding to the modal
-                                                'box-shadow': '0px 0px 10px 2px rgba(0,0,0,0.5)', // Add a shadow for depth
-                                                'color': 'white', // Set text color to white
-                                            });
-                                        
-                                            // Define the colors for the second, third, and fourth balloons
-                                            var balloonColors = ['2', '3', '4'];
-                                            var $selectedBalloon = null;
-                                        
+                                            
+                                            
                                             for (var i = 0; i < 4; i++) {
-                                                var color = i === 0 ? '' : balloonColors[i - 1];
-                                                var balloonImage = balloon.replace('.png', color + '.png');
-                                                var $balloon = $('<div class="balloon"><img src="' + balloonImage + '" alt="Balloon ' + (i + 1) + '"></div>');
-                                                $balloon.css({
-                                                    'width': '50px',
-                                                    'height': '100px',
-                                                    'margin': '5px',
-                                                    'cursor': 'pointer' // Add cursor pointer for indicating it's clickable
-                                                });
-                                        
-                                                // Add a click event handler to the balloon
-                                                $balloon.click(function (event) {
-                                                    event.preventDefault();
-                                                    var balloonNumber = $(this).find('img').attr('alt').split(' ')[1];
-                                        
-                                                    if (![2, 3, 4].includes(parseInt(balloonNumber))) {
-                                                        balloonNumber = '1';
+                                                var xPosition = 150 + i * 150; // Adjust the x position as needed
+                                                var groupName = 'group_' + (i + 1); // Create group names 'group_1', 'group_2', ...
+                                                var balloon = scene.add.image(xPosition, 300, 'balloon');
+                                                balloon.setTint(balloonColors[i]); // Set the balloon color based on the array
+                                                balloon.setInteractive();
+                                                balloon.setData('group', groupName); // Store the group name as data
+                                                balloon.setScale(0.3);
+                                                
+                                                balloon.on('pointerdown', function () {
+                                                    var group = this.getData('group');
+                                                    if (selectedBalloon !== null) {
+                                                        selectedBalloon.removeTick(); // Remove the tick from the previously selected balloon
                                                     }
-                                        
-                                                    handleBalloonClicked(balloonNumber, $(this));
+                                                    this.addTick(); // Add a tick below the clicked balloon
+                                                    selectedBalloon = this; // Set the selected balloon
+                                                    handleBalloonClick(group); // Call the function with the group name
                                                 });
-                                        
-                                                $modal.append($balloon);
+                                                
+                                                balloon.addTick = function () {
+                                                    // Add a tick (e.g., a line) below the balloon
+                                                    var tick = scene.add.line(0, 0, 0, 20, 0, 0, 0xffffff);
+                                                    tick.setStrokeStyle(3, 0xffffff);
+                                                    tick.x = this.x;
+                                                    tick.y = this.y + this.displayHeight / 2 + 10;
+                                                    tick.setOrigin(0, 0);
+                                                    this.tick = tick;
+                                                };
+                                                
+                                                balloon.removeTick = function () {
+                                                    // Remove the tick from the balloon
+                                                    if (this.tick) {
+                                                        this.tick.destroy();
+                                                        this.tick = null;
+                                                    }
+                                                };
+                                                
+                                                balloons_selected.push(balloon);
                                             }
-                                        
-                                            // Append the modal to the body
-                                            $('body').append($modal);
-                                        
-                                            // Open the modal
-                                            $modal.dialog({
-                                                modal: true,
-                                                title: 'Choose Balloon:',
-                                                width: 'auto',
-                                               
-                                                close: function (event, ui) {
-                                                    // This function is executed when the dialog is closed.
-                                                    // You can perform any cleanup or post-closing actions here.
-                                                    $(this).dialog('destroy').remove();
-                                                }
-                                            });
-                                        
-                                            // Function to handle balloon click outside the if (showballoons) block
-                                            function handleBalloonClicked(balloonNumber, $clickedBalloon) {
-                                                // Remove highlight from previously selected balloon
-                                                if ($selectedBalloon) {
-                                                    $selectedBalloon.css('background-color', '');
-                                                }
-                                        
-                                                // Highlight the clicked balloon
-                                                $clickedBalloon.css('background-color', 'yellow');
-                                                $selectedBalloon = $clickedBalloon;
-                                                switch (balloonNumber) {
-                                                    case '1':
-                                                        handleBalloonClick('group_1');
-                                                        break;
-                                                    case '2':
-                                                        handleBalloonClick('group_2');
-                                                        break;
-                                                    case '3':
-                                                        handleBalloonClick('group_3');
-                                                        break;
-                                                    case '4':
-                                                        handleBalloonClick('group_4');
-                                                        break;
-                                                    default:
-                                                        handleBalloonClick('group_1');
-                                                        break;
-                                                }
-                                        
-                                            }
-                                        
-                                            // Close and destroy the modal after five seconds
-                                            setTimeout(function () {
-                                                handleBalloonClicked('1');
-
-                                                // Close and destroy the modal
-                                                $modal.dialog('close');
-                                            }, 10000);
                                         }
+
+                                        
                                         
                                         
                                         await new Promise(resolve => setTimeout(resolve, delay));
@@ -279,22 +236,27 @@ class Example extends Phaser.Scene
                                         }
 
                                         // Update the text with the remaining countdown time
-                                        chooseballoontext.setText('Choose balloon in ' + count + 's');
+                                        // chooseballoontext.setText('Choose balloon in ' + count + 's');
                                         if (count === 0) {
+                                            for (var i = 0; i < balloons_selected.length; i++) {
+                                                balloons_selected[i].destroy();
+                                            }
+                                            
                                             break;
                                         }
                                     }
+                                
                                 chooseballoontext.destroy();
-
                                 game_id = data.game_id
                                 
 
                                     
-                                crashInstructionProcessed = false;
+                                
                                 cashoutclicked = false;
                                 start = true;
+                                
                                
-                                startgame_official();
+                                await startgame_official();
                                
                                 
                                
@@ -310,51 +272,67 @@ class Example extends Phaser.Scene
                        
                     }
                     async function startgame_official(){
-                        if(start_with_balloon){
+                       
+                            window.allowballoonchange = true;
+                            betButton.disabled = false;
 
                             start_with_balloon = false
-                        if(window.roomName){
-                            roomName = window.roomName;
-                            console.log(roomName);
                             
-                       
-
-                        }
-                        else{
-                            window.roomName = 'group_1';
-                            roomName = 'group_1';
-
-                        }
-                        groupSocket = new WebSocket(
-                                'ws://'
-                                + window.location.host
-                                + '/ws/real_time_updates/'
-                                + roomName
-                                + '/'
-                            );
-                            console.log("connected to room");
+                          
+                         
                             
-                            groupSocket.onmessage = async function (e) {
+                            if (window.roomName) {
+                                roomName = window.roomName
+                                handleBalloonClick(roomName)
+                                groupSocket = new WebSocket(
+                                    'wss://'
+                                    + window.location.host
+                                    + '/ws/real_time_updates/'
+                                    + roomName
+                                    + '/'
+                                );
                                 
-                                    const data = JSON.parse(e.data);
-                                    console.log(data)
+                                await continuation_of_start_game_official()
+                            }
+                            else {
+                                
+                                roomName = 'group_1';
+                                handleBalloonClick(roomName)
+                                 groupSocket = new WebSocket(
+                                    'wss://'
+                                    + window.location.host
+                                    + '/ws/real_time_updates/'
+                                    + roomName
+                                    + '/'
+                                );
+                                await continuation_of_start_game_official()
+                            }
+                               
+                        }
+                    
+                            
+                    async function continuation_of_start_game_official(){
+                        window.allowballoonchange = false;
+                            
+                         
+                                groupSocket.onmessage = async function (e) {
                                     
-                                   
-                                     
-                                    if (data.type === "crash_instruction") {
-                                        // Handle crash instruction, e.g., trigger the crash action in the game
-                                        console.log(data)
-                                        groupSocket.close();
+                                        const data = JSON.parse(e.data);
+                                    
+                                        if (data.type === "crash_instruction") {
+                                            // Handle crash instruction, e.g., trigger the crash action in the game
                                         
-                                        const crashpoint = data.crash
-                                        if (backg) {
-                                            // Destroy the existing background image
-                                            backg.destroy();
-                                        }
-                                        if (balloonsTween) {
-                                            balloonsTween.stop(); // Stop the balloon animation
-                                            balloonsTween = null; // Clear the tween reference
-                                        }
+                                            groupSocket.close();
+                                            
+                                            const crashpoint = data.crash
+                                            if (backg) {
+                                                // Destroy the existing background image
+                                                backg.destroy();
+                                         }
+                                            if (balloonsTween) {
+                                                balloonsTween.stop(); // Stop the balloon animation
+                                                balloonsTween = null; // Clear the tween reference
+                                            }
                                         
                                         // Clear any balloons that might still be visible
                                         if (balloons) {
@@ -373,6 +351,7 @@ class Example extends Phaser.Scene
                                     
                                         // Create a new background image with the new texture
                                         poppedbackground = scene.add.image(400, 300, 'popped');
+                                        poppedbackground.setScale(3.5, 3.5);
                                         switch (window.roomName) {
                                             case 'group_1':
                                                 // No tint (default color)
@@ -387,7 +366,7 @@ class Example extends Phaser.Scene
                                                 poppedbackground.setTint(0x800080); // White tint
                                                 break;
                                             default:
-                                                console.log('Invalid group name: ' + roomName);
+                                                
                                                 poppedbackground.setTint(0x0000ff);
                                                
                                                 break;
@@ -395,7 +374,7 @@ class Example extends Phaser.Scene
                                         
                                         // isCrashTriggered = true;
                                         CountingComplete(crashpoint);
-                                        console.log('back to here');
+                                     
                                         if (typeof globalBetAmount !== 'undefined') {
                                             globalBetAmount = 0;
                                         }
@@ -403,13 +382,13 @@ class Example extends Phaser.Scene
                                         betButton.disabled = false;
                                         betButton.textContent = 'BET'
             
-                                        console.log('bet_amount reset');
+                                        
                                         start_initial = true;
                                         start = true;
-                                        window.allowballoonchange = false
+                                        window.allowballoonchange = false;
             
-                                        crashInstructionProcessed = true;
-                                        start_with_balloon = true
+                                        
+                                        start_with_balloon = true;
                                         
             
                                     }
@@ -422,36 +401,16 @@ class Example extends Phaser.Scene
                                         
                                     
                                     else if (data.type == "count_initial"){
-                                        if (start_initial){
-                                            window.allowballoonchange = false
-                                            start_initial = false;
-                                            if (poppedbackground) {
-                                                // Destroy the existing background image
-                                                poppedbackground.destroy();
-                                            }
-                                           
-                
-                                            backg = scene.add.image(400, 300, 'bg').setPipeline('Light2D');
-                                            
-                                            
-                                            
-                                        }
                                         
-                                        if (countdownText) {
-                                            countdownText.destroy();
-                                        }
-                                        
-                                       
-                                        if (crashText) {
-                                            crashText.destroy();
-                                        }
-                                        countAndDisplayInitial(data.count);
+                                            
+                                        await countAndDisplayInitial(type="connected", data.count);
             
             
                                     }
                                     
                                     
                                     else if (data.type == "count_update"){
+                                        start_initial = false
                                         if (start){
                                             start = false;
                                             
@@ -469,12 +428,58 @@ class Example extends Phaser.Scene
             
                                     }
                                     
+                                
+                                                                // Optionally, you can handle WebSocket errors and close events
+                                    groupSocket.onerror = function (error) {
+                                        // Handle WebSocket errors
+                                        console.error('WebSocket Error:', error);
+                                    };
+
+                                    groupSocket.onclose = function (event) {
+                                        // Handle WebSocket close event
+                                        if (event.wasClean) {
+                                            console.log('WebSocket closed cleanly, code=' + event.code + ', reason=' + event.reason);
+                                        } else {
+                                            console.error('WebSocket connection died');
+                                        }
+                                    };
+
+                                    // You can send messages using groupSocket.send() if needed
+
+                                    // Perform other actions or await other events as necessary
+                                    await countAndDisplayInitial(type="disconnected", 15);
                                 }
+                            }
                         
 
-                    }
-                }
-                    async function countAndDisplayInitial(count){
+                    
+                
+                    async function countAndDisplayInitial(type, count){
+                       
+                        window.allowballoonchange = false
+                        
+                        if (poppedbackground) {
+                            // Destroy the existing background image
+                            poppedbackground.destroy();
+                        }
+                        
+
+                        backg = scene.add.image(400, 300, 'bg').setPipeline('Light2D');
+                        backg.setScale(2.7, 3.5);
+                        
+                        
+                        
+                    
+                    
+                        if (crashText) {
+                            crashText.destroy();
+                        }
+                        if(count>20){
+                            
+                            groupSocket.close();
+                            return
+                                
+                         }
                        
                         if(bet_allowed_text){
                             
@@ -484,33 +489,77 @@ class Example extends Phaser.Scene
                         if (counterText) {
                             counterText.destroy();
                         }
-                        countdownText = scene.add.dynamicBitmapText(400, 400, 'desyrel', '').setOrigin(0.5, 0);
-                        bet_allowed_text = scene.add.dynamicBitmapText(400, 200, 'desyrel', '').setOrigin(0.5, 0);
-                        countdownText.setText(`Game starts in ${count}`);
-                       
-                        if(count>5){
-                            
-                            bet_allowed_text.setText('Place your bet');
-                               
+                        if (countdownText){
+                            countdown.destroy();
                         }
-                        else {
-                            if(bet_allowed_text){
+                        switch(type){
+                            case 'connected':
+                                countdownText = scene.add.dynamicBitmapText(400, 400, 'desyrel', '').setOrigin(0.5, 0);
+                                bet_allowed_text = scene.add.dynamicBitmapText(400, 200, 'desyrel', '').setOrigin(0.5, 0);
+                                countdownText.setText(`Game starts in ${count}`);
+                                
+                                if(count>1){
+                                    
+                                    bet_allowed_text.setText('Place your bet');
+                                       
+                                }
+                                else {
+                                    if(bet_allowed_text){
+                                    
+                                        bet_allowed_text.destroy();
+                                           
+                                    }
+                                }
+                                break;
+                            case 'disconnected': 
+                                let counting = 15;                              
+                        
+                                async function update() {
+                                while (start_initial){
+                                    while (counting <= count) {
+                                        await new Promise(resolve => setTimeout(resolve, 1000));
+                                        counting -= 1;
+                                        
                             
-                                bet_allowed_text.destroy();
-                                   
+                                        countdownText = scene.add.dynamicBitmapText(400, 400, 'desyrel', '').setOrigin(0.5, 0);
+                                        bet_allowed_text = scene.add.dynamicBitmapText(400, 200, 'desyrel', '').setOrigin(0.5, 0);
+                                        countdownText.setText(`Game starts in ${counting}`);
+                                        
+                                        if(count>1){
+                                            
+                                            bet_allowed_text.setText('Place your bet');
+                                            
+                                        }
+                                        else {
+                                            if(bet_allowed_text){
+                                            
+                                                bet_allowed_text.destroy();
+                                                
+                                            }
+                                        }
+                                        break;
+                            
+                                        // Schedule the next update
+                                        
+                                    }
+                                }
                             }
-                        }
+                    
+                        // Start the asynchronous update loop
+                        update();
+                      
 
                         
                     
                         
                         
                         }
+                    }
 
 
                     
                     async function startgame(wsSocket){
-                        console.log('startgame called')
+                        
                         pump = scene.add.image(650, 450, 'pumpUp');
                         Line = new Phaser.Geom.Line(centerX-4, centerY-2, 638, 572);
                         graphics.strokeLineShape(Line);
@@ -539,7 +588,7 @@ class Example extends Phaser.Scene
                                     balloon.setTint(0x800080); // White tint
                                     break;
                                 default:
-                                    console.log('Invalid group name: ' + roomName);
+                                    
                                     balloon.setTint(0x0000ff);
                                     // You may want to set a default tint here or clear the tint
                                     break;
@@ -552,7 +601,7 @@ class Example extends Phaser.Scene
                         balloons.getChildren().forEach((balloon) => {
                             changeBalloonColor(balloon, window.roomName);
                             balloon.setOrigin(0.5, 1); // Set the anchor point to the bottom center
-                            balloon.setScale(0.1);
+                            balloon.setScale(0.5);
                             balloon.x = centerX; // Set the initial x position to the center
                             balloon.y = centerY+10; // Set the initial y position to the bottom
                         });
@@ -635,7 +684,7 @@ class Example extends Phaser.Scene
                             let y = 0;
                         
                             //  To change the total number of lights see the Game Config object
-                            const maxLights = 20;
+                            const maxLights = 3;
                         
                             //  Create a bunch of lights
                             for (let i = 0; i < maxLights; i++) {
@@ -670,12 +719,12 @@ class Example extends Phaser.Scene
                         
                    
                     async function countAndDisplayOngoing(multiplier) {
-                        console.log('countAndDisplay Ongoing called')
+                        
                         if (counterText) {
                             counterText.destroy();
                         }
                        
-                        const delay = 100;  // Delay in milliseconds
+                        const delay = 110;  // Delay in milliseconds
                         const updateInterval = 0.01;
                         const crashPoint = 1000000; // Adjust this value as needed
                         counterText = scene.add.dynamicBitmapText(400, 200, 'desyrel').setOrigin(0.5, 0);
@@ -683,14 +732,40 @@ class Example extends Phaser.Scene
                         bet_allowed_text.setText(' Ongoing game,\n Wait for new game');
                         
                             let count = multiplier;
-                            while (count <= crashPoint) {
-                                await new Promise(resolve => setTimeout(resolve, delay));
-                                count += updateInterval;
-                                const counted = Math.round(count * 100) / 100;
-                                 // Assuming you have a context with 'self' available
-                                counterText.setText('x' + counted);
-                                 
+                            
+                            async function update() {
+                                while (count <= crashPoint) {
+                                    await new Promise(resolve => setTimeout(resolve, delay));
+                                    count += updateInterval;
+                                    const counted = Math.round(count * 100) / 100;
+                                    if (count < window.multiplier){
+                                        count = window.multiplier
+                                        counted = count.toFixed(2);
+                                        
+                                        }
+                        
+                                    // Check if counterText is still valid before setting text
+                                    try {
+                                        if (!counterText) {
+                                            throw new Error("counterText is null.");
+                                        }
+                        
+                                        counterText.setText('x' + counted);
+                                        
+                                    } catch (error) {
+                                        console.error(`error is ${error.message}`);
+                                        break;
+                                    }
+                        
+                                    // Schedule the next update
+                                    
+                                }
                             }
+                        
+                            // Start the asynchronous update loop
+                            update();
+                        }
+                        
                           
                         
                  
@@ -702,53 +777,88 @@ class Example extends Phaser.Scene
                         
                         
                     
-                    }
-                    async function countAndDisplay() {
-                        // Destroy the existing counterText if it exists
-                        if (counterText) {
-                            counterText.destroy();
-                        }
-                        if(bet_allowed_text){
+                        async function countAndDisplay() {
+                            // Destroy the existing counterText if it exists
                             
-                            bet_allowed_text.destroy();
-                               
-                        }
-                        const delay = 50;  // Delay in milliseconds
-                        const updateInterval = 0.01;
-                        const crashPoint = 1000000; // Adjust this value as needed
-                        counterText = scene.add.dynamicBitmapText(400, 200, 'desyrel').setOrigin(0.5, 0);
-                        
+                            if (counterText) {
+                                counterText.destroy();
+                            }
+                            if (bet_allowed_text) {
+                                bet_allowed_text.destroy();
+                            }
+                            const delay = 110;  // Delay in milliseconds
+                            const updateInterval = 0.01;
+                            const crashPoint = 1000000; // Adjust this value as needed
+                            counterText = scene.add.dynamicBitmapText(400, 200, 'desyrel').setOrigin(0.5, 0);
                         
                             let count = 1;
-                            while (count <= crashPoint) {
-                                await new Promise(resolve => setTimeout(resolve, delay));
-                                count += updateInterval;
-                                const counted = Math.round(count * 100) / 100;
-                                 // Assuming you have a context with 'self' available
-                                counterText.setText('x' + counted);
-                                await updateCashoutButtonText(counterText); 
+                           
+                            let counted;
+                          
+                            async function update() {
+                                while (count <= crashPoint) {
+                                    await new Promise(resolve => setTimeout(resolve, delay));
+                                    count += updateInterval;
+                                    counted = Math.round(count * 100) / 100;
+                                    
+                                    
+
+                                    if (count < window.multiplier){
+                                        count = window.multiplier
+                                        counted = count.toFixed(2);
+                                        
+                                        }
+                                   
+                                        
+                                    
+                        
+                                    // Check if counterText is still valid before setting text
+                                    try {
+                                        if (!counterText) {
+                                            throw new Error("counterText is null.");
+                                        }
+                        
+                                        counterText.setText('x' + counted);
+                                        await updateCashoutButtonText(counterText);
+                                    } catch (error) {
+                                        console.error(`error is ${error.message}`);
+                                        break;
+                                    }
+                        
+                                    // Schedule the next update
+                                    
+                                }
                             }
+                        
+                            // Start the asynchronous update loop
+                            update();
+                        }
+                        
+                        
+                                    
+                        
+                                    // Schedule the next update
+                        
+                            // Start the asynchronous update loop
                           
                         
                         
                         
-                            
                         
-                        
-                    }
+                    
                         
                     async function cashout(){
-                        console.log('cashout called')
+                        
                         // Add a click event listener to the cashoutButton
                         const cashoutButton = document.getElementById('cashout-button');
                         
                         cashoutButton.addEventListener('click', function() {
                             if(!cashoutclicked){
                             cashoutclicked=true;
-                            console.log('cashout clicked and value set to true');
+                           
                             
                             const cashOutValue = parseFloat(counterText.text.substring(1)); 
-                            console.log('cashed_out at: ', cashOutValue);// Extract and parse the value
+                            
                             const betForm = document.getElementById("bet-form");
                             // Send the cashOutValue to the server using an API call
                            
@@ -756,7 +866,7 @@ class Example extends Phaser.Scene
 
                             
                             const data = JSON.stringify(formdata)
-                            console.log(data)
+                          
                             groupSocket.send(data)
 
                            
@@ -783,7 +893,7 @@ class Example extends Phaser.Scene
                     function CountingComplete( crashpoint) {
                         
                         
-                                clearTimeout(countAndDisplayTimer);
+                               
                                 if (counterText) {
                                     counterText.destroy();
                                 }
@@ -791,15 +901,11 @@ class Example extends Phaser.Scene
                                 
                                 
                                
-                                console.log('its the crashtexts font', crashpoint);
+                               
                                 crashText = scene.add.dynamicBitmapText(400, 200, 'desyrel').setOrigin(0.5, 0);
                                 crashText.setText('Popped at x' + crashpoint);
                                 
-                                // Schedule the text to be cleared after 5 minutes
-                                setTimeout(() => {
-                                    crashText.destroy();
-                                }, 5000); // 5 minutes in milliseconds                          
-     
+                              
 
                 }
                     function drawgraph(scene, wsSocket){

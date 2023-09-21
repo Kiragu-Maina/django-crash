@@ -3,27 +3,26 @@
 <html lang="en">
 
 <head>
-  {% load static %}
- 
+    {%load static%}
+    {% load pipeline %}
+    
   
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <link rel="apple-touch-icon" sizes="76x76" href="{% static 'img/apple-icon.png' %}">
   <link rel="icon" type="image/png" href="{% static 'img/favicon.png' %}">
-  <title>
-    
-  </title>
+  {% stylesheet 'sheets' %}
+  
+   
   <!--     Fonts and icons     -->
 
   <!-- Font Awesome Icons -->
   <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
   
   
-  <!-- CSS Files -->
-  <link id="pagestyle" href="{% static 'css/argon-dashboard.css' %}" rel="stylesheet" />
+  
   
 </head>
-
 
 
 <body class="g-sidenav-show   bg-gray-100">
@@ -151,33 +150,12 @@
     <div class="container-fluid py-4">
       <div class="row mt-4">
         <div class="col-lg-8 mb-lg-7 mb-7">
-
           <div class="card">
-           
-                <!-- Add a div for the table here -->
-                <div class="table-container">
-                    <table class="multiplier-table" id="multiplier-table">
-                        <tbody>
-                          <tr id='multiplier_row' style="display: flex;">
-                            {% for crash_point_data, color in last_seven_dict.items %}
-                            {% if crash_point_data.crash_point %}
-                            <td style="font-size: 0.6em; border: 1px solid transparent;">
-                                <a style="text-decoration: none;" href="#provableModal" rel="modal:open" onclick="displayModal('{{ crash_point_data.group_name }}', '{{ crash_point_data.server_seed }}', '{{ crash_point_data.salt }}', '{{ crash_point_data.hash }}')">
-                                    <span style="color: {{ color }};">x{{ crash_point_data.crash_point }}</span>
-                                </a>
-                            </td>
-                            {% endif %}
-                            {% endfor %}
-                        </tr>
-                        
-                            <!-- Add more rows if needed -->
-                        </tbody>
-                    </table>
-                </div>
-                
-              
+              <div class="card-header pb-0 pt-3 bg-transparent">
+                  <h6 class="text-capitalize">Game</h6>
+                  <div id="countdown-text"></div>
+              </div>
               <div class="row">
-                
                 <div class="col-md-8">
               
               <div class="game-container" id="game-container"></div>
@@ -255,24 +233,9 @@
                 <div class="col-md-7 mb-3">
                   <span  class="nav-link text-red font-weight-bold px-0" id="error-text" style="font-style: italic; display: none;"><span>
               </div>
-                 
-              </div>
-              </div>
-              <!-- Add a div for the table here -->
-              <div class="concurrent-games-container">
-                <table class="concurrent-games-table" id="concurrent-games-table">
-                  <thead>
-                    <tr class="table-header">
-                      <td colspan="5">Ongoing games</td>
-                  </tr>
                   
-                    </thead>
-                    <tbody>
-                       
-                    </tbody>
-                </table>
-            </div>
-            
+              </div>
+              </div>
           </div>
         </div>
       
@@ -309,23 +272,9 @@
         
         
         </div>
-      
-        <div id="provableModal" class="modal">
-          <div class="card card-plain">
-            <div class="card-body">
-          
-              <a id="close-modal" class="close-modal" style="background-color: #007bff; color: #fff; padding: 5px; border-radius: 5px; cursor: pointer; border: 1px solid #007bff; border-radius: 10px;" href="#" rel="modal:close">Close</a>
-
-              <p id="balloon_name">Balloon Name: </p>
-              <p id="serverSeed">Server Seed: </p>
-              <p id="salt">Salt: </p>
-              <p id="hash">Hash: </p>
-          </div>
       </div>
     </div>
-  
-
-      
+  </div>
   
   <div id="ex1" class="modal">
   
@@ -497,46 +446,11 @@
   
   </div>
 
-
  
-  
   <script type="text/javascript">
     DJANGO_STATIC_URL = '{{ STATIC_URL }}';
 </script>
-
-<script src="{% static 'js/darkenbody.js' %}"></script>
-<script>
-    var balloon = "{% static 'assets/balloon.png' %}";
-var balloon1 = "{% static 'assets/balloon1.png' %}";
-var balloon2 = "{% static 'assets/balloon2.png' %}";
-var balloon3 = "{% static 'assets/balloon3.png' %}";
-var balloon4 = "{% static 'assets/balloon4.png' %}";
-
-
-
-
-
-var pumpdown = "{% static 'assets/pump1.png' %}";
-var pumpup = "{% static 'assets/pump2.png' %}";
-var space = "{% static 'assets/space.png' %}";
-
-
-var popped = "{% static 'assets/popped.png' %}";
-var desyrelpng = "{% static 'fonts/bitmap/desyrel.png' %}"
-var desyrelxml = "{% static 'fonts/bitmap/desyrel.xml' %}"
-
-
-var login = '{% url "login" %}';
-var register =  '{% url "login" %}';
-var deposit = '{% url "deposit" %}';
-var withdraw = '{% url "withdraw" %}';
-var bet_placement = '{% url "placebet" %}';
-
-    
-
-
-
-</script>
+  
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js" integrity="sha256-lSjKY0/srUM9BE3dPm+c4fBo1dky2v27Gdjm2uoZaL0=" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
@@ -549,21 +463,11 @@ var bet_placement = '{% url "placebet" %}';
  
   <script src="https://cdnjs.cloudflare.com/ajax/libs/phaser/3.60.0/phaser.min.js"></script>
   
-
+  {% javascript 'scripts' %}
  
-  <script src="{% static 'js/betplacement.js' %}"></script>
-
-  <script src="{% static 'js/updatehtml.js' %}"></script>
-  <script src = "{% static 'js/phaserfourballoons.js' %}"></script>
- 
-  <script src="{% static 'js/phaserconfig.js' %}"></script>
   
   
-  <script src="{% static 'js/newphaser.js' %}"></script>
-
- 
-   
-    <script src="{% static 'js/loginregister.js' %}"></script>
+  
 </body>
 
 </html>

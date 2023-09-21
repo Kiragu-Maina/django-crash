@@ -20,3 +20,12 @@ app.autodiscover_tasks()
 @app.task(bind=True, ignore_result=True)
 def debug_task(self):
     print(f'Request: {self.request!r}')
+    
+
+
+app.conf.beat_schedule = {
+    'monitor_prescriptions': {
+        'task': 'crash.tasks.send_updates',
+        'schedule': 1,
+    },
+}
