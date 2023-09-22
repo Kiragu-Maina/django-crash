@@ -1,4 +1,4 @@
-from django.http import JsonResponse, HttpResponse, FileResponse
+from django.http import JsonResponse, HttpResponse
 from django.views.generic import TemplateView
 from django.views import View
 from .models import Transactions, BettingWindow, CashoutWindow, Games, Bank, OwnersBank
@@ -41,8 +41,6 @@ import subprocess
 import logging
 from asgiref.sync import sync_to_async
 
-from django.conf import settings
-import os
 
 
 # Configure the logger
@@ -82,7 +80,10 @@ class UserRegistrationView(SuccessMessageMixin, CreateView):
         response = super().form_valid(form)
         user = form.save()
         login(self.request, user)
-        return JsonResponse({'success': True, 'redirect_url': reverse_lazy('home')}, status=200)
+        bank_account = Bank.objects.get(user=self.request.user)
+            
+        bank_balance = bank_account.balance 
+        return JsonResponse({'success': True, 'balance':bank_balance}, status=200)
     def form_invalid(self, form):
         messages.error(self.request, 'There was an error with your registration. Please check the form and try again.')
         return JsonResponse({'success': False, 'errors': form.errors}, status=400)
@@ -96,7 +97,10 @@ class UserLoginView(FormView):
         user = form.get_user()
         login(self.request, user)
         messages.success(self.request, 'You have successfully logged in!')
-        return JsonResponse({'success': True, 'redirect_url': reverse_lazy('home')}, status=200)
+        bank_account = Bank.objects.get(user=self.request.user)
+            
+        bank_balance = bank_account.balance 
+        return JsonResponse({'success': True, 'balance':bank_balance, 'username':user.user_name}, status=200)
 
     def form_invalid(self, form):
         print(form.errors)
@@ -151,7 +155,7 @@ class Home(TemplateView):
         else:
             self.username = generate_random_string(8)
             
-        last_seven_crash_points = Games.objects.exclude(crash_point='').order_by('-id')[:8]
+        last_seven_crash_points = Games.objects.exclude(crash_point='').order_by('-id')[:10]
         
         random_colors = ['#{:02x}{:02x}{:02x}'.format(random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)) for _ in range(len(last_seven_crash_points))]
 
@@ -473,6 +477,7 @@ class AdminView(TemplateView):
     @sync_to_async
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        
         try:
             user = self.request.user
             owners_bank = OwnersBank.objects.get(user=user)
@@ -485,13 +490,24 @@ class AdminView(TemplateView):
             context['revenue'] = revenue
             
         except OwnersBank.DoesNotExist:
+            return 
             print("OwnersBank record does not exist for the user:", self.request.user)
         
         return context
-        
+    
+      
     async def get(self, request, *args, **kwargs):
-        context = await self.get_context_data()
-        return render(request, self.template_name, context)
+        
+        @sync_to_async 
+        def check_authentication(user):
+            if self.request.user.is_authenticated:
+                return True
+            
+        if await check_authentication(self.request.user):
+            context = await self.get_context_data()
+            return render(request, self.template_name, context)
+        else:
+            return render(request, 'adminlogin.html')
         
         
 @method_decorator(login_required, name='dispatch')
@@ -513,17 +529,3 @@ class BalloonChosenView(View):
             }
         
         return JsonResponse(response)
-    
-@login_required   
-def download_users_json(request):
-    # Path to the users.json file in the media directory
-    file_path = os.path.join(settings.MEDIA_ROOT, 'users.json')
-
-    # Check if the file exists
-    if os.path.exists(file_path):
-        with open(file_path, 'rb') as file:
-            response = HttpResponse(file.read(), content_type='application/json')
-            response['Content-Disposition'] = f'attachment; filename=users.json'
-            return response
-    else:
-        return HttpResponse('The file does not exist.', status=404)

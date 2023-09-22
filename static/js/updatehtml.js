@@ -209,6 +209,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 break;
         }
     }
+    else {
+    const groupNames = ['group_1', 'group_2', 'group_3', 'group_4'];
+
+    for (const groupName of groupNames) {
+        if (!isNaN(parseFloat(data[groupName]))) {
+            window.multiplier = parseFloat(data[groupName]);
+            
+            break; // Stop the loop once a valid multiplier is found
+        }
+    }
+
+    }
+   
        
 
         
