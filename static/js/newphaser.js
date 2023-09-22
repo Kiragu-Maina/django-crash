@@ -449,7 +449,12 @@ class Example extends Phaser.Scene
                                     }
                                     
                                 }
-                            }
+                                bet_allowed_text = scene.add.dynamicBitmapText(400, 200, 'desyrel', '').setOrigin(0.5, 0);
+                        
+                            
+                                bet_allowed_text.setText('Place your bet');
+                               
+                            
                         
 
                     
