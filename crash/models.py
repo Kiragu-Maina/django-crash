@@ -23,9 +23,6 @@ class CustomUserManager(BaseUserManager):
         if not phone_number:
             raise ValueError("The phone number field must be set")
         phone_number = self.normalize_phone_number(phone_number)
-        if not phone_number:
-            raise ValueError("Invalid phone number format")
-        
         user = self.model(phone_number=phone_number, user_name=user_name, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
@@ -41,7 +38,8 @@ class CustomUserManager(BaseUserManager):
             raise ValueError('Superuser must have is_superuser=True.')
 
         return self.create_user(phone_number, user_name, password, **extra_fields)
-    
+    import re
+
     def normalize_phone_number(self, phone_number):
         # Remove non-numeric characters
         cleaned_number = re.sub(r'\D', '', phone_number)
@@ -51,10 +49,6 @@ class CustomUserManager(BaseUserManager):
             cleaned_number = cleaned_number[1:]
         elif cleaned_number.startswith('254'):
             cleaned_number = cleaned_number[3:]
-        elif cleaned_number.startswith('+254'):
-            cleaned_number = cleaned_number[4:]
-        else:
-            return None
 
         # Ensure the number is 10 digits long
         if len(cleaned_number) == 9:

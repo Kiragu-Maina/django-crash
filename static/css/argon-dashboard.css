@@ -17252,10 +17252,11 @@ td:hover {
 background-color: transparent; /* Change the background color as desired */
 cursor: pointer;
 }
-.concurrent-games-container table tbody tr:hover {
-background-color: transparent; /* Set background color to transparent (no change) */
-/* Set other styles to their default values or use 'initial' */
-}
+
+.concurrent-games-table tbody tr:hover {
+  background-color: transparent; /* Set background color to transparent (no change) */
+  /* Set other styles to their default values or use 'initial' */
+  }
 #provableModal {
   display: none; /* By default, display will be hidden */
   position: relative; /* Position will be fixed */

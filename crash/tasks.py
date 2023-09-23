@@ -37,10 +37,7 @@ def send_updates():
             
             all_groups_wait_for_new_game += 1
         elif cached_multiplier is None:
-            cache.set(cache_key, 'Wait for new game')
             all_groups_wait_for_new_game += 1
-            data[group] = 'Wait for new game'
-            
         else:
             data[group] = cached_multiplier
             
@@ -53,6 +50,7 @@ def send_updates():
             num = 6 
         if num is not None:        
             num -= 1
+        
         for group, cache_key in group_game_multipliers.items():            
             
             data[group] = f'New game in {num}s'
@@ -106,3 +104,26 @@ def stop_game():
       return True
 
     stop_games()
+
+@shared_task
+def data_to_admin():
+    data = {
+            'type':'player_update',
+        'players_online':cache.get("realtime_group_user_count"),
+        'players_betting':cache.get("realtime_betting_users_count"),
+        'players_won':cache.get("bets_won_user_count"),
+        'players_lost':cache.get("bets_lost_user_count"),
+    }
+    
+  
+        # Send the update using Channels' channel layer
+    channel_layer = get_channel_layer()
+       
+    async_to_sync(channel_layer.group_send)(
+            "admin_updates",
+            {
+                "type": "pot.update",
+                "data": data,
+            }
+        )
+    return True

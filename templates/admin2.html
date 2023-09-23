@@ -275,21 +275,24 @@
     
         <table class="players-container">
             <tr>
-                
-                    <span class="players">Players Online</span>
-                
+              <td style="border: 1px solid transparent;">
+                    <span id="players_online" class="players">Players Online: {{players_online}}</span>
+              </td>
             </tr>
             <tr>
-                <td>
-                    <span class="players">Players in current game</span>
+             
+                          <!-- Your table body content here -->
+                     
+                <td style="border: 1px solid transparent;">
+                    <span id="players_in_current_game" class="players">Players betting: {{players_betting}}</span>
                 </td>
-                <td>
-                    <span class="players">Players won</span>
+                <td style="border: 1px solid transparent;">
+                    <span id="players_winning" class="players">Players who cashed out:{{players_won}} </span>
                 </td>
-                <td>
-                    <span class="players">Players lost</span>
+                <td style="border: 1px solid transparent;">
+                    <span id="players_losing" class="players">Players who lost: {{players_betting}}</span>
                 </td>
-            </tr>
+              </tr>
         </table>
     
         <div class="status">
@@ -297,8 +300,7 @@
         </div>
     </div>
     
-    <a href="{% url 'download_users_json' %}">Download Users JSON</a>
-
+  
   
     
   </div>

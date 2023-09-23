@@ -27,34 +27,11 @@
 })();
 
 
- if(document.querySelectorAll('.amount-btn')){
-  const amountButtons=document.querySelectorAll('.amount-btn');
-  const selectedAmountInput = document.getElementById('selected-amount');
 
-  let selectedAmount = null;
-
-  amountButtons.forEach(button => {
-      button.addEventListener('click', function() {
-          selectedAmount = parseInt(this.getAttribute('data-amount'));
-          selectedAmountInput.value = selectedAmount;
-          console.log('why is not displaying', selectedAmount);
-      });
-  });
-}
 
   // You can also add event listeners for the arrow buttons or manual editing here
 
-  const betForm = document.getElementById('bet-form');
-  betForm.addEventListener('submit', function(event) {
-      event.preventDefault(); // Prevent the form from submitting normally
 
-      if (selectedAmount !== null) {
-          // You can use the selectedAmount for further processing, e.g., sending to an endpoint
-          console.log('Selected amount:', selectedAmount);
-      } else {
-          console.log('No amount selected');
-      }
-  });
 
 
 // Verify navbar blur on scroll

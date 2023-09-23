@@ -36,7 +36,7 @@
       <i class="fas fa-times p-3 cursor-pointer text-secondary opacity-5 position-absolute end-0 top-0 d-none d-xl-none" aria-hidden="true" id="iconSidenav"></i>
       <a class="navbar-brand m-0" href="  " target="_blank">
         <img src="{% static 'img/logo-ct-dark.png' %}" class="navbar-brand-img h-100" alt="main_logo">
-        <span class="ms-1 font-weight-bold">{{username}}</span>
+        <span id="user-name" class="ms-1 font-weight-bold">{{username}}</span>
       </a>
     </div>
     <hr class="horizontal dark mt-0">
@@ -56,6 +56,7 @@
           <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Account pages</h6>
         </li>
         <div>
+          <div id="side-bar">
         
         {% if user.is_authenticated %}
         <li class="nav-item">
@@ -87,7 +88,7 @@
           </a>
         </li>
         {% endif %}
-        
+      </div>
       </ul>
     </div>
     </div>
@@ -105,6 +106,7 @@
               <span class="d-sm-inline d-none"></span>
             </div>
           </div>
+          <div id="nav-menu">
           <ul class="navbar-nav  justify-content-end">
             {% if user.is_authenticated %}
             <li class="nav-item d-flex align-items-center">
@@ -144,6 +146,7 @@
            
           </ul>
         </div>
+      </div>
       </div>
     </nav>
     <!-- End Navbar -->
@@ -259,15 +262,19 @@
               </div>
               </div>
               <!-- Add a div for the table here -->
-              <div class="concurrent-games-container">
-                <table class="concurrent-games-table" id="concurrent-games-table">
-                  <thead>
-                    <tr class="table-header">
-                      <td colspan="5">Ongoing games</td>
+              <div class="table-container">
+                <table class="multiplier-table" id="concurrent-games-table">
+                    <tbody>
+                      <tr id='multiplier_row'>
+                      <td colspan="5">blue</td>
+                      <td>red</td>
+                      <td>green</td>
+                      <td>purple</td>
                   </tr>
                   
                     </thead>
                     <tbody>
+
                        
                     </tbody>
                 </table>
@@ -418,7 +425,7 @@
     </div>
   
     
-    <a href="#" rel="modal:close">Close</a>
+    <a  id="closeloginmodal" href="#" rel="modal:close">Close</a>
   </div>
   <div id="ex3" class="modal">
   
@@ -454,7 +461,7 @@
 
   
     
-    <a href="#" rel="modal:close">Close</a>
+    <a id="closeregistermodal" href="#" rel="modal:close">Close</a>
     
   
   </div>
@@ -527,6 +534,7 @@ var desyrelxml = "{% static 'fonts/bitmap/desyrel.xml' %}"
 
 
 var login = '{% url "login" %}';
+var logout = '{% url "logout" %}';
 var register =  '{% url "login" %}';
 var deposit = '{% url "deposit" %}';
 var withdraw = '{% url "withdraw" %}';

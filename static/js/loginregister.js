@@ -27,7 +27,11 @@
                       // Handle the response from the server, e.g., redirect or show a success message
                       console.log('here');
                       console.log(response);
-                      location.reload();
+                      updateNavigationMenu(true, response.balance, response.username)
+                      const loginmodal = document.getElementById("closeloginmodal")
+                      loginmodal.click();
+                      $("#login_submit_btn").show();
+                    $("#spinner1").hide();
                       
                   },
                   error: function (xhr, status, error) {
@@ -76,7 +80,11 @@
                 success: function (response) {
                     // Handle the response from the server, e.g., redirect or show a success message
                     console.log(response);
-                    location.reload();
+                    updateNavigationMenu(true, response.balance, response.username)
+                    $("#register_submit_btn").show();
+                    $("#spinner2").hide();
+                    const registermodal = document.getElementById("closeregistermodal")
+                    registermodal.click();
                     
                 },
                 error: function (xhr, status, error) {
@@ -113,7 +121,7 @@
 
             // Send an AJAX POST request to the server
             $.ajax({
-                url: '{% url "deposit" %}',  // Replace with your actual login URL
+                url: deposit,  // Replace with your actual login URL
                 type: 'POST',
                 data: data,
                 success: function (response) {
@@ -160,7 +168,7 @@
 
             // Send an AJAX POST request to the server
             $.ajax({
-                url: '{% url "withdraw" %}',  // Replace with your actual login URL
+                url: withdraw,  // Replace with your actual login URL
                 type: 'POST',
                 data: data,
                 success: function (response) {
@@ -193,3 +201,85 @@
         });
       });
   
+      function updateNavigationMenu(isAuthenticated, balance = null, username) {
+        const navMenu = document.getElementById('nav-menu');
+        const side_bar = document.getElementById('side-bar');
+        const user_name = document.getElementById('user-name');
+
+        
+        if (isAuthenticated) {
+            // User is authenticated, update the menu
+            user_name.innerHTML = username
+            navMenu.innerHTML = `
+                <ul class="navbar-nav justify-content-end">
+                    <li class="nav-item d-flex align-items-center">
+                        <a class="nav-link" href="#ex3" rel="modal:open">
+                            <i class="fa fa-money me-sm-1"></i>
+                            <span class="nav-link text-white font-weight-bold px-0">Deposit</span>
+                        </a>
+                    </li>
+                    <li class="nav-item d-flex align-items-center">
+                        <a class="nav-link" href="#ex4" rel="modal:open">
+                            <i class="fa fa-credit-card me-sm-1"></i>
+                            <span class="nav-link text-white font-weight-bold px-0">Withdraw</span>
+                        </a>
+                    </li>
+                    <li class="nav-item d-flex align-items-center">
+                        <span class="nav-link text-white font-weight-bold px-0" id="balance">Balance: ${balance}</span>
+                    </li>
+                </ul>
+            `;
+          side_bar.innerHTML = `
+            <li class="nav-item">
+              <a class="nav-link " href=${logout}>
+                <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+                  <i class="ni ni-collection text-info text-sm opacity-10"></i>
+                </div>
+                <span class="nav-link-text ms-1">Log out</span>
+              </a>
+            </li>
+           `
+            
+            
+           
+            
+
+        } else {
+            // User is not authenticated, update the menu
+            navMenu.innerHTML = `
+                <ul class="navbar-nav justify-content-end">
+                    <li class="nav-item d-flex align-items-center">
+                        <a href="#ex1" rel="modal:open" class="nav-link text-white font-weight-bold px-2">
+                            <i class="fa fa-user me-sm-1"></i>
+                            <span class="nav-link text-white font-weight-bold px-0">Sign In</span>
+                        </a>
+                    </li>
+                    <li class="nav-item d-flex align-items-center">
+                        <a href="#ex2" rel="modal:open" class="nav-link text-white font-weight-bold px-2">
+                            <i class="fa fa-user-plus me-sm-1"></i>
+                            <span class="nav-link text-white font-weight-bold px-0">Register</span>
+                        </a>
+                    </li>
+                </ul>
+            `;
+            side_bar.innerHTML = `
+                      <li class="nav-item">
+                      <a class="nav-link"  href="#ex1" rel="modal:open">
+                      
+                        <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+                          <i class="ni ni-single-copy-04 text-warning text-sm opacity-10"></i>
+                        </div>
+                        <span class="nav-link-text ms-1">Sign In</span>
+                      </a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link " href="#ex2" rel="modal:open">
+                        <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+                          <i class="ni ni-collection text-info text-sm opacity-10"></i>
+                        </div>
+                        <span class="nav-link-text ms-1">Register</span>
+                      </a>
+                    </li>`;
+        }
+    }
+    

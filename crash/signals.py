@@ -5,9 +5,10 @@ from .models import Transactions, User, Bank, Clients, Games, OwnersBank, GameSe
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 from decimal import Decimal
-from .tasks import start_game, stop_game
+from .tasks import start_game, stop_game, data_to_admin
 import time
 from django.db import transaction
+from django.core.cache import cache
 
 @receiver(post_save, sender=Transactions)
 def transaction_saved(sender, instance, **kwargs):
@@ -18,11 +19,30 @@ def transaction_saved(sender, instance, **kwargs):
         if instance.game_played == True:
             if instance.won > 0:
                 data_type ="table_update"
+                user_count = cache.get("bets_won_user_count")
+                if user_count is None:
+                    user_count = 1
+                else:
+                    user_count += 1
+                cache.set("bets_won_user_count", user_count)
+        
                 
             elif instance.won == 0:
                 data_type ="lose_update"
+                user_count = cache.get("bets_lost_user_count")
+                if user_count is None:
+                    user_count = 1
+                else:
+                    user_count += 1
+                cache.set("bets_lost_user_count", user_count)
             else:
                 data_type ="lose_update"
+                user_count = cache.get("bets_lost_user_count")
+                if user_count is None:
+                    user_count = 1
+                else:
+                    user_count += 1
+                cache.set("bets_lost_user_count", user_count)
         else:
             data_type = "bet_placed_update"
             
@@ -42,9 +62,12 @@ def transaction_saved(sender, instance, **kwargs):
             "won": str(instance.won),
             "balloon":balloon,
             "type":data_type,
+            
         }
+     
         return data
         
+   
     def send_data_to_websocket(data):
         # Send the update using Channels' channel layer
         channel_layer = get_channel_layer()
@@ -55,11 +78,18 @@ def transaction_saved(sender, instance, **kwargs):
                 "data": data,
             }
         )
+       
 
     # Define a function to be called when the transaction is successfully committed
     def on_commit_callback():
         data = update_table(instance)  # Call the update_table function
+       
         send_data_to_websocket(data)
+        data_to_admin.delay()
+        
+        
+        
+        
 
     # Use transaction.on_commit to ensure the callback is executed after the transaction
     transaction.on_commit(on_commit_callback)
