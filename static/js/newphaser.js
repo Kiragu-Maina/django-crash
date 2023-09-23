@@ -92,6 +92,26 @@ class Example extends Phaser.Scene {
 						if (groupSocket) {
 							groupSocket.close();
 						}
+
+					if (balloonsTween) {
+						balloonsTween.stop(); // Stop the balloon animation
+						balloonsTween = null; // Clear the tween reference
+					}
+
+					// Clear any balloons that might still be visible
+					if (balloons) {
+						balloons.clear(true, true);
+					}
+
+					if (animationTimer) {
+						animationTimer.remove(); // Remove the timer
+						animationTimer = null; // Clear the timer reference
+					}
+
+					if (pump) {
+						pump.destroy();
+					}
+
 						
 						balloonsalreadychosen = false;
 						window.allowballoonchange = true;
@@ -100,6 +120,29 @@ class Example extends Phaser.Scene {
 
 						chooseballoontext.setText('Choose balloon.\n Game start soon.}');
 					} else if (data.type === 'mid_start_synchronizer') {
+                        if (chooseballoontext){
+                            chooseballoontext.destroy();
+                        }
+
+					if (balloonsTween) {
+						balloonsTween.stop(); // Stop the balloon animation
+						balloonsTween = null; // Clear the tween reference
+					}
+
+					// Clear any balloons that might still be visible
+					if (balloons) {
+						balloons.clear(true, true);
+					}
+
+					if (animationTimer) {
+						animationTimer.remove(); // Remove the timer
+						animationTimer = null; // Clear the timer reference
+					}
+
+					if (pump) {
+						pump.destroy();
+					}
+
 						window.allowballoonchange = true;
 						showballoons = true;
 						choose_balloon(data.data);
