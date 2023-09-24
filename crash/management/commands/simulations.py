@@ -18,7 +18,7 @@ class WebSocketClient:
 
     async def connect(self):
         print('Connecting to WebSocket...')
-        self.ws = await websockets.connect(self.host, compression=None, origin="https://django-crash-testing.up.railway.app")
+        self.ws = await websockets.connect(self.host, compression=None, origin="https://django-crash-production.up.railway.app")
 
     async def send_message(self, message):
         await self.ws.send(json.dumps(message))
@@ -228,7 +228,7 @@ class Command(BaseCommand):
         user_simulators = await self.login_users(selected_users)
 
         # Create a WebSocket client
-        ws_client = WebSocketClient('wss://django-crash-testing.up.railway.app/ws/realtime/')
+        ws_client = WebSocketClient('wss://django-crash-production.up.railway.app/ws/realtime/')
         await ws_client.connect()
 
         while True:
