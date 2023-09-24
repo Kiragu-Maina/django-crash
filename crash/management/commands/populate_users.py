@@ -1,11 +1,12 @@
 import os
 import json
 from django.core.management.base import BaseCommand
-import random
+from django.conf import settings
 from faker import Faker
+from ...models import User
 
 fake = Faker()
-from ...models import User
+
 class Command(BaseCommand):
     help = 'Run the GameManager in the background'
 
@@ -14,7 +15,8 @@ class Command(BaseCommand):
         def generate_user_data(num_users):
             users = []
             for _ in range(num_users):
-                phone_number = fake.unique.phone_number()
+                # Generate a 10-digit phone number starting with "01" or "07"
+                phone_number = fake.random_element(elements=('01', '07')) + str(fake.random_number(digits=8))
                 user_name = fake.unique.user_name()
                 password = fake.password()
                 user_to_json = {
@@ -22,13 +24,16 @@ class Command(BaseCommand):
                     'user_name': user_name,
                     'password': password,
                 }
+               
                 user = User.objects.create(phone_number=phone_number, user_name=user_name)
                 user.set_password(password)
                 user.save()
                 users.append(user_to_json)
+            file_path = os.path.join(settings.MEDIA_ROOT, 'users.json')
 
-            with open('users.json', 'w') as json_file:
+            with open(file_path, 'w') as json_file:
                 json.dump(users, json_file)
-        num_users = 300
-        generate_user_data(num_users)
+                print('users generated')
 
+        num_users = 50
+        generate_user_data(num_users)

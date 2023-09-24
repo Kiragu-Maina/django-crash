@@ -544,3 +544,56 @@ class BalloonChosenView(View):
             }
         
         return JsonResponse(response)
+    
+class TestView(View):
+    
+    async def post(self, request, *args, **kwargs):
+        action = request.POST.get('action')
+         
+     
+
+        if action == 'start':
+            # Retrieve data from the POST request
+            num_users = int(request.POST.get('num_users'))
+            risk_factor = int(request.POST.get('risk_factor'))
+
+            # Define a background task to start the game
+            async def start_game():
+                try:
+                    # Find and terminate the 'simulations' process if it's running
+                    subprocess.run(['pkill', '-f', 'simulations'])
+
+                    # Start the game as an asynchronous subprocess
+                    process = await asyncio.create_subprocess_exec(
+                        'python', 'manage.py', 'simulations',
+                        f'--risk_factor={risk_factor}', f'--num_users={num_users}',
+                        stdout=asyncio.subprocess.PIPE,
+                        stderr=asyncio.subprocess.PIPE,
+                    )
+
+                  
+
+                except Exception as e:
+                    logger.error(f'Error starting the game: {str(e)}')
+
+            # Start the background task
+            asyncio.create_task(start_game())
+            
+
+            response_data = {'message': 'Simulation started'}
+            return JsonResponse(response_data, status=200)
+
+        elif action == 'stop':
+            try:
+                # Find and kill the 'rungame' process
+                subprocess.run(['pkill', '-f', 'simulations'])
+                response_data = {'message': 'Test stopped successfully.'}
+                return JsonResponse(response_data, status=200)
+            except Exception as e:
+                response_data = {'error': f'Error stopping the game: {str(e)}'}
+                return JsonResponse(response_data, status=500)
+
+
+        else:
+            response_data = {'error': 'Invalid action'}
+            return JsonResponse(response_data, status=400)

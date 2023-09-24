@@ -239,76 +239,117 @@
             </div>
              
           </div>
-        </div>
-      
-      
-          <div class="col-lg-4">
           <div class="card">
-              <div class="card-header pb-0 p-3">
-                  <h6 class="mb-0">Bets</h6>
-              </div>
-              <div class="card-body p-3">
-                  <table class='bet-table' style="background-color: #333; color: black;">
-                      <thead>
-                          <tr>
-                              <th style="font-size: 0.6em;">Amount in POT</th>
-                              <th style="font-size: 0.6em;">User_cash</th>
-                              
-                              <th style="font-size: 0.6em;">Float_Cash</th>
-                              <th style="font-size: 0.6em;">Profit</th>
-                          </tr>
-                      </thead>
-                      <tbody id='bet-table-body'>
-                          <!-- Your table body content here -->
-                      </tbody>
-                  </table>
-              </div>
-          </div>
-
-
+            <div class="card-header pb-0 pt-3 bg-transparent">
+                <h6 class="text-capitalize">Simulate Users</h6>
             </div>
-            <div class="col-lg-8">
-      <div class="card">
-        <div class="card-header pb-0 pt-3 bg-transparent">
-            <h6 class="text-capitalize">Game Control Panel</h6>
-        </div>
-    
-        <table class="players-container">
-            <tr>
-              <td style="border: 1px solid transparent;">
-                    <span id="players_online" class="players">Players Online: {{players_online}}</span>
-              </td>
-            </tr>
-            <tr>
-             
-                          <!-- Your table body content here -->
+            
+            <div class="card-body">
+              <form id='simulation-form' role="form" class="row g-3 align-items-center">
+                
+               
+                    {% csrf_token %}
+                    
+                    <div class="col-auto">
+                        <label for="num_users" class="visually-hidden">Number of Users:</label>
+                        <input type="number" class="form-control" id="num_users" name="num_users" placeholder="Number of Users" required>
+                    </div>
+                    
+                    <div class="col-auto">
+                        <label for="risk_factor" class="visually-hidden">Risk Factor:</label>
+                        <input type="number" class="form-control" id="risk_factor" name="risk_factor" placeholder="Risk Factor" required>
+                    </div>
+                    
+                    
+                    <div class="col-auto">
                      
-                <td style="border: 1px solid transparent;">
-                    <span id="players_in_current_game" class="players">Players betting: {{players_betting}}</span>
-                </td>
-                <td style="border: 1px solid transparent;">
-                    <span id="players_winning" class="players">Players who cashed out:{{players_won}} </span>
-                </td>
-                <td style="border: 1px solid transparent;">
-                    <span id="players_losing" class="players">Players who lost: {{players_betting}}</span>
-                </td>
-              </tr>
-        </table>
-    
-        <div class="status">
-            <p id="status" style="color: red"></p>
+                        <button type="button" id="simulate_submit_btn" class="btn btn-primary">Simulate</button>
+                    </div>
+                    <div id="spinner4" style="display: none;">
+                      <!-- Add your spinner HTML or image here -->
+                      
+                          <span>Simulating...</span>
+
+                     
+                  </div>
+                  <p id="error4" style="color: red"></p>
+                  <p id="status4" style="color: red"></p>
+                </form>
+               
+                
+            </div>
         </div>
-    </div>
-    
-  
-  
-    
-  </div>
+        
+        
+          <div class="card">
+            <div class="card-header pb-0 pt-3 bg-transparent">
+                <h6 class="text-capitalize">Players</h6>
+            </div>
+        
+            <table class="players-container">
+                <tr>
+                  <td style="border: 1px solid transparent;">
+                        <span id="players_online" class="players">Players Online: {{players_online}}</span>
+                  </td>
+                </tr>
+                <tr>
+                 
+                              <!-- Your table body content here -->
+                         
+                    <td style="border: 1px solid transparent;">
+                        <span id="players_in_current_game" class="players">Players betting: {{players_betting}}</span>
+                    </td>
+                    <td style="border: 1px solid transparent;">
+                        <span id="players_winning" class="players">Players who cashed out:{{players_won}} </span>
+                    </td>
+                    <td style="border: 1px solid transparent;">
+                        <span id="players_losing" class="players">Players who lost: {{players_betting}}</span>
+                    </td>
+                  </tr>
+            </table>
+        
+           
+        </div>
+        
+      
+        </div>
+
+        <div class="col-lg-4">
+          <div class="row">
+        <div class="card">
+            <div class="card-header pb-0 p-3">
+                <h6 class="mb-0">Bets</h6>
+            </div>
+            <div class="card-body p-3">
+                <table class='bet-table' style="background-color: #333; color: black;">
+                    <thead>
+                        <tr>
+                            <th style="font-size: 0.6em;">Amount in POT</th>
+                            <th style="font-size: 0.6em;">User_cash</th>
+                            
+                            <th style="font-size: 0.6em;">Float_Cash</th>
+                            <th style="font-size: 0.6em;">Profit</th>
+                        </tr>
+                    </thead>
+                    <tbody id='bet-table-body'>
+                        <!-- Your table body content here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+
+          </div>
+        </div>
+      
+      
+            
 </div>
         
-        
-        </div>
-   
+     
+
+      
+      </div>
   
   <div id="ex1" class="modal">
   
@@ -597,6 +638,69 @@
               }
           });
       });
+     
+    
+      $('#simulate_submit_btn').click(function () {
+        // Check the current action
+        var action = "start";
+        
+        if ($(this).text() === "Stop Simulation") {
+            // If the button text is "Stop Simulation," change the action to "stop"
+            action = "stop";
+        }
+    
+        // Hide the button and show the spinner
+        $(this).hide();
+        $("#spinner4").show();
+    
+        var num_users = $('#num_users').val();
+        var risk_factor = $('#risk_factor').val();
+        var csrf_token = $("input[name=csrfmiddlewaretoken]").val();
+    
+        // Prepare the data to be sent
+        var data = {
+            action: action,
+            num_users: num_users,
+            risk_factor: risk_factor,
+            csrfmiddlewaretoken: csrf_token
+        };
+    
+        // Send an AJAX POST request to the server
+        $.ajax({
+            url: '{% url "simulate_users" %}',  // Replace with your actual simulation URL
+            type: 'POST',
+            data: data,
+            success: function (response) {
+                if (action === "start") {
+                    // If the action was "start," change the button text to "Stop Simulation"
+                    $("#simulate_submit_btn").text("Stop Simulation");
+                }
+                console.log('Simulation started successfully');
+                console.log(response);
+                $("#spinner4").hide();
+                $("#status4").html(response.message);
+                // Handle the response as needed
+            },
+            error: function (xhr, status, error) {
+                // Handle errors, e.g., display an error message
+                try {
+                    var errorResponse = JSON.parse(xhr.responseText);
+                    console.log(errorResponse);
+                    var errorMessage = errorResponse.errors.__all__[0];
+                    console.log(errorMessage);
+                    $("#error4").html(errorMessage);
+                } catch (e) {
+                    // Handle JSON parsing error or other issues
+                    console.error(e);
+                    $("#error4").html("An error occurred.");
+                }
+                // Show the button and hide the spinner
+                $("#simulate-submit-btn").show();
+                $("#spinner4").hide();
+            }
+        });
+    });
+    
     
     });
 </script>
