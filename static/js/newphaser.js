@@ -315,6 +315,9 @@ class Example extends Phaser.Scene {
 
 		async function continuation_of_start_game_official() {
 			window.allowballoonchange = false;
+			bet_allowed_text = scene.add.dynamicBitmapText(400, 200, 'desyrel', '').setOrigin(0.5, 0);
+
+			bet_allowed_text.setText('Place your bet');
 
 			groupSocket.onmessage = async function (e) {
 				const data = JSON.parse(e.data);
@@ -428,9 +431,7 @@ class Example extends Phaser.Scene {
 				}
 			};
 
-			bet_allowed_text = scene.add.dynamicBitmapText(400, 200, 'desyrel', '').setOrigin(0.5, 0);
-
-			bet_allowed_text.setText('Place your bet');
+			
 		}
 
 		async function countAndDisplayInitial(count) {
@@ -563,9 +564,7 @@ class Example extends Phaser.Scene {
 		}
 
 		async function animateLights() {
-			const duration = 5000; // Set the desired animation duration in milliseconds
-
-			// Your light animation code here...
+			const duration = 5000; 
 			scene.lights.enable().setAmbientColor(0x555555);
 
 			const hsv = Phaser.Display.Color.HSVColorWheel();
@@ -713,9 +712,7 @@ class Example extends Phaser.Scene {
 			update();
 		}
 
-		// Schedule the next update
-
-		// Start the asynchronous update loop
+	
 
 		async function cashout() {
 			// Add a click event listener to the cashoutButton
