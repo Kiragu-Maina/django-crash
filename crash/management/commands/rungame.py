@@ -402,8 +402,8 @@ class BettingCashoutManager:
                 "count":count,
                 "game_id":game_id
             }
-          
-            await self.send2_instruction({"type": "mid_start_synchronizer", "data": data })
+            if group_name == 'group_1':          
+                await self.send2_instruction({"type": "mid_start_synchronizer", "data": data })
            
            
             

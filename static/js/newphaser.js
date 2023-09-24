@@ -92,56 +92,59 @@ class Example extends Phaser.Scene {
 						if (groupSocket) {
 							groupSocket.close();
 						}
+						if (chooseballoontext) {
+							chooseballoontext.destroy();
+						}
 
-					if (balloonsTween) {
-						balloonsTween.stop(); // Stop the balloon animation
-						balloonsTween = null; // Clear the tween reference
-					}
+						if (balloonsTween) {
+							balloonsTween.stop(); // Stop the balloon animation
+							balloonsTween = null; // Clear the tween reference
+						}
 
-					// Clear any balloons that might still be visible
-					if (balloons) {
-						balloons.clear(true, true);
-					}
+						// Clear any balloons that might still be visible
+						if (balloons) {
+							balloons.clear(true, true);
+						}
 
-					if (animationTimer) {
-						animationTimer.remove(); // Remove the timer
-						animationTimer = null; // Clear the timer reference
-					}
+						if (animationTimer) {
+							animationTimer.remove(); // Remove the timer
+							animationTimer = null; // Clear the timer reference
+						}
 
-					if (pump) {
-						pump.destroy();
-					}
+						if (pump) {
+							pump.destroy();
+						}
 
-						
+
 						balloonsalreadychosen = false;
 						window.allowballoonchange = true;
 						showballoons = true;
 						chooseballoontext = scene.add.dynamicBitmapText(400, 100, 'desyrel').setOrigin(0.5, 0);
 
-						chooseballoontext.setText('Choose balloon.\n Game start soon.}');
+						chooseballoontext.setText('Choose balloon.\n Game starts soon.');
 					} else if (data.type === 'mid_start_synchronizer') {
-                        if (chooseballoontext){
-                            chooseballoontext.destroy();
-                        }
+						if (chooseballoontext) {
+							chooseballoontext.destroy();
+						}
 
-					if (balloonsTween) {
-						balloonsTween.stop(); // Stop the balloon animation
-						balloonsTween = null; // Clear the tween reference
-					}
+						if (balloonsTween) {
+							balloonsTween.stop(); // Stop the balloon animation
+							balloonsTween = null; // Clear the tween reference
+						}
 
-					// Clear any balloons that might still be visible
-					if (balloons) {
-						balloons.clear(true, true);
-					}
+						// Clear any balloons that might still be visible
+						if (balloons) {
+							balloons.clear(true, true);
+						}
 
-					if (animationTimer) {
-						animationTimer.remove(); // Remove the timer
-						animationTimer = null; // Clear the timer reference
-					}
+						if (animationTimer) {
+							animationTimer.remove(); // Remove the timer
+							animationTimer = null; // Clear the timer reference
+						}
 
-					if (pump) {
-						pump.destroy();
-					}
+						if (pump) {
+							pump.destroy();
+						}
 
 						window.allowballoonchange = true;
 						showballoons = true;
@@ -163,6 +166,12 @@ class Example extends Phaser.Scene {
 			// Start the synchronizer countdown
 
 			if (crashText) {
+				crashText.destroy();
+			}
+			if (chooseballoontext) {
+				chooseballoontext.destroy();
+			}
+			if (crashText){
 				crashText.destroy();
 			}
 
@@ -431,7 +440,7 @@ class Example extends Phaser.Scene {
 				}
 			};
 
-			
+
 		}
 
 		async function countAndDisplayInitial(count) {
@@ -564,7 +573,7 @@ class Example extends Phaser.Scene {
 		}
 
 		async function animateLights() {
-			const duration = 5000; 
+			const duration = 5000;
 			scene.lights.enable().setAmbientColor(0x555555);
 
 			const hsv = Phaser.Display.Color.HSVColorWheel();
@@ -712,7 +721,7 @@ class Example extends Phaser.Scene {
 			update();
 		}
 
-	
+
 
 		async function cashout() {
 			// Add a click event listener to the cashoutButton
