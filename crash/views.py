@@ -607,29 +607,29 @@ class TestView(View):
             return JsonResponse(response_data, status=400)
   
   
-# @login_required   
-# def download_users_json(request):
-#     file_path = os.path.join(settings.MEDIA_ROOT, 'simulationslog.txt')
-
-#     # Check if the file exists
-#     if os.path.exists(file_path):
-#         with open(file_path, 'rb') as file:
-#             response = HttpResponse(file.read(), content_type='text/plain')  # Use 'text/plain' for a plain text file
-#             response['Content-Disposition'] = f'attachment; filename=simulationslog.txt'  # Correct filename
-#             return response
-#     else:
-#         return HttpResponse('The file does not exist.', status=404)   
-        
 @login_required   
 def download_users_json(request):
-    # Path to the users.json file in the media directory
-    file_path = os.path.join(settings.MEDIA_ROOT, 'users.json')
+    file_path = os.path.join(settings.MEDIA_ROOT, 'simulationslog.txt')
 
     # Check if the file exists
     if os.path.exists(file_path):
         with open(file_path, 'rb') as file:
-            response = HttpResponse(file.read(), content_type='application/json')
-            response['Content-Disposition'] = f'attachment; filename=users.json'
+            response = HttpResponse(file.read(), content_type='text/plain')  # Use 'text/plain' for a plain text file
+            response['Content-Disposition'] = f'attachment; filename=simulationslog.txt'  # Correct filename
             return response
     else:
-        return HttpResponse('The file does not exist.', status=404)
+        return HttpResponse('The file does not exist.', status=404)   
+        
+# @login_required   
+# def download_users_json(request):
+#     # Path to the users.json file in the media directory
+#     file_path = os.path.join(settings.MEDIA_ROOT, 'users.json')
+
+#     # Check if the file exists
+#     if os.path.exists(file_path):
+#         with open(file_path, 'rb') as file:
+#             response = HttpResponse(file.read(), content_type='application/json')
+#             response['Content-Disposition'] = f'attachment; filename=users.json'
+#             return response
+#     else:
+#         return HttpResponse('The file does not exist.', status=404)
