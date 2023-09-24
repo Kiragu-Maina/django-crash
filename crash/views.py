@@ -570,6 +570,12 @@ class TestView(View):
                         stdout=asyncio.subprocess.PIPE,
                         stderr=asyncio.subprocess.PIPE,
                     )
+                    async def log_output():
+                        async for line in process.stdout:
+                            logger.info(line.decode().strip())
+
+                    # Start logging the output without waiting for it to complete
+                    asyncio.create_task(log_output())
 
                   
 

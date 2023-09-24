@@ -17,7 +17,7 @@ class WebSocketClient:
         self.ws = None
 
     async def connect(self):
-        logging.INFO('Connecting to WebSocket...')
+        print('Connecting to WebSocket...')
         self.ws = await websockets.connect(self.host, compression=None, origin="https://django-crash-testing.up.railway.app")
 
     async def send_message(self, message):
@@ -28,7 +28,7 @@ class WebSocketClient:
         return await self.ws.recv()
 
     async def disconnect(self):
-        logging.INFO('Disconnecting WebSocket...')
+        print('Disconnecting WebSocket...')
         await self.ws.close()
 
 class UserSimulator:
@@ -55,7 +55,7 @@ class UserSimulator:
         
 
     async def login(self):
-        logging.INFO(f"Logging in as {self.phone_number}...")
+        print(f"Logging in as {self.phone_number}...")
         async with httpx.AsyncClient() as client:
             response = await client.post(f'{self.host}/login/', data={
                 'username': self.phone_number,
@@ -63,9 +63,9 @@ class UserSimulator:
             }, timeout=30)
 
             if response.status_code == 200:
-                logging.INFO("Login successful")
+                print("Login successful")
                 self.session = response.cookies
-                logging.INFO(response)
+                print(response)
                 return True
             else:               
                 logging.error("Login failed")
@@ -96,8 +96,8 @@ class UserSimulator:
                     )
 
                     if response.status_code == 200:
-                        logging.INFO("Bet placement successful")
-                        logging.INFO("Clicked on 'BET'")
+                        print("Bet placement successful")
+                        print("Clicked on 'BET'")
                         
                         break  # Break out of the retry loop on success
                     else:
@@ -126,14 +126,14 @@ class UserSimulator:
             while True:
                 self.crashed = False
                 message = await self.ws_client2.receive_message()
-                logging.INFO(message)
+                print(message)
                 message_data = json.loads(message)
                 message_type = message_data.get('type')
 
                 if message_type == "crash_instruction":
                     self.crashed = True
                     self.cashout_event.set()
-                    logging.INFO("Heard 'crash_instruction'")
+                    print("Heard 'crash_instruction'")
                     await self.ws_client2.disconnect()
                     return
                     
@@ -156,30 +156,30 @@ class UserSimulator:
             update_interval = 0.01
             delay = 0.05
             count = 1
-            logging.INFO(f"Waiting for {time_to_wait} seconds...")
+            print(f"Waiting for {time_to_wait} seconds...")
 
             try:
                 while count <= time_to_wait:
                     # Check for cancellation request
                     if self.cashout_event.is_set():
-                        logging.INFO("Cashout operation canceled.")
+                        print("Cashout operation canceled.")
                         return
 
                     await asyncio.sleep(delay)
                     if not self.crashed:
                         count += update_interval
                     else:
-                        logging.INFO('Game crashed')
+                        print('Game crashed')
                         break
 
                 # Signal that the cashout operation is ready to proceed
                 self.cashout_event.set()
                 await asyncio.sleep(5)
-                logging.INFO("Sending 'cashout_validate' message")
+                print("Sending 'cashout_validate' message")
                 message = {'type': 'cashout_validate', 'multiplier': time_to_wait, 'game_id': game_id, 'user_name': self.user_name, 'password': 'qwertyadu'}
                 await self.ws_client2.send_message(message)
             except asyncio.CancelledError:
-                logging.INFO("Cashout operation canceled.")
+                print("Cashout operation canceled.")
                 raise  # Re-raise the CancelledError if needed
 
 
@@ -215,7 +215,7 @@ class Command(BaseCommand):
         asyncio.run(user_simulator.simulate_user(risk_factor, game_id))
 
     async def main(self, risk_factor, num_users):
-        logging.INFO('here')
+        print('here')
         file_path = os.path.join(settings.MEDIA_ROOT, 'users.json')
         with open(file_path, 'r') as json_file:
             users = json.load(json_file)
@@ -233,7 +233,7 @@ class Command(BaseCommand):
 
         while True:
             message = await ws_client.receive_message()
-            logging.INFO(message)
+            print(message)
             message_data = json.loads(message)
             message_type = message_data.get('type')
             

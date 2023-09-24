@@ -673,6 +673,7 @@
             success: function (response) {
                 if (action === "start") {
                     // If the action was "start," change the button text to "Stop Simulation"
+                    $("#simulate_submit_btn").show();
                     $("#simulate_submit_btn").text("Stop Simulation");
                 }
                 console.log('Simulation started successfully');
