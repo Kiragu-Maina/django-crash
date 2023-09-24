@@ -555,41 +555,39 @@ class TestView(View):
      
 
         if action == 'start':
-            # Retrieve data from the POST request
-            num_users = int(request.POST.get('num_users'))
-            risk_factor = int(request.POST.get('risk_factor'))
+            try:
+                # Retrieve data from the POST request
+                num_users = int(request.POST.get('num_users'))
+                risk_factor = int(request.POST.get('risk_factor'))
 
-            # Define a background task to start the game
-            async def start_game():
-                try:
-                    # Find and terminate the 'simulations' process if it's running
-                    subprocess.run(['pkill', '-f', 'simulations'])
+                    
+                        # Find and terminate the 'simulations' process if it's running
+                subprocess.run(['pkill', '-f', 'simulations'])
 
-                     # Define the log file path
-                    file_path = os.path.join(settings.MEDIA_ROOT, 'simulationslog.txt')
+                    # Define the log file path
+                file_path = os.path.join(settings.MEDIA_ROOT, 'simulationslog.txt')
 
-                    # Open the log file in append mode
-                    with open(file_path, 'a') as log_file:
-                        # Start the game as an asynchronous subprocess and redirect stdout to the log file
-                        process = await asyncio.create_subprocess_exec(
-                            'python', 'manage.py', 'simulations',
-                            f'--risk_factor={risk_factor}', f'--num_users={num_users}',
-                            stdout=log_file,  # Redirect stdout to the log file
-                            
-                        )
-                  
-                  
-                  
-
-                except Exception as e:
-                    logger.error(f'Error starting the game: {str(e)}')
-
-            # Start the background task
-            asyncio.create_task(start_game())
+                # Open the log file in append mode
+                with open(file_path, 'a') as log_file:
+                    # Start the game as an asynchronous subprocess and redirect stdout to the log file
+                    process = await asyncio.create_subprocess_exec(
+                        'python', 'manage.py', 'simulations',
+                        f'--risk_factor={risk_factor}', f'--num_users={num_users}',
+                        stdout=log_file,  # Redirect stdout to the log file
+                        
+                    )
+                    
+                    
+                    
             
+                
 
-            response_data = {'message': 'Simulation started'}
-            return JsonResponse(response_data, status=200)
+                response_data = {'message': 'Simulation started'}
+                return JsonResponse(response_data, status=200)
+            except Exception as e:
+                response_data = {'error': f'Error starting the simulation: {str(e)}'}
+                print(response_data)
+                return JsonResponse(response_data, status=500)
 
         elif action == 'stop':
             try:
