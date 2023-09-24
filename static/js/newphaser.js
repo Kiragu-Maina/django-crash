@@ -681,7 +681,7 @@ class Example extends Phaser.Scene
                                 while (count <= crashPoint) {
                                     await new Promise(resolve => setTimeout(resolve, delay));
                                     count += updateInterval;
-                                    const counted = Math.round(count * 100) / 100;
+                                    let counted = Math.round(count * 100) / 100;
                                     if (count < window.multiplier){
                                         count = window.multiplier
                                         counted = count.toFixed(2);
