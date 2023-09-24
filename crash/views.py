@@ -39,6 +39,7 @@ from channels.layers import get_channel_layer # Import your GameManager module
 from .tasks import start_game, stop_game
 from django.contrib.auth.decorators import permission_required
 import subprocess
+import os
 import logging
 from asgiref.sync import sync_to_async
 
