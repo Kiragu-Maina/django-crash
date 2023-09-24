@@ -565,22 +565,20 @@ class TestView(View):
                     # Find and terminate the 'simulations' process if it's running
                     subprocess.run(['pkill', '-f', 'simulations'])
 
-                    # Start the game as an asynchronous subprocess
-                    process = await asyncio.create_subprocess_exec(
-                        'python', 'manage.py', 'simulations',
-                        f'--risk_factor={risk_factor}', f'--num_users={num_users}',
-                        stdout=asyncio.subprocess.PIPE,
-                        stderr=asyncio.subprocess.PIPE,
-                    )
+                     # Define the log file path
                     file_path = os.path.join(settings.MEDIA_ROOT, 'simulationslog.txt')
-                    with open(file_path, 'w') as log_file:
-                        async for line in process.stdout:
-                            decoded_line = line.decode().strip()
-                            log_file.write(decoded_line + '\n')
 
-                    # Start logging the output without waiting for it to complete
-                    asyncio.create_task(log_output())
-
+                    # Open the log file in append mode
+                    with open(file_path, 'a') as log_file:
+                        # Start the game as an asynchronous subprocess and redirect stdout to the log file
+                        process = await asyncio.create_subprocess_exec(
+                            'python', 'manage.py', 'simulations',
+                            f'--risk_factor={risk_factor}', f'--num_users={num_users}',
+                            stdout=log_file,  # Redirect stdout to the log file
+                            
+                        )
+                  
+                  
                   
 
                 except Exception as e:
