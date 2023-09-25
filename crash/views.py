@@ -631,3 +631,133 @@ def download_users_json(request):
 #             return response
 #     else:
 #         return HttpResponse('The file does not exist.', status=404)
+
+class AdminViewWithRespawn(TemplateView):
+    template_name = 'theadminwithrespawn.html'
+
+
+    async def post(self, request, *args, **kwargs):
+        action = request.POST.get('action')
+        respawn = request.POST.get('respawn')
+        if respawn == 'true':
+            try:
+                # Find and terminate the 'rungame' process if it's running
+                subprocess.run(['pkill', '-f', 'respawn'])
+
+                # Start the game as an asynchronous subprocess
+                process = await asyncio.create_subprocess_exec(
+                    'python', 'manage.py', 'respawn',
+                    stdout=asyncio.subprocess.PIPE,
+                    stderr=asyncio.subprocess.PIPE,
+                )
+
+                # Log the stdout output asynchronously
+                async def log_output():
+                    async for line in process.stdout:
+                        logger.info(line.decode().strip())
+
+                # Start logging the output without waiting for it to complete
+                asyncio.create_task(log_output())
+
+                response_data = {'message': 'Respawn started successfully.'}
+                return JsonResponse(response_data, status=200)
+            except Exception as e:
+                response_data = {'error': f'Error starting the respawn: {str(e)}'}
+                print(response_data)
+                return JsonResponse(response_data, status=500)
+        elif respawn == 'false':
+            try:
+                # Find and kill the 'rungame' process
+                subprocess.run(['pkill', '-f', 'respawn'])
+                response_data = {'message': 'respawn stopped successfully.'}
+                return JsonResponse(response_data, status=200)
+            except Exception as e:
+                response_data = {'error': f'Error stopping the respawn: {str(e)}'}
+                return JsonResponse(response_data, status=500)
+            
+
+        if action == 'start':
+            try:
+                # Find and terminate the 'rungame' process if it's running
+                subprocess.run(['pkill', '-f', 'rungame'])
+
+                # Start the game as an asynchronous subprocess
+                process = await asyncio.create_subprocess_exec(
+                    'python', 'manage.py', 'rungame',
+                    stdout=asyncio.subprocess.PIPE,
+                    stderr=asyncio.subprocess.PIPE,
+                )
+
+                # Log the stdout output asynchronously
+                async def log_output():
+                    async for line in process.stdout:
+                        logger.info(line.decode().strip())
+
+                # Start logging the output without waiting for it to complete
+                asyncio.create_task(log_output())
+
+                response_data = {'message': 'Game started successfully.'}
+                return JsonResponse(response_data, status=200)
+            except Exception as e:
+                response_data = {'error': f'Error starting the game: {str(e)}'}
+                print(response_data)
+                return JsonResponse(response_data, status=500)
+
+        elif action == 'stop':
+            try:
+                # Find and kill the 'rungame' process
+                subprocess.run(['pkill', '-f', 'rungame'])
+                response_data = {'message': 'Game stopped successfully.'}
+                return JsonResponse(response_data, status=200)
+            except Exception as e:
+                response_data = {'error': f'Error stopping the game: {str(e)}'}
+                return JsonResponse(response_data, status=500)
+
+
+        else:
+            response_data = {'error': 'Invalid action'}
+            return JsonResponse(response_data, status=400)
+        
+
+    @sync_to_async
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        try:
+            user = self.request.user
+            owners_bank = OwnersBank.objects.get(user=user)
+            pot_amount = owners_bank.total_cash
+            profit = owners_bank.profit_to_owner
+            revenue = owners_bank.total_real
+            players_online = cache.get("realtime_group_user_count")
+            players_betting = cache.get("realtime_betting_users_count")
+            players_lost = cache.get("bets_lost_user_count")
+            players_won = cache.get("bets_won_user_count")
+            
+            context['pot_amount'] = pot_amount
+            context['profit'] = profit
+            context['revenue'] = revenue
+            context['players_online'] = players_online
+            context['players_betting'] = players_betting
+            context['players_lost'] = players_lost
+            context['players_won'] = players_won
+            
+        except OwnersBank.DoesNotExist:
+            return 
+            print("OwnersBank record does not exist for the user:", self.request.user)
+        
+        return context
+    
+      
+    async def get(self, request, *args, **kwargs):
+        
+        @sync_to_async 
+        def check_authentication(user):
+            if self.request.user.is_authenticated:
+                return True
+            
+        if await check_authentication(self.request.user):
+            context = await self.get_context_data()
+            return render(request, self.template_name, context)
+        else:
+            return render(request, 'adminlogin.html')
