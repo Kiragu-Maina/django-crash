@@ -20,10 +20,11 @@ class ServerSeedGenerator:
     def crash_point_from_hash(self):
             # Calculate HMAC with generated_hash and salt
             hash_input = hmac.new(bytes.fromhex(self.generated_hash), self.salt.encode(), hashlib.sha256).hexdigest()
-            hs = int(100 / 3)
+            hs = int(100 / 25)
 
             def divisible(hash_val, divisor):
                 return int(hash_val, 16) % divisor == 0
+                #this just checks if hash is divisible by four
 
             if divisible(hash_input, hs):
                 self.crash_point = 1
