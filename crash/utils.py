@@ -20,7 +20,7 @@ class ServerSeedGenerator:
     def crash_point_from_hash(self):
             # Calculate HMAC with generated_hash and salt
             hash_input = hmac.new(bytes.fromhex(self.generated_hash), self.salt.encode(), hashlib.sha256).hexdigest()
-            hs = int(100 / 25)
+            hs = int(4)
 
             def divisible(hash_val, divisor):
                 return int(hash_val, 16) % divisor == 0
@@ -32,6 +32,9 @@ class ServerSeedGenerator:
                 h = int(hash_input[:int(52 / 4)], 16)
                 e = 2 ** 52
                 self.crash_point = math.floor((100 * e - h) / (e - h)) / 100.0
+                if self.crash_point > 10 and divisible(hash_input, 2):
+                    self.crash_point = 1
+                    
 
             return self.crash_point
 
