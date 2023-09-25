@@ -38,8 +38,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 		const formData = new FormData();
 		formData.append('bet_amount', selectedAmountInput.value);
-		if (window.room_name) {
-			formData.append('group_name', window.room_name);
+		if (window.roomName) {
+			formData.append('group_name', window.roomName);
 		} else {
 			formData.append('group_name', 'group_1');
 		}
