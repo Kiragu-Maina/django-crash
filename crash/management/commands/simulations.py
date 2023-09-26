@@ -151,22 +151,23 @@ class UserSimulator:
         finally:
             await self.ws_client2.disconnect()
     
-    def get_multiplier(self, risk_factor):
-            # Parameters for the exponential distribution
-        scale_parameter = risk_factor # Adjust this parameter to control the distribution shape
+    def get_multiplier(risk_factor):
+        # Parameters for the exponential distribution
+        scale_parameter = risk_factor  # Adjust this parameter to control the distribution shape
 
         # Generate random values following the exponential distribution
-        random_values = np.random.exponential(scale=scale_parameter, size=500)
+        random_values = np.random.exponential(scale=scale_parameter, size=20)
 
-        # Scale and shift the values to fit within the range [1.01, 1000]
-        min_value = 1.01
-        max_value = 1000
-        random_values = np.clip(random_values, min_value, max_value)
-        
-                
-        time_to_wait = round(random.choice(random_values), 2)
+        # Filter values to be within the range [1.01, 1000]
+        filtered_values = [value for value in random_values if 1.01 <= value <= 1000]
+
+        if filtered_values:
+            time_to_wait = round(random.choice(filtered_values), 2)
+        else:
+            time_to_wait = None  # No valid values within the specified range
+
         return time_to_wait
-                
+                    
                 
     async def cashout(self, group_name, game_id, risk_factor):
             time_to_wait = self.get_multiplier(risk_factor)
