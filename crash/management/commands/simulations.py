@@ -158,7 +158,7 @@ class UserSimulator:
         # Generate random values following the exponential distribution
         random_values = np.random.exponential(scale=scale_parameter, size=500)
 
-        # Scale and shift the values to fit within the range [0, 500]
+        # Scale and shift the values to fit within the range [1.01, 1000]
         min_value = 1.01
         max_value = 1000
         random_values = np.clip(random_values, min_value, max_value)
