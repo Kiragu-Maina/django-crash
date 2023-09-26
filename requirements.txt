@@ -81,4 +81,4 @@ zope.interface==6.0
 python-dotenv==1.0.0
 httpx==0.25.0 
 websockets==11.0.3 
-
+numpy==1.26.0

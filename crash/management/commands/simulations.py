@@ -7,6 +7,7 @@ import websockets
 import time
 import multiprocessing
 import os
+import numpy as np
 from django.conf import settings
 from django.core.management.base import BaseCommand
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s: %(message)s')
@@ -149,9 +150,26 @@ class UserSimulator:
                     
         finally:
             await self.ws_client2.disconnect()
-           
+    
+    def get_multiplier(self, risk_factor):
+            # Parameters for the exponential distribution
+        scale_parameter = risk_factor # Adjust this parameter to control the distribution shape
+
+        # Generate random values following the exponential distribution
+        random_values = np.random.exponential(scale=scale_parameter, size=500)
+
+        # Scale and shift the values to fit within the range [0, 500]
+        min_value = 1.01
+        max_value = 1000
+        random_values = np.clip(random_values, min_value, max_value)
+        
+                
+        time_to_wait = round(random.choice(random_values), 2)
+        return time_to_wait
+                
+                
     async def cashout(self, group_name, game_id, risk_factor):
-            time_to_wait = round(random.uniform(1, risk_factor), 2)
+            time_to_wait = self.get_multiplier(risk_factor)
             self.time_to_play = time_to_wait
             update_interval = 0.01
             delay = 0.05
