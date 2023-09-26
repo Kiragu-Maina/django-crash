@@ -213,9 +213,7 @@ class GameConsumer(AsyncWebsocketConsumer):
 		print(cashout_window)
 
 		if cashout_window:
-			
-				if sent_multiplier <= cached_multiplier:
-					return True
+			return True
 		else:
 			
 			print("Window closed or received multiplier doesn't match the current game.")
@@ -244,14 +242,15 @@ class GameConsumer(AsyncWebsocketConsumer):
 				user = User.objects.get(user_name=user_name)
 				new_transaction = Transactions.objects.filter(user=user).order_by('created_at').last()
 				games_game_id = Games.objects.filter(group_name= self.group_name).order_by('created_at').last()
+				multiplier = cache.get(f'{self.group_name}_game_multiplier')
 				
 				print('placed_bet_game_id', new_transaction.game_id)
 				print('game_id for respective grp', games_game_id.game_id)
 
 				if new_transaction.game_id == games_game_id.game_id:
 					if not new_transaction.game_played:
-						new_transaction.multiplier = data.get('multiplier')
-						new_transaction.won = new_transaction.bet * float(data.get('multiplier'))
+						new_transaction.multiplier = multiplier
+						new_transaction.won = new_transaction.bet * float(multiplier)
 						new_transaction.game_played = True
 						new_transaction.group_name = self.group_name
 						new_transaction.save()
