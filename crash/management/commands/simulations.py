@@ -193,8 +193,9 @@ class UserSimulator:
 
                 # Signal that the cashout operation is ready to proceed
                 self.cashout_event.set()
-                await asyncio.sleep(0.06)
+                
                 print("Sending 'cashout_validate' message")
+                time_to_wait = time_to_wait-0.1
                 message = {'type': 'cashout_validate', 'multiplier': time_to_wait, 'game_id': game_id, 'user_name': self.user_name, 'password': 'qwertyadu'}
                 await self.ws_client2.send_message(message)
             except asyncio.CancelledError:
