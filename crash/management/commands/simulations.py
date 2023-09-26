@@ -151,7 +151,7 @@ class UserSimulator:
         finally:
             await self.ws_client2.disconnect()
     
-    def get_multiplier(risk_factor):
+    def get_multiplier(self, risk_factor):
         # Parameters for the exponential distribution
         scale_parameter = risk_factor  # Adjust this parameter to control the distribution shape
 
