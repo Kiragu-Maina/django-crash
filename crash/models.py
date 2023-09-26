@@ -123,13 +123,13 @@ class GameSets(models.Model):
 class OwnersBank(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     account_id = models.UUIDField(default=uuid.uuid4, editable=False)
-    users_cash = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    amount_won_by_users = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    amount_lost_by_users = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    float_cash = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    total_cash = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    profit_to_owner = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    total_real = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    users_cash = models.DecimalField(max_digits=50, decimal_places=2, default=0)
+    amount_won_by_users = models.DecimalField(max_digits=50, decimal_places=2, default=0)
+    amount_lost_by_users = models.DecimalField(max_digits=50, decimal_places=2, default=0)
+    float_cash = models.DecimalField(max_digits=50, decimal_places=2, default=0)
+    total_cash = models.DecimalField(max_digits=50, decimal_places=2, default=0)
+    profit_to_owner = models.DecimalField(max_digits=50, decimal_places=2, default=0)
+    total_real = models.DecimalField(max_digits=50, decimal_places=2, default=0)
 
     def update_balance(self):
             try:
