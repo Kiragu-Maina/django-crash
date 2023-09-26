@@ -181,8 +181,8 @@ def update_owners_bank(sender, instance, **kwargs):
     # Whenever a Bank instance is saved, update the OwnersBank balance
     
     def update_owners(instance):
-        owner_username = 'admin'  # Replace with the actual owner's username
-        owners_bank, created = OwnersBank.objects.get_or_create(user=User.objects.get(user_name=owner_username))
+        admin = '0714313598'  # Replace with the actual owner's username
+        owners_bank, created = OwnersBank.objects.get_or_create(user=User.objects.get(phone_number=admin))
         
         if not created:
             owners_bank.update_balance()
