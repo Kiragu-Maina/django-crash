@@ -2347,7 +2347,7 @@ button:not(:disabled) {
 }
 
 .nav-item {
-  padding-right: 50px
+  padding-left: 20px
 }
 
 .nav-fill .nav-item,
