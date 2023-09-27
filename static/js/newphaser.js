@@ -59,62 +59,67 @@ class Example extends Phaser.Scene {
 		let selectedBalloon = null;
 		let balloons_to_show = [];
 		let balloonsalreadychosen = false;
-	        let stopCounting = false;
-	        let isAnimationCancelled = false;
-	        const lightsAnimationPromise = animateLights();
-
-			// Wait for both animations to complete before continuing
-		await Promise.all([lightsAnimationPromise]);
+        let stopCounting = false;
+        let isAnimationCancelled = false;
         
-	        async function animateLights() {
-				const duration = 5000;
-				scene.lights.enable().setAmbientColor(0x555555);
-	
-				const hsv = Phaser.Display.Color.HSVColorWheel();
-	
-				const radius = 80;
-				const intensity = 6;
-				let x = radius;
-				let y = 0;
-	
-				//  To change the total number of lights see the Game Config object
-				const maxLights = 3;
-	
-				//  Create a bunch of lights
-				for (let i = 0; i < maxLights; i++) {
-					const { color } = hsv[i * 10];
-	
-					light = scene.lights.addLight(x, y, radius, color, intensity);
-	
-					lightsTween = scene.tweens.add({
-						targets: light,
-						y: 600,
-						yoyo: true,
-						repeat: -1,
-						ease: 'Sine.easeInOut',
-						duration, // Use the specified duration
-						delay: i * 100,
-						onComplete() {
-							// Resolve the promise when the animation is done
-							resolve();
-						},
-					});
-	
-					x += radius * 2;
-	
-					if (x > 800) {
-						x = radius;
-						y += radius;
-					}
-				}
-	
-				return new Promise(resolve => { });
-			}
+		main(scene);
+
+		
+        
+       
 
 		async function main(scene) {
 			try {
-				const wsSocket = new WebSocket('wss://' + window.location.host + '/ws/realtime/');
-				// Const wsSocket = new WebSocket('wss://'
+				// await animateLights();
+
+				// async function animateLights() {
+				// 	console.log('lights called')
+				// 	const duration = 5000;
+				// 	scene.lights.enable().setAmbientColor(0x555555);
+		
+				// 	const hsv = Phaser.Display.Color.HSVColorWheel();
+		
+				// 	const radius = 80;
+				// 	const intensity = 6;
+				// 	let x = radius;
+				// 	let y = 0;
+		
+				// 	//  To change the total number of lights see the Game Config object
+				// 	const maxLights = 3;
+		
+				// 	//  Create a bunch of lights
+				// 	for (let i = 0; i < maxLights; i++) {
+				// 		const { color } = hsv[i * 10];
+		
+				// 		light = scene.lights.addLight(x, y, radius, color, intensity);
+		
+				// 		lightsTween = scene.tweens.add({
+				// 			targets: light,
+				// 			y: 600,
+				// 			yoyo: true,
+				// 			repeat: -1,
+				// 			ease: 'Sine.easeInOut',
+				// 			duration, // Use the specified duration
+				// 			delay: i * 100,
+				// 			onComplete() {
+				// 				// Resolve the promise when the animation is done
+				// 				resolve();
+				// 			},
+				// 		});
+		
+				// 		x += radius * 2;
+		
+				// 		if (x > 800) {
+				// 			x = radius;
+				// 			y += radius;
+				// 		}
+				// 	}
+		
+				// 	return new Promise(resolve => { });
+				// }
+				console.log('main called')
+				const wsSocket = new WebSocket('ws://' + window.location.host + '/ws/realtime/');
+				// Const wsSocket = new WebSocket('ws://'
 				// + window.location.host
 				// + '/ws/real_time_updates/'
 				// + 'group_1'
@@ -212,7 +217,7 @@ class Example extends Phaser.Scene {
 			}
 		}
 
-		main(scene);
+		
 		async function choose_balloon(data) {
 			// Start the synchronizer countdown
 
@@ -351,7 +356,7 @@ class Example extends Phaser.Scene {
 					roomName = window.roomName;
 					handleBalloonClick(roomName);
 					groupSocket = new WebSocket(
-						'wss://'
+						'ws://'
 						+ window.location.host
 						+ '/ws/real_time_updates/'
 						+ roomName
@@ -362,7 +367,7 @@ class Example extends Phaser.Scene {
 					roomName = 'group_1';
 					handleBalloonClick(roomName);
 					groupSocket = new WebSocket(
-						'wss://'
+						'ws://'
 						+ window.location.host
 						+ '/ws/real_time_updates/'
 						+ roomName
