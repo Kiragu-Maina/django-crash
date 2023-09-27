@@ -541,7 +541,7 @@ class Example extends Phaser.Scene {
 
 			// Start the animation
 
-			balloons = scene.add.group({ key: 'balloon', repeat: 50 });
+			balloons = scene.add.group({ key: 'balloon', repeat: 20 });
 			// Function to change the tint color of balloons
 			function changeBalloonColor(balloon, roomName) {
 				switch (roomName) {
@@ -609,7 +609,7 @@ class Example extends Phaser.Scene {
 		}
 
 		async function animateBalloons() {
-			const duration = 500000; // Set the desired animation duration in milliseconds
+			const duration = 300000; // Set the desired animation duration in milliseconds
 
 			// Your balloon animation code here...
 			balloonsTween = scene.tweens.add({
@@ -619,8 +619,8 @@ class Example extends Phaser.Scene {
 				radius: 228,
 				ease: 'Quintic.easeOut',
 				duration, // Use the specified duration
-				yoyo: true,
-				repeat: -1,
+				yoyo: false,
+				
 				onUpdate() {
                 // Check for cancellation within the onUpdate function
                 if (isAnimationCancelled) {
