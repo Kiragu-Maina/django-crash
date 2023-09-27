@@ -201,6 +201,7 @@ class Example extends Phaser.Scene {
 						if (pump) {
 							pump.destroy();
 						}
+						graphics.clear();
 
 						window.allowballoonchange = true;
 						showballoons = true;
@@ -416,7 +417,8 @@ class Example extends Phaser.Scene {
 					if (pump) {
 						pump.destroy();
 					}
-					
+					graphics.clear(); // This will remove all drawn elements, including the line
+
 						
 
 					// Create a new background image with the new texture
