@@ -416,9 +416,7 @@ class Example extends Phaser.Scene {
 					if (pump) {
 						pump.destroy();
 					}
-					if(Line){
-						Line.destroy();
-					}
+					
 						
 
 					// Create a new background image with the new texture
@@ -529,8 +527,8 @@ class Example extends Phaser.Scene {
 		}
 
 		async function startgame(wsSocket) {
-            stopCounting = false;
-            isAnimationCancelled = false;
+		    stopCounting = false;
+		    isAnimationCancelled = false;
 			pump = scene.add.image(650, 450, 'pumpUp');
 			Line = new Phaser.Geom.Line(centerX - 4, centerY - 2, 638, 572);
 			graphics.strokeLineShape(Line);
