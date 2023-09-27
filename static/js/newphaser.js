@@ -59,57 +59,57 @@ class Example extends Phaser.Scene {
 		let selectedBalloon = null;
 		let balloons_to_show = [];
 		let balloonsalreadychosen = false;
-		let stopCounting = false;
-           	let isAnimationCancelled = false;
-        	const lightsAnimationPromise = animateLights();
+	        let stopCounting = false;
+	        let isAnimationCancelled = false;
+	        const lightsAnimationPromise = animateLights();
 
 			// Wait for both animations to complete before continuing
 		await Promise.all([lightsAnimationPromise]);
         
-        async function animateLights() {
-			const duration = 5000;
-			scene.lights.enable().setAmbientColor(0x555555);
-
-			const hsv = Phaser.Display.Color.HSVColorWheel();
-
-			const radius = 80;
-			const intensity = 6;
-			let x = radius;
-			let y = 0;
-
-			//  To change the total number of lights see the Game Config object
-			const maxLights = 3;
-
-			//  Create a bunch of lights
-			for (let i = 0; i < maxLights; i++) {
-				const { color } = hsv[i * 10];
-
-				light = scene.lights.addLight(x, y, radius, color, intensity);
-
-				lightsTween = scene.tweens.add({
-					targets: light,
-					y: 600,
-					yoyo: true,
-					repeat: -1,
-					ease: 'Sine.easeInOut',
-					duration, // Use the specified duration
-					delay: i * 100,
-					onComplete() {
-						// Resolve the promise when the animation is done
-						resolve();
-					},
-				});
-
-				x += radius * 2;
-
-				if (x > 800) {
-					x = radius;
-					y += radius;
+	        async function animateLights() {
+				const duration = 5000;
+				scene.lights.enable().setAmbientColor(0x555555);
+	
+				const hsv = Phaser.Display.Color.HSVColorWheel();
+	
+				const radius = 80;
+				const intensity = 6;
+				let x = radius;
+				let y = 0;
+	
+				//  To change the total number of lights see the Game Config object
+				const maxLights = 3;
+	
+				//  Create a bunch of lights
+				for (let i = 0; i < maxLights; i++) {
+					const { color } = hsv[i * 10];
+	
+					light = scene.lights.addLight(x, y, radius, color, intensity);
+	
+					lightsTween = scene.tweens.add({
+						targets: light,
+						y: 600,
+						yoyo: true,
+						repeat: -1,
+						ease: 'Sine.easeInOut',
+						duration, // Use the specified duration
+						delay: i * 100,
+						onComplete() {
+							// Resolve the promise when the animation is done
+							resolve();
+						},
+					});
+	
+					x += radius * 2;
+	
+					if (x > 800) {
+						x = radius;
+						y += radius;
+					}
 				}
+	
+				return new Promise(resolve => { });
 			}
-
-			return new Promise(resolve => { });
-		}
 
 		async function main(scene) {
 			try {
@@ -378,15 +378,13 @@ class Example extends Phaser.Scene {
 			bet_allowed_text = scene.add.dynamicBitmapText(400, 200, 'desyrel', '').setOrigin(0.5, 0);
 
 			bet_allowed_text.setText('Place your bet');
-			stopCounting = false;
-           		isAnimationCancelled = false;
 
 			groupSocket.onmessage = async function (e) {
 				const data = JSON.parse(e.data);
 
 				if (data.type === 'crash_instruction') {
 					// Handle crash instruction, e.g., trigger the crash action in the game
-                    			await stopCountingAndBalloonsFunction();
+                    await stopCountingAndBalloonsFunction();
 					groupSocket.close();
 
 					const crashpoint = data.crash;
@@ -522,6 +520,8 @@ class Example extends Phaser.Scene {
 		}
 
 		async function startgame(wsSocket) {
+            stopCounting = false;
+            isAnimationCancelled = false;
 			pump = scene.add.image(650, 450, 'pumpUp');
 			Line = new Phaser.Geom.Line(centerX - 4, centerY - 2, 638, 572);
 			graphics.strokeLineShape(Line);
