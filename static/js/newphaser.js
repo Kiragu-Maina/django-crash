@@ -416,6 +416,10 @@ class Example extends Phaser.Scene {
 					if (pump) {
 						pump.destroy();
 					}
+					if(Line){
+						Line.destroy();
+					}
+						
 
 					// Create a new background image with the new texture
 					poppedbackground = scene.add.image(400, 300, 'popped');
