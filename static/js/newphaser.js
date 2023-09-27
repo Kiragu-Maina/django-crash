@@ -59,9 +59,9 @@ class Example extends Phaser.Scene {
 		let selectedBalloon = null;
 		let balloons_to_show = [];
 		let balloonsalreadychosen = false;
-        let stopCounting = false;
-        let isAnimationCancelled = false;
-        
+	        let stopCounting = false;
+	        let isAnimationCancelled = false;
+	        
 		main(scene);
 
 		
@@ -177,7 +177,7 @@ class Example extends Phaser.Scene {
 						showballoons = true;
 						chooseballoontext = scene.add.dynamicBitmapText(400, 100, 'desyrel').setOrigin(0.5, 0);
 
-						chooseballoontext.setText('Choose balloon.\n Game starts soon.');
+						chooseballoontext.setText('Game starts soon...');
 					} else if (data.type === 'mid_start_synchronizer') {
 						if (chooseballoontext) {
 							chooseballoontext.destroy();
@@ -459,6 +459,9 @@ class Example extends Phaser.Scene {
 					window.allowballoonchange = false;
 
 					start_with_balloon = true;
+					setTimeout(function() {
+					    scene.scene.restart();
+					}, 5000);
 				} else if (data.type == 'count_initial') {
 					if (start_initial) {
 						window.allowballoonchange = false;
