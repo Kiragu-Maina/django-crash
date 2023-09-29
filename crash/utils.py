@@ -34,7 +34,9 @@ class ServerSeedGenerator:
                 self.crash_point = math.floor((100 * e - h) / (e - h)) / 100.0
                 if self.crash_point > 10 and divisible(hash_input, 2):
                     self.crash_point = 1
-                   
+
+            if self.crash_point > 500:
+                self.crash_point = 500
                     
                     
 
