@@ -158,9 +158,9 @@ class Example extends Phaser.Scene {
 						}
 
 						// Clear any balloons that might still be visible
-						if (balloons) {
-							balloons.clear(true, true);
-						}
+						// if (balloons) {
+						// 	balloons.clear(true, true);
+						// }
 
 						if (animationTimer) {
 							animationTimer.remove(); // Remove the timer
