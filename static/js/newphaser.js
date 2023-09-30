@@ -158,9 +158,15 @@ class Example extends Phaser.Scene {
 						}
 
 						// Clear any balloons that might still be visible
-						// if (balloons) {
-						// 	balloons.clear(true, true);
-						// }
+					
+
+						try {
+							if (balloons) {
+								balloons.clear(true, true);
+							}
+						} catch (error) {
+							// This block will be executed if an error occurs, but it won't take any specific action.
+						}
 
 						if (animationTimer) {
 							animationTimer.remove(); // Remove the timer
@@ -189,10 +195,13 @@ class Example extends Phaser.Scene {
 						}
 
 						// Clear any balloons that might still be visible
-						// if (balloons) {
-						// 	balloons.clear(true, true);
-						// }
-
+						try {
+							if (balloons) {
+								balloons.clear(true, true);
+							}
+						} catch (error) {
+							// This block will be executed if an error occurs, but it won't take any specific action.
+						}
 						if (animationTimer) {
 							animationTimer.remove(); // Remove the timer
 							animationTimer = null; // Clear the timer reference
@@ -405,9 +414,13 @@ class Example extends Phaser.Scene {
 					}
 
 					// Clear any balloons that might still be visible
-					if (balloons) {
-						balloons.clear(true, true);
-					}
+					try {
+							if (balloons) {
+								balloons.clear(true, true);
+							}
+						} catch (error) {
+							// This block will be executed if an error occurs, but it won't take any specific action.
+						}
 
 					if (animationTimer) {
 						animationTimer.remove(); // Remove the timer
@@ -459,6 +472,7 @@ class Example extends Phaser.Scene {
 					window.allowballoonchange = false;
 
 					start_with_balloon = true;
+					delete window.roomName;
 					setTimeout(function() {
 					    scene.scene.restart();
 					}, 5000);
