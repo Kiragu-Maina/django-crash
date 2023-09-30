@@ -83,7 +83,7 @@ class RealtimeUpdatesConsumer(AsyncWebsocketConsumer):
 		await self.channel_layer.group_discard(self.group_name, self.channel_name)
 		
 	async def realtime_update(self, event):
-		print('game new update')
+		# print('game new update')
 		updated_item = event['data']
 		await self.send(text_data=json.dumps(updated_item))
 		
@@ -310,9 +310,9 @@ class GameConsumer(AsyncWebsocketConsumer):
 		)
 
 	async def game_update(self, event):
-		print('game update')
+		# print('game update')
 		updated_item = event['data']
-		print(updated_item)
+		# print(updated_item)
 		await self.send(text_data=json.dumps(updated_item))
 	
 	async def handle_crash_instruction(self, data):
@@ -348,12 +348,12 @@ class TableUpdateConsumer(AsyncWebsocketConsumer):
 		await self.channel_layer.group_discard(self.group_name, self.channel_name)
 
 	async def table_update(self, event):
-		print('table update')
+		# print('table update')
 		updated_item = event['data']
 		await self.send(text_data=json.dumps(updated_item))
 
 	async def update_table(self, data):
-		print('update_data called')
+		# print('update_data called')
 		await self.channel_layer.group_send(self.group_name, {
 			"type": "table.update",
 			"data": data,
@@ -405,7 +405,7 @@ class BalanceUpdateConsumer(AsyncWebsocketConsumer):
 
 	async def balance_update(self, event):
 		# Handles the "balance.update" event when it's sent to us.
-		print('balance update')
+		# print('balance update')
 		updated_item = event['data']
 		await self.send(text_data=json.dumps(updated_item))
 
