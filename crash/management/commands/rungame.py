@@ -65,6 +65,7 @@ class Command(BaseCommand):
                 else:
                     # Handle the case when a game returns False or raises an exception
                     pass
+            self.stop_games()
 
             # Add a delay (e.g., sleep for a while) before restarting tasks
             await asyncio.sleep(5)  # Adjust the duration as needed
