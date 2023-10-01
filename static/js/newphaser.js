@@ -399,8 +399,9 @@ class Example extends Phaser.Scene {
 
 				if (data.type === 'crash_instruction') {
 					// Handle crash instruction, e.g., trigger the crash action in the game
-                    await stopCountingAndBalloonsFunction();
+                    			await stopCountingAndBalloonsFunction();
 					groupSocket.close();
+					wsSocket.close();
 
 					const crashpoint = data.crash;
 					if (backg) {
