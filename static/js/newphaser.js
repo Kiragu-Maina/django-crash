@@ -51,6 +51,7 @@ class Example extends Phaser.Scene {
 		let start_initial = true;
 		let roomName;
 		let groupSocket;
+		let wsSocket;
 		let chooseballoontext;
 		let ballooncount;
 		let start_with_balloon = true;
@@ -118,15 +119,8 @@ class Example extends Phaser.Scene {
 				// 	return new Promise(resolve => { });
 				// }
 				console.log('main called')
-				const wsSocket = new WebSocket('wss://' + window.location.host + '/ws/realtime/');
-				// Const wsSocket = new WebSocket('wss://'
-				// + window.location.host
-				// + '/ws/real_time_updates/'
-				// + 'group_1'
-				// + '/');
-
-				// Scene.add.sprite(400, 300, 'background').play('explodeAnimation');
-
+				wsSocket = new WebSocket('wss://' + window.location.host + '/ws/realtime/');
+				
 				backg = scene.add.image(400, 300, 'bg').setPipeline('Light2D');
 				backg.setScale(2.7, 3.5);
 
