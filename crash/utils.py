@@ -36,6 +36,10 @@ class ServerSeedGenerator:
                 if self.crash_point > 5 and not divisible(hash_input, 3):
                     self.crash_point = round(float("1." + str(self.crash_point).replace(".", "")), 2)
                     return self.crash_point
+                if self.crash_point > 10 and divisible(hash_input, 5):
+                    self.crash_point = 1
+                    return self.crash_point
+                
                 
                
                 
