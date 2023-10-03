@@ -32,19 +32,12 @@ class ServerSeedGenerator:
                 h = int(hash_input[:int(52 / 4)], 16)
                 e = 2 ** 52
                 self.crash_point = math.floor((100 * e - h) / (e - h)) / 100.0
-                # for this logic below, if crash_point is greater than 5, for 75% of the time return a value in between 1 and 2. let's say value is 6.71, newvalue will be 1.67.. if value is 30.9, new value will be 1.31
-                if self.crash_point > 5 and not divisible(hash_input, 4):
+                # for this logic below, if crash_point is greater than 5, for 66% of the time return a value in between 1 and 2. let's say value is 6.71, newvalue will be 1.67.. if value is 30.9, new value will be 1.31
+                if self.crash_point > 5 and not divisible(hash_input, 3):
                     self.crash_point = round(float("1." + str(self.crash_point).replace(".", "")), 2)
                     return self.crash_point
-                if self.crash_point > 10 and divisible(hash_input, 2):
-                    self.crash_point = 1
-                    return self.crash_point
-                if self.crash_point > 10 and not divisible(hash_input, 8):
-                    self.crash_point = round(float("1." + str(self.crash_point).replace(".", "")), 2)
-                    return self.crash_point
-                if self.crash_point > 50 and not divisible(hash_input, 16):
-                    self.crash_point = round(float("1." + str(self.crash_point).replace(".", "")), 2)
-                    return self.crash_point
+                
+               
                 
                 
 
