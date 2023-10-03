@@ -333,6 +333,7 @@ class Example extends Phaser.Scene {
 
 			if (chooseballoontext) {
 				chooseballoontext.destroy();
+				selectedBalloon = null;
 			}
 			game_id = data.game_id;
 

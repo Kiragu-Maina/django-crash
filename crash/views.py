@@ -1,7 +1,7 @@
 from django.http import JsonResponse, HttpResponse
 from django.views.generic import TemplateView
 from django.views import View
-from .models import Transactions, BettingWindow, CashoutWindow, Games, Bank, OwnersBank
+from .models import Transactions, BettingWindow, CashoutWindow, Games, Bank, OwnersBank, GameSets
 from .utils import ServerSeedGenerator
 
 from django.contrib.messages.views import SuccessMessageMixin
@@ -192,7 +192,7 @@ class PlaceBet(View):
     @method_decorator(decorators)
     def post(self, request, *args, **kwargs):
         
-        betting_window_state, game_id = self.get_betting_window_state(request.POST.get('group_name'))
+        betting_window_state, game_id, game_set_id = self.get_betting_window_state(request.POST.get('group_name'))
         if betting_window_state:
             
             
@@ -201,6 +201,7 @@ class PlaceBet(View):
                 print(bet_amount)
                 group_name = request.POST.get('group_name')
                 user = self.request.user
+                
                   # Check if a transaction with the same game_id exists
                 if Transactions.objects.filter(game_id=game_id, user=user).exists():
                     raise ValidationError("A transaction with this game_id already exists.")
@@ -209,7 +210,14 @@ class PlaceBet(View):
                     'message': 'A transaction with this game_id already exists',
                         }
                     return JsonResponse(response_data, status=400)
-                
+                if Transactions.objects.filter(game_set_id=game_set_id, user=user).exists():
+                    raise ValidationError("A transaction with this game_set_id already exists.")
+                    response_data = {
+                    'status': 'error',
+                    'message': 'A transaction with this game_set_id already exists',
+                        }
+                    return JsonResponse(response_data, status=400)
+                    
                 try:
                     bank_instance = Bank.objects.select_for_update().get(user=user)
                     amount = Decimal(bet_amount)
@@ -226,7 +234,7 @@ class PlaceBet(View):
                      
 
                 # Create and save the transaction instance
-                bet_instance = Transactions(user=user, bet=bet_amount, multiplier=0, won=0, game_id=game_id, bet_placed=True, group_name=group_name)
+                bet_instance = Transactions(user=user, bet=bet_amount, multiplier=0, won=0, game_id=game_id,game_set_id=game_set_id, bet_placed=True, group_name=group_name)
                 bet_instance.save()
                 
                 response_data = {
@@ -260,24 +268,27 @@ class PlaceBet(View):
     def get_betting_window_state(self, group_name):
         cached_state = cache.get('betting_window_state')
         cached_game_id = cache.get(f'{group_name}_game_id')
+        cache_game_set_id = cache.get('game_set_id')
         
-        if cached_state is not None and cached_game_id is not None:
-            return cached_state, cached_game_id
+        if cached_state is not None and cached_game_id is not None and cache_game_set_id is not None:
+            return cached_state, cached_game_id, cache_game_set_id
         
-        betting_window, game_id = self.database_fetch_betting_window_state(group_name)
+        betting_window, game_id, game_set_id = self.database_fetch_betting_window_state(group_name)
         
-        cache.set('betting_window_state', betting_window, timeout=3600)
-        cache.set('game_id', game_id, timeout=3600)
+       
         
-        return betting_window, game_id
+        
+        return betting_window, game_id, game_set_id
     
     def database_fetch_betting_window_state(self, group_name):
         betting_window_object = BettingWindow.objects.first()
         betting_window = betting_window_object.is_open
         game_id_object = Games.objects.filter(group_name= group_name).order_by('created_at').last()
+        game_set_id_object = GameSets.objects.order_by('created_at').last()
         game_id = game_id_object.game_id
+        game_set_id = game_set_id_object.game_set_id
         
-        return betting_window, game_id
+        return betting_window, game_id, game_set_id
 
     
 class CashoutView(View):

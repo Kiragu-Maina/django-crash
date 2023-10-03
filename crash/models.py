@@ -98,6 +98,7 @@ class Transactions(models.Model):
     won = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     
     game_id = models.CharField(max_length=200)
+    game_set_id = models.CharField(max_length=200)
     created_at = models.DateTimeField(auto_now=True)
     updated_at = models.DateTimeField(auto_now=True)
     game_played = models.BooleanField(default=False)
