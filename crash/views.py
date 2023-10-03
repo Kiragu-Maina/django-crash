@@ -85,7 +85,7 @@ class UserRegistrationView(SuccessMessageMixin, CreateView):
         bank_account = Bank.objects.get(user=self.request.user)
             
         bank_balance = bank_account.balance 
-        return JsonResponse({'success': True, 'balance':bank_balance}, status=200)
+        return JsonResponse({'success': True, 'balance':bank_balance, 'username':user.user_name}, status=200)
     def form_invalid(self, form):
         messages.error(self.request, 'There was an error with your registration. Please check the form and try again.')
         return JsonResponse({'success': False, 'errors': form.errors}, status=400)
