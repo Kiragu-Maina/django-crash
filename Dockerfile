@@ -46,4 +46,7 @@ RUN python manage.py makemigrations && \
     
 
 # Start the application using Daphne and Celery
-CMD ["sh", "-c", "daphne -b 0.0.0.0 -p $PORT crashsite.asgi:application & celery -A crashsite beat & celery -A crashsite worker --loglevel=ERROR"]
+# CMD ["sh", "-c", "daphne -b 0.0.0.0 -p $PORT crashsite.asgi:application & celery -A crashsite beat & celery -A crashsite worker --loglevel=ERROR"]
+
+CMD ["sh", "-c", "daphne -b 0.0.0.0 -p $PORT crashsite.asgi:application"]
+
