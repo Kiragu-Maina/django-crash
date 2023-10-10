@@ -6,6 +6,8 @@ document.addEventListener('DOMContentLoaded', () => {
 	const errorText = document.getElementById('error-text');
 	let type;
 
+	
+
 	socket.onmessage = async function (e) {
 		const data = JSON.parse(e.data);
 
@@ -41,7 +43,10 @@ document.addEventListener('DOMContentLoaded', () => {
 			await updateTable(data, type);
 		} else if (data.type == 'new_game') {
 			const tableBody1 = document.getElementById('bet-table-body');
+			const tableBody2 = document.getElementById('bets-table-body');
 			tableBody1.innerHTML = '';
+			tableBody2.innerHTML = '';
+			
 			errorText.innerHTML = '';
 		} else if (data.type == 'multiplier_update') {
 			await new Promise(resolve => setTimeout(resolve, 1000));
@@ -71,33 +76,50 @@ document.addEventListener('DOMContentLoaded', () => {
 		errorText.style.display = 'none';
 		errorText.innerHTML = '';
 	};
-
 	async function updateTable(updatedItem, type) {
-		const tableBody = document.getElementById('bet-table-body');
-
+		const tableBody1 = document.getElementById('bet-table-body');
+		const tableBody2 = document.getElementById('bets-table-body');
+	
 		const newRow = document.createElement('tr');
-		newRow.innerHTML = `
-            <td style="font-size: 0.6em;">${updatedItem.user}</td>
-            <td style="font-size: 0.6em;">${updatedItem.bet}</td>
-            <td style="font-size: 0.6em;">${updatedItem.multiplier}</td>
-            <td style="font-size: 0.6em;">${parseFloat(updatedItem.won).toFixed(2)}</td>
-            <td style="font-size: 0.6em;">${updatedItem.balloon}</td>
-        `;
+		
+	
 		if (type == 'won') {
-			newRow.style.backgroundColor = 'lightgreen'; // Set the background color
+			newRow.innerHTML = `
+			<td style="font-size: 0.6em;">${updatedItem.user}</td>
+			<td style="font-size: 0.6em;">${updatedItem.bet}</td>
+			<td style="font-size: 0.6em;">${updatedItem.multiplier}</td>
+			<td style="font-size: 0.6em;">${parseFloat(updatedItem.won).toFixed(2)}</td>
+			<td style="font-size: 0.6em;">${updatedItem.balloon}</td>
+		`;
+			newRow.style.color = '#64ff00';
 		} else if (type == 'placed') {
-			newRow.style.backgroundColor = 'whitesmoke'; // Set the background color
+			newRow.innerHTML = `
+			<td style="font-size: 0.6em;">${updatedItem.user}</td>
+			<td style="font-size: 0.6em;">${updatedItem.bet}</td>
+			<td style="font-size: 0.6em;">--</td>
+			<td style="font-size: 0.6em;">--</td>
+			<td style="font-size: 0.6em;">${updatedItem.balloon}</td>
+		`;
+			newRow.style.color = 'white'; // Default color
 		} else if (type == 'lost') {
-			newRow.style.backgroundColor = 'red'; // Set the background color
+			newRow.style.color = 'red';
 		}
-
-		if (tableBody.firstChild) {
-			tableBody.insertBefore(newRow, tableBody.firstChild);
+		// Clone the row for the second table body
+		const newRow2 = newRow.cloneNode(true);
+	
+		if (tableBody1.firstChild) {
+			tableBody1.insertBefore(newRow, tableBody1.firstChild);
 		} else {
-			tableBody.appendChild(newRow);
+			tableBody1.appendChild(newRow);
+		}
+	
+		if (tableBody2.firstChild) {
+			tableBody2.insertBefore(newRow2, tableBody2.firstChild);
+		} else {
+			tableBody2.appendChild(newRow2);
 		}
 	}
-
+	
 	async function updateBalance(updatedbalance) {
 		const balance = document.getElementById('balance');
 

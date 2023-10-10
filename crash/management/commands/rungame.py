@@ -233,7 +233,7 @@ class GameManager:
         
         # Send crash instruction and print message
         await self.bettingcashoutmanager.close_cashout_window()
-        await self.send_instruction({"type": "crash_instruction", "crash": self.crash_point})
+        # await self.send_instruction({"type": "crash_instruction", "crash": self.crash_point})
         channel_layer = get_channel_layer()
         print(f"Crash for {self.group_name} occurred at {self.crash_point} seconds")
         
@@ -242,6 +242,7 @@ class GameManager:
         data = {
             'group_name':self.group_name,
             'game_id':self.current_game_id,
+            'crash_point':self.crash_point,
         }
         await channel_layer.group_send(
                 "realtime_group",  

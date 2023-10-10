@@ -204,14 +204,14 @@ class PlaceBet(View):
                 
                   # Check if a transaction with the same game_id exists
                 if Transactions.objects.filter(game_id=game_id, user=user).exists():
-                    raise ValidationError("A transaction with this game_id already exists.")
+                    # raise ValidationError("A transaction with this game_id already exists.")
                     response_data = {
                     'status': 'error',
                     'message': 'A transaction with this game_id already exists',
                         }
                     return JsonResponse(response_data, status=400)
                 if Transactions.objects.filter(game_set_id=game_set_id, user=user).exists():
-                    raise ValidationError("A transaction with this game_set_id already exists.")
+                    # raise ValidationError("A transaction with this game_set_id already exists.")
                     response_data = {
                     'status': 'error',
                     'message': 'A transaction with this game_set_id already exists',
@@ -772,3 +772,65 @@ class AdminViewWithRespawn(TemplateView):
             return render(request, self.template_name, context)
         else:
             return render(request, 'adminlogin.html')
+class TopWinnersView(View):
+    def get(self, request, *args, **kwargs):
+        # Get the top 5 transactions with the highest 'won' values
+        top_5_transactions = Transactions.objects.filter(game_played=True).order_by('-won')[:5]
+
+        # Serialize the transaction data to JSON
+        top_winners_data = [{
+            'user': transaction.user.user_name,
+            'bet': transaction.bet,
+            'multiplier': float(transaction.multiplier),
+            'won': float(transaction.won),
+            'balloon': self.get_balloon_color(transaction.group_name),
+            # Add other fields as needed
+        } for transaction in top_5_transactions]
+        
+        # print(top_winners_data)
+
+        # Return the data as JSON response
+        return JsonResponse(top_winners_data, safe=False)
+    
+    def get_balloon_color(self, group_name):
+        if group_name == 'group_1':
+            return 'blue'
+        elif group_name == 'group_2':
+            return 'red'
+        elif group_name == 'group_3':
+            return 'green'
+        else:
+            return 'purple'
+    
+    
+@method_decorator(login_required, name='dispatch')
+class UserBetsView(View):
+    def get(self, request, *args, **kwargs):
+        user = self.request.user
+
+        # Retrieve the top 10 transactions for the logged-in user
+        top_10_transactions = Transactions.objects.filter(user=user, game_played=True).order_by('-created_at')[:10]
+
+        # Serialize the transaction data to JSON
+        user_bets_data = [{
+            'created_at': transaction.created_at.strftime('%Y-%m-%d %H:%M:%S'),  # Format the date as needed
+            'game_id': transaction.game_id,
+            'stake': float(transaction.bet),
+            'multiplier': float(transaction.multiplier),
+            'balloon': self.get_balloon_color(transaction.group_name),
+            'won': float(transaction.won),
+            # Add other fields as needed
+        } for transaction in top_10_transactions]
+
+        # Return the data as JSON response
+        return JsonResponse(user_bets_data, safe=False)
+
+    def get_balloon_color(self, group_name):
+        if group_name == 'group_1':
+            return 'blue'
+        elif group_name == 'group_2':
+            return 'red'
+        elif group_name == 'group_3':
+            return 'green'
+        else:
+            return 'purple'

@@ -16,7 +16,7 @@
   <!--     Fonts and icons     -->
 
   <!-- Font Awesome Icons -->
-  <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+  {% comment %} <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script> {% endcomment %}
   
   
   <!-- CSS Files -->
@@ -290,15 +290,16 @@
             <h6 class="mb-0">Bets</h6>
         </div>
         <div class="card-body p-3">
-            <table class='bet-table' style="background-color: #333; color: black;">
+            <table class='bet-table'>
                 <thead>
-                    <tr>
-                        <th style="font-size: 0.6em;">User</th>
-                        <th style="font-size: 0.6em;">Bet</th>
-                        <th style="font-size: 0.6em;">@</th>
-                        <th style="font-size: 0.6em;">Cashed_Out</th>
-                        <th style="font-size: 0.6em;">Balloon</th>
-                    </tr>
+                  <tr>
+                    <th style="flex: 1; text-align: left; font-size: 0.6em;">User</th>
+                    <th style="flex: 1; text-align: left; font-size: 0.6em;">Bet</th>
+                    <th style="flex: 1; text-align: left; font-size: 0.6em;">@</th>
+                    <th style="flex: 1; text-align: left; font-size: 0.6em;">Cashed_Out</th>
+                    <th style="flex: 1; text-align: left; font-size: 0.6em;">Balloon</th>
+                </tr>
+                
                 </thead>
                 <tbody id='bet-table-body'>
                     <!-- Your table body content here -->
@@ -307,6 +308,80 @@
         </div>
     </div>
 </div>
+<div class="col-md-8">
+  <div class="card">
+   
+    
+        <table class="selections" id="selections">
+          <tr>
+            <!-- First Row with Selections -->
+            <th id="betsHeader" colspan="1" style="font-size: 0.6em;">Bets</th>
+            <th id="chatRoomHeader" colspan="1" style="font-size: 0.6em;">Chat_room</th>
+            <th id="topWinnersHeader" colspan="1" style="font-size: 0.6em;">Top_winners</th>
+            <th id="myBetsHeader" colspan="1" style="font-size: 0.6em;">My_bets</th>
+          </tr>
+        </table>
+       
+        
+      
+       
+          <table class="bets-table" id="bets-table">
+              <thead>
+                
+                  <tr>
+                      <th style="flex: 1; text-align: left; font-size: 0.6em;">User</th>
+                      <th style="flex: 1; text-align: left; font-size: 0.6em;">Bet</th>
+                      <th style="flex: 1; text-align: left; font-size: 0.6em;">@</th>
+                      <th style="flex: 1; text-align: left; font-size: 0.6em;">Cashed_Out</th>
+                      <th style="flex: 1; text-align: left; font-size: 0.6em;">Balloon</th>
+                  </tr>
+              </thead>
+              <tbody id='bets-table-body'>
+                  <!-- Your table body content here -->
+              </tbody>
+          </table>
+
+          <table class='my-bets-table' id="my-bets-table" style="display:none;">
+            <thead>
+              
+                <tr background>
+                    <th style="flex: 1; text-align: left; font-size: 0.6em;">Created at</th>
+                    <th style="flex: 1; text-align: left; font-size: 0.6em;">Game_id</th>                    
+                    <th style="flex: 1; text-align: left; font-size: 0.6em;">Stake</th>
+                    <th style="flex: 1; text-align: left; font-size: 0.6em;">@</th>
+                    <th style="flex: 1; text-align: left; font-size: 0.6em;">Balloon</th>
+                    <th style="flex: 1; text-align: left; font-size: 0.6em;">Won</th>
+                </tr>
+            </thead>
+            <tbody id='my-bets-body'>
+                <!-- Your table body content here -->
+            </tbody>
+        </table>
+        <table class='chat-room-table' id="chat-room-table" style="display:none;">
+        
+          <tbody id='chat-room-body'>
+              <!-- Your table body content here -->
+          </tbody>
+      </table>
+      <table class='top-winners-table' id="top-winners-table" style="display:none;">
+        <thead>
+          
+          <tr>
+            <th style="flex: 1; text-align: left; font-size: 0.6em;">User</th>
+            <th style="flex: 1; text-align: left; font-size: 0.6em;">Bet</th>
+            <th style="flex: 1; text-align: left; font-size: 0.6em;">@</th>
+            <th style="flex: 1; text-align: left; font-size: 0.6em;">Cashed_Out</th>
+            <th style="flex: 1; text-align: left; font-size: 0.6em;">Balloon</th>
+        </tr>
+        </thead>
+        <tbody id='top-winners-body'>
+            <!-- Your table body content here -->
+        </tbody>
+    </table>
+  
+      </div>
+  </div>
+</div>
 
       </div>
   
@@ -314,8 +389,7 @@
     
       
         
-        
-        </div>
+     
       
         <div id="provableModal" class="modal">
           <div class="card card-plain">
@@ -523,8 +597,15 @@ var balloon4 = "{% static 'assets/balloon4.png' %}";
 
 
 
-var pumpdown = "{% static 'assets/pump1.png' %}";
-var pumpup = "{% static 'assets/pump2.png' %}";
+var pumpgreendown = "{% static 'assets/pumpgreendown.png' %}";
+var pumpgreenup = "{% static 'assets/pumpgreenup.png' %}";
+var pumpbluedown =  "{% static 'assets/pumpbluedown.png' %}";
+var pumpblueup = "{% static 'assets/pumpblueup.png' %}";
+var pumpreddown =  "{% static 'assets/pumpreddown.png' %}";
+var pumpredup = "{% static 'assets/pumpredup.png' %}";
+var pumppurpledown =  "{% static 'assets/pumppurpledown.png' %}";
+var pumppurpleup = "{% static 'assets/pumppurpleup.png' %}";
+
 var space = "{% static 'assets/space.png' %}";
 
 
@@ -539,6 +620,9 @@ var register =  '{% url "register" %}';
 var deposit = '{% url "deposit" %}';
 var withdraw = '{% url "withdraw" %}';
 var bet_placement = '{% url "placebet" %}';
+var top_winners = '{% url "top_winners" %}';
+var my_bets = '{% url "user_bets" %}';
+
 
     
 
@@ -560,6 +644,8 @@ var bet_placement = '{% url "placebet" %}';
 
  
   <script src="{% static 'js/betplacement.js' %}"></script>
+  <script src="{% static 'js/changingtables.js' %}"></script>
+
 
   <script src="{% static 'js/updatehtml.js' %}"></script>
   <script src = "{% static 'js/phaserfourballoons.js' %}"></script>

@@ -48,7 +48,9 @@ class RealtimeUpdatesConsumer(AsyncWebsocketConsumer):
 				print(group, cached_multiplier)
 				await self.send(text_data=json.dumps({
 					'type': 'ongoing_synchronizer',
-					'cached_multiplier': cached_multiplier
+					'cached_multiplier': cached_multiplier,
+					'group_name': group,
+					'message': 'ongoing',
 				}))
 				break
 		
@@ -119,12 +121,58 @@ class RealtimeUpdatesConsumer(AsyncWebsocketConsumer):
 			except Exception as e:
 				print("An error occurred:", str(e))
 				
+	task = None 
 	async def game_crashed(self, event):
+        # If there's an existing task, cancel it
+		if self.task:
+			self.task.cancel()
+
 		data = event['data']
-		group_name = data['group_name']       
+		group_name = data['group_name']
 		game_id = data['game_id']
+		crash_point = data['crash_point']
 		await self.update_game_on_crash(group_name, game_id)
-		
+		await self.send(text_data=json.dumps({
+			'type': 'ongoing_synchronizer',
+			'crash_point': crash_point,
+			'group_name': group_name,
+			'message': 'crashed',
+		}))
+
+		# Create a new task for ongoing_send
+		self.task = asyncio.create_task(self.ongoing_send())
+
+	async def ongoing_send(self):
+		try:
+			await asyncio.sleep(5)  # Sleep for 5 seconds
+			print("Task completed")
+			group_game_multipliers = {
+				'group_1': 'group_1_game_multiplier',
+				'group_2': 'group_2_game_multiplier',
+				'group_3': 'group_3_game_multiplier',
+				'group_4': 'group_4_game_multiplier',
+			}
+
+			for group, cache_key in group_game_multipliers.items():
+				cached_multiplier = cache.get(cache_key)
+				print(cached_multiplier)
+				if cached_multiplier == 'Popped':
+					pass
+				elif cached_multiplier == 'Wait for new game':
+					pass
+				elif cached_multiplier is None:
+					pass
+				else:
+					print(group, cached_multiplier)
+					await self.send(text_data=json.dumps({
+						'type': 'ongoing_synchronizer',
+						'cached_multiplier': cached_multiplier,
+						'group_name': group,
+						'message': 'ongoing',
+					}))
+					break
+		except asyncio.CancelledError:
+			print("Task was cancelled")
 		
 		
 
