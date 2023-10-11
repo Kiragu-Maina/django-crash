@@ -67,8 +67,69 @@ class Example extends Phaser.Scene {
 		let balloonsalreadychosen = false;
         let stopCounting = false;
         let isAnimationCancelled = false;
+		let ongoinggame = false;
+		let poppedBackgroundsArray = [];
+		
+		
+		
+		main(scene); // Render the main content
+		animateLights();
+		async function animateLights() {
+			console.log('lights called');
+			backg = scene.add.image(400, 300, 'bg').setPipeline('Light2D');
+			backg.setScale(2.7, 3.5);
+			const duration = 5000;
+			scene.lights.enable().setAmbientColor(0x555555);
+		
+			const hsv = Phaser.Display.Color.HSVColorWheel();
+		
+			const radius = 80;
+			const intensity = 6;
+			let x = radius;
+			let y = 0;
+		
+			const maxLights = 6;
+		
+			const lightPromises = [];
+		
+			for (let i = 0; i < maxLights; i++) {
+				const { color } = hsv[i * 10];
+		
+				light = scene.lights.addLight(x, y, radius, color, intensity);
+		
+				const lightsPromise = new Promise(resolve => {
+					const lightsTween = scene.tweens.add({
+						targets: light,
+						y: 600,
+						yoyo: true,
+						repeat: -1,
+						ease: 'Sine.easeInOut',
+						duration,
+						delay: i * 100,
+						onComplete() {
+							resolve();
+						},
+					});
+				});
+		
+				lightPromises.push(lightsPromise);
+		
+				x += radius * 2;
+		
+				if (x > 800) {
+					x = radius;
+					y += radius;
+				}
+			}
+		
+			await Promise.all(lightPromises);
+		}
+			
+		
+	
         
-		main(scene);
+	
+
 
 		
         
@@ -76,53 +137,7 @@ class Example extends Phaser.Scene {
 
 		async function main(scene) {
 			try {
-				// await animateLights();
-
-				// async function animateLights() {
-				// 	console.log('lights called')
-				// 	const duration = 5000;
-				// 	scene.lights.enable().setAmbientColor(0x555555);
-		
-				// 	const hsv = Phaser.Display.Color.HSVColorWheel();
-		
-				// 	const radius = 80;
-				// 	const intensity = 6;
-				// 	let x = radius;
-				// 	let y = 0;
-		
-				// 	//  To change the total number of lights see the Game Config object
-				// 	const maxLights = 3;
-		
-				// 	//  Create a bunch of lights
-				// 	for (let i = 0; i < maxLights; i++) {
-				// 		const { color } = hsv[i * 10];
-		
-				// 		light = scene.lights.addLight(x, y, radius, color, intensity);
-		
-				// 		lightsTween = scene.tweens.add({
-				// 			targets: light,
-				// 			y: 600,
-				// 			yoyo: true,
-				// 			repeat: -1,
-				// 			ease: 'Sine.easeInOut',
-				// 			duration, // Use the specified duration
-				// 			delay: i * 100,
-				// 			onComplete() {
-				// 				// Resolve the promise when the animation is done
-				// 				resolve();
-				// 			},
-				// 		});
-		
-				// 		x += radius * 2;
-		
-				// 		if (x > 800) {
-				// 			x = radius;
-				// 			y += radius;
-				// 		}
-				// 	}
-		
-				// 	return new Promise(resolve => { });
-				// }
+				
 				console.log('main called')
 				const wsSocket = new WebSocket('wss://' + window.location.host + '/ws/realtime/');
 				// Const wsSocket = new WebSocket('wss://'
@@ -133,8 +148,7 @@ class Example extends Phaser.Scene {
 
 				// Scene.add.sprite(400, 300, 'background').play('explodeAnimation');
 
-				backg = scene.add.image(400, 300, 'bg').setPipeline('Light2D');
-				backg.setScale(2.7, 3.5);
+				
 
 				wsSocket.onmessage = async function (e) {
 					if (loading_game) {
@@ -147,6 +161,7 @@ class Example extends Phaser.Scene {
 					if (data.type === 'ongoing_synchronizer') {
 						// Use the current multiplier to render the ongoing graph
 						if (data.message === 'crashed'){
+						if (!ongoinggame){
 							if (poppedbackground){
 								poppedbackground.destroy();
 							}
@@ -154,9 +169,51 @@ class Example extends Phaser.Scene {
 							const crashpoint = data.crash_point
 							const group_name = data.group_name
 							killeverything(crashpoint, group_name);
+						}
+						else {
+							const group_name = data.group_name;
+							const crashpoint = data.crash_point;
+							const x = Phaser.Math.Between(100, 600); // Random X coordinate between 100 and 600
+							const y = Phaser.Math.Between(100, 150); // Random Y coordinate between 100 and 150
+
+							const poppedbackground = scene.add.image(x, y, 'popped');
+
+							crashText = scene.add.dynamicBitmapText(x, y, 'desyrel').setOrigin(0.5, 0);
+							crashText.setText('x' + crashpoint);
+							poppedBackgroundsArray.push({ background: poppedbackground, text: crashText });
+    
+							switch (group_name) {
+								case 'group_1':
+									// No tint (default color)
+									break;
+								case 'group_2':
+									poppedbackground.setTint(0xff0000); // Red tint
+									break;
+								case 'group_3':
+									poppedbackground.setTint(0x00ff00); // Green tint
+									break;
+								case 'group_4':
+									poppedbackground.setTint(0x800080); // purple tint
+									break;
+								default:
+				
+									poppedbackground.setTint(0x0000ff);
+				
+									break;
+							}
+							setTimeout(() => {
+								// Destroy the poppedbackgrounds and their associated crashText
+								poppedBackgroundsArray.forEach(({ background, text }) => {
+									background.destroy();
+									text.destroy();
+								});
+							}, 2000);
+
+						}
 							
 						}
 						else if (data.message === 'ongoing'){
+							if (!ongoinggame){
 							if (poppedbackground){
 								poppedbackground.destroy();
 							}
@@ -168,6 +225,7 @@ class Example extends Phaser.Scene {
 							countAndDisplayOngoing(currentMultiplier);
 
 						}
+					}
 
 						
 					} else if (data.type === 'start_synchronizer') {
@@ -213,6 +271,7 @@ class Example extends Phaser.Scene {
 						balloonsalreadychosen = false;
 						window.allowballoonchange = true;
 						showballoons = true;
+						ongoinggame = true;
 						chooseballoontext = scene.add.dynamicBitmapText(400, 100, 'desyrel').setOrigin(0.5, 0);
 
 						chooseballoontext.setText('Choose balloon.\n Game starts soon.');
@@ -437,8 +496,9 @@ class Example extends Phaser.Scene {
 				const data = JSON.parse(e.data);
 
 				if (data.type === 'crash_instruction') {
-					const crashpoint = data.crash;
+					const crashpoint = data.crash_point;
 					const group_name = data.group_name;
+					ongoinggame = false;
 					killeverything(crashpoint, group_name);
 					
 					
@@ -603,7 +663,7 @@ class Example extends Phaser.Scene {
 					poppedbackground.setTint(0x00ff00); // Green tint
 					break;
 				case 'group_4':
-					poppedbackground.setTint(0x800080); // White tint
+					poppedbackground.setTint(0x800080); // purple tint
 					break;
 				default:
 
@@ -659,6 +719,8 @@ class Example extends Phaser.Scene {
 		async function startgame(count, group_name) {
 		    stopCounting = false;
 		    isAnimationCancelled = false;
+			Line = new Phaser.Geom.Line(centerX - 4, centerY - 2, 638, 572);
+			
 			
 		
 			switch (group_name) {
@@ -666,34 +728,38 @@ class Example extends Phaser.Scene {
 					// No tint (default color)
 					console.log('group_1');
 					pump = scene.add.image(650, 450, 'pumpblueup');
+					graphics.lineStyle(2, 0x0000FF);
+
 					break;
 				case 'group_2':
 					console.log('group_2');
 					pump = scene.add.image(650, 450, 'pumpredup');
+					graphics.lineStyle(2, 0xFF0000);
 					break;
 				case 'group_3':
 					console.log('group_3');
 					pump = scene.add.image(650, 450, 'pumpgreenup');
+					graphics.lineStyle(2, 0x00FF00);
 					break;
 				case 'group_4':
 					console.log('group_4');
 					pump = scene.add.image(650, 450, 'pumppurpleup');// Purple tint
+					graphics.lineStyle(2, 0x800080);
 					break;
 				default:
 					console.log('default');
 					pump = scene.add.image(650, 450, 'pumpblueup');
+					graphics.lineStyle(2, 0x0000FF);
 
 					
 					break;
 			}
-			
-			
-			
-			Line = new Phaser.Geom.Line(centerX - 4, centerY - 2, 638, 572);
 			graphics.strokeLineShape(Line);
-			// Graphics.strokeLineShape(verticalLine);
-
-			// Start the animation
+			
+			
+			
+			
+			
 
 			balloons = scene.add.group({ key: 'balloon', repeat: 5 });
 			// Function to change the tint color of balloons
@@ -847,8 +913,8 @@ class Example extends Phaser.Scene {
 			const updateInterval = 0.01;
 			const crashPoint = 1000000; // Adjust this value as needed
 			counterText = scene.add.dynamicBitmapText(400, 200, 'desyrel').setOrigin(0.5, 0);
-			bet_allowed_text = scene.add.dynamicBitmapText(400, 300, 'desyrel', '').setOrigin(0.5, 0);
-			bet_allowed_text.setText(' Ongoing game,\n Wait for new game');
+			bet_allowed_text = scene.add.dynamicBitmapText(300, 500, 'desyrel', '').setOrigin(0.5, 0);
+			bet_allowed_text.setText('Wait for new game');
 
 			let count = multiplier;
 
