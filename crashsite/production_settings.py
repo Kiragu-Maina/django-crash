@@ -109,7 +109,7 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'crashsite.urls'
-REDIS_URL = os.environ["REDISURL"]
+REDIS_URL = os.environ["REDIS_URL"]
 
 CACHES = {
     "default": {
