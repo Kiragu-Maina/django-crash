@@ -109,23 +109,17 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'crashsite.urls'
-REDISHOST = os.environ["REDISHOST"]
-REDISPORT = os.environ["REDISPORT"]
-REDISPASSWORD = os.environ["REDISPASSWORD"]
-REDISUSER = os.environ["REDISUSER"]
+REDIS_URL = os.environ["REDISURL"]
+
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": f"redis://{REDISHOST}:{REDISPORT}",
-        "OPTIONS": {
-            "PASSWORD": REDISPASSWORD,
-            "USERNAME": REDISUSER,
-            
-        },
+        "LOCATION": f"{REDIS_URL}",
+        
     }
 }
-CELERY_BROKER_URL = f"redis://:{REDISPASSWORD}@{REDISHOST}:{REDISPORT}"
-CELERY_RESULT_BACKEND = f"redis://:{REDISPASSWORD}@{REDISHOST}:{REDISPORT}"
+CELERY_BROKER_URL =  f"{REDIS_URL}"
+CELERY_RESULT_BACKEND =  f"{REDIS_URL}"
 AUTH_USER_MODEL = 'crash.User'
 # CACHES = {
 #     "default": {
@@ -230,7 +224,7 @@ CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-           "hosts": [f"redis://:{REDISPASSWORD}@{REDISHOST}:{REDISPORT}/0"],
+           "hosts": [f"{REDIS_URL}/0"],
             
         },
     },
