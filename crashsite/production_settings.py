@@ -40,7 +40,7 @@ DEBUG = False
 ALLOWED_HOSTS = ["*"]
 
 
-CSRF_TRUSTED_ORIGINS = os.environ.get('TRUSTED_ORIGINS')
+CSRF_TRUSTED_ORIGINS = [os.environ.get('TRUSTED_ORIGINS')]
 # CSRF_TRUSTED_ORIGINS = ["https://django-crash-testing.up.railway.app"]
 
 
