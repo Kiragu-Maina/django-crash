@@ -28,8 +28,8 @@ app.conf.beat_schedule = {
         'task': 'crash.tasks.send_updates',
         'schedule': 1,
     },
-    'send_admin_updates': {
-        'task': 'crash.tasks.data_to_admin',
-        'schedule': 1,
-    },
+    # 'send_admin_updates': {
+    #     'task': 'crash.tasks.data_to_admin',
+    #     'schedule': 1,
+    # },
 }
