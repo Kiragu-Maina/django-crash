@@ -40,7 +40,12 @@ DEBUG = False
 ALLOWED_HOSTS = ["*"]
 
 
-CSRF_TRUSTED_ORIGINS = [os.environ.get('TRUSTED_ORIGINS')]
+# Retrieve the value of TRUSTED_ORIGINS from the environment variable
+trusted_origins = os.environ.get('TRUSTED_ORIGINS', '')
+
+# Split the comma-separated string into a list of origins
+CSRF_TRUSTED_ORIGINS = [origin.strip() for origin in trusted_origins.split(',')]
+
 # CSRF_TRUSTED_ORIGINS = ["https://django-crash-testing.up.railway.app"]
 
 
