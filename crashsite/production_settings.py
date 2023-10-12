@@ -41,7 +41,7 @@ ALLOWED_HOSTS = ["*"]
 
 
 # Retrieve the value of TRUSTED_ORIGINS from the environment variable
-trusted_origins = os.environ.get('TRUSTED_ORIGINS')
+TRUSTED_ORIGINS = os.environ.get('TRUSTED_ORIGINS')
 
 # Split the comma-separated string into a list of origins
 CSRF_TRUSTED_ORIGINS =  [f"{TRUSTED_ORIGINS}"]
