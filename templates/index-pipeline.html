@@ -1,0 +1,473 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    {%load static%}
+    {% load pipeline %}
+    
+  
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="apple-touch-icon" sizes="76x76" href="{% static 'img/apple-icon.png' %}">
+  <link rel="icon" type="image/png" href="{% static 'img/favicon.png' %}">
+  {% stylesheet 'sheets' %}
+  
+   
+  <!--     Fonts and icons     -->
+
+  <!-- Font Awesome Icons -->
+  <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+  
+  
+  
+  
+</head>
+
+
+<body class="g-sidenav-show   bg-gray-100">
+ 
+  
+  {{ room_name|json_script:"room-name" }}
+  <div class="min-height-300 bg-primary position-absolute w-100"></div>
+  <aside class="sidenav bg-white navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-4 " id="sidenav-main">
+    <div class="sidenav-header">
+      <i class="fas fa-times p-3 cursor-pointer text-secondary opacity-5 position-absolute end-0 top-0 d-none d-xl-none" aria-hidden="true" id="iconSidenav"></i>
+      <a class="navbar-brand m-0" href="  " target="_blank">
+        <img src="{% static 'img/logo-ct-dark.png' %}" class="navbar-brand-img h-100" alt="main_logo">
+        <span class="ms-1 font-weight-bold">{{username}}</span>
+      </a>
+    </div>
+    <hr class="horizontal dark mt-0">
+    <div class="collapse navbar-collapse  w-auto " id="sidenav-collapse-main">
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <a class="nav-link active" href="./pages/dashboard.html">
+            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="ni ni-tv-2 text-primary text-sm opacity-10"></i>
+            </div>
+            <span class="nav-link-text ms-1">Crash</span>
+          </a>
+        </li>
+       
+       
+        <li class="nav-item mt-3">
+          <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Account pages</h6>
+        </li>
+        <div>
+        
+        {% if user.is_authenticated %}
+        <li class="nav-item">
+          <a class="nav-link " href="{%url 'logout'%}">
+            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="ni ni-collection text-info text-sm opacity-10"></i>
+            </div>
+            <span class="nav-link-text ms-1">Log out</span>
+          </a>
+        </li>
+       
+        {% else %}
+        
+        <li class="nav-item">
+          <a class="nav-link"  href="#ex1" rel="modal:open">
+          
+            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="ni ni-single-copy-04 text-warning text-sm opacity-10"></i>
+            </div>
+            <span class="nav-link-text ms-1">Sign In</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link " href="#ex2" rel="modal:open">
+            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="ni ni-collection text-info text-sm opacity-10"></i>
+            </div>
+            <span class="nav-link-text ms-1">Register</span>
+          </a>
+        </li>
+        {% endif %}
+        
+      </ul>
+    </div>
+    </div>
+    
+  </aside>
+  <main class="main-content position-relative border-radius-lg ">
+    <!-- Navbar -->
+    <nav class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl " id="navbarBlur" data-scroll="false">
+      <div class="container-fluid py-1 px-3">
+        
+        <div class="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4" id="navbar">
+          <div class="ms-md-auto pe-md-3 d-flex align-items-center">
+            <div class="input-group">
+              
+              <span class="d-sm-inline d-none"></span>
+            </div>
+          </div>
+          <ul class="navbar-nav  justify-content-end">
+            {% if user.is_authenticated %}
+            <li class="nav-item d-flex align-items-center">
+             
+              <a class="nav-link"  href="#ex3" rel="modal:open">
+                      <i class="fa fa-money me-sm-1"></i> <!-- Changed the icon to fa-money -->
+                      <span class="nav-link text-white font-weight-bold px-0">Deposit</span>
+                  </a>
+              </li>
+              <li class="nav-item d-flex align-items-center">
+                <a class="nav-link"  href="#ex4" rel="modal:open">
+                      <i class="fa fa-credit-card me-sm-1"></i> <!-- Changed the icon to fa-credit-card -->
+                      <span class="nav-link text-white font-weight-bold px-0">Withdraw</span>
+                  </a>
+              </li>
+              <li class="nav-item d-flex align-items-center">
+                 <span class="nav-link text-white font-weight-bold px-0" id='balance'>Balance: {{ balance }}</span>
+              </li>
+          {% else %}
+              <li class="nav-item d-flex align-items-center">
+                  <a href="#ex1" rel="modal:open" class="nav-link text-white font-weight-bold px-2">
+                      <i class="fa fa-user me-sm-1"></i>
+                      <span class="nav-link text-white font-weight-bold px-0">Sign In</span>
+                      
+                  </a>
+              </li>
+              <li class="nav-item d-flex align-items-center">
+                  <a  href="#ex2" rel="modal:open" class="nav-link text-white font-weight-bold px-2">
+                      <i class="fa fa-user-plus me-sm-1"></i> <!-- Changed the icon to fa-user-plus -->
+                      <span class="nav-link text-white font-weight-bold px-0">Register</span>
+                      
+                  </a>
+              </li>
+          {% endif %}
+          
+            
+           
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <!-- End Navbar -->
+   
+    <div class="container-fluid py-4">
+      <div class="row mt-4">
+        <div class="col-lg-8 mb-lg-7 mb-7">
+          <div class="card">
+              <div class="card-header pb-0 pt-3 bg-transparent">
+                  <h6 class="text-capitalize">Game</h6>
+                  <div id="countdown-text"></div>
+              </div>
+              <div class="row">
+                <div class="col-md-8">
+              
+              <div class="game-container" id="game-container"></div>
+                </div>
+              
+             
+            <div class="col-md-4">
+              
+              <div class="balloon-container">
+                
+                <!-- Balloon 1 -->
+                <div id="balloon1" class="balloon" onclick="handleBalloonClick('group_1')">
+                    <img src="{% static 'assets/balloon1.png' %}" alt="Balloon 1">
+                </div>
+    
+                <!-- Balloon 2 -->
+                <div id="balloon2" class="balloon" onclick="handleBalloonClick('group_2')">
+                    <img src="{% static 'assets/balloon2.png' %}" alt="Balloon 2">
+                </div>
+    
+                <!-- Balloon 3 -->
+                <div id="balloon3" class="balloon" onclick="handleBalloonClick('group_3')">
+                    <img src="{% static 'assets/balloon3.png' %}" alt="Balloon 3">
+                </div>
+    
+                <!-- Balloon 4 -->
+                <div id="balloon4" class="balloon" onclick="handleBalloonClick('group_4')">
+                    <img src="{% static 'assets/balloon4.png' %}" alt="Balloon 4">
+                </div>
+            </div>
+              <form id="bet-form" method='post'>
+                {% csrf_token %}
+                    
+                      <div class="row">
+                          <!-- Six 2x3 buttons for amounts -->
+                          
+                              <button type="button" class="amount-btn" data-amount="10">10</button>
+                          
+                          
+                              <button type="button" class="amount-btn" data-amount="20">20</button>
+                    
+                          
+                              <button type="button" class="amount-btn" data-amount="50">50</button>
+                          
+                          
+                              <button type="button" class="amount-btn" data-amount="100">100</button>
+                          
+                          
+                              <button type="button" class="amount-btn" data-amount="500">500</button>
+                          
+                          
+                              <button type="button" class="amount-btn" data-amount="3000">3000</button>
+                          
+                      </div>
+                      <div class="row mt-2">
+                          <!-- Input field to display selected value -->
+                          <div class="col-md-7 mb-3">
+                              <input type="number" class="form-control" id="selected-amount">
+                          </div>
+                          
+                          <div class="col-md-5 mb-3">
+                              <button type="submit" class="btn btn-primary btn-block" id="bet-button">BET</button>
+                          </div>
+                          <div class="col-md-12">
+                            <p id="errorfield"></p>
+                          </div>
+                          
+                      </div>
+                      <input type="hidden" id="betAmount" name="bet_amount">
+
+                  </form>
+                  <div class="col-md-7 mb-3">
+                    <button class="btn btn-primary btn-block" id="cashout-button">CASH OUT</button>
+                </div>
+                <div class="col-md-7 mb-3">
+                  <span  class="nav-link text-red font-weight-bold px-0" id="error-text" style="font-style: italic; display: none;"><span>
+              </div>
+                  
+              </div>
+              </div>
+          </div>
+        </div>
+      
+      
+          <div class="col-lg-4">
+    <div class="card">
+        <div class="card-header pb-0 p-3">
+            <h6 class="mb-0">Bets</h6>
+        </div>
+        <div class="card-body p-3">
+            <table class='bet-table' style="background-color: #333; color: black;">
+                <thead>
+                    <tr>
+                        <th style="font-size: 0.6em;">User</th>
+                        <th style="font-size: 0.6em;">Bet</th>
+                        <th style="font-size: 0.6em;">@</th>
+                        <th style="font-size: 0.6em;">Cashed_Out</th>
+                        <th style="font-size: 0.6em;">Balloon</th>
+                    </tr>
+                </thead>
+                <tbody id='bet-table-body'>
+                    <!-- Your table body content here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+      </div>
+  
+  
+    
+      
+        
+        
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div id="ex1" class="modal">
+  
+    
+    <div class="card card-plain" style="width: auto; height: auto;">
+      
+      <div class="card-header pb-0 text-start">
+        
+        <h4 class="font-weight-bolder">Sign In</h4>
+        <p id="error1" style="color: red"></p>
+        <p class="mb-0">Enter your phone_number and password to sign in</p>
+      </div>
+      <div class="card-body">
+        <form id='login-form' role="form">
+          {% csrf_token %}
+          <div class="mb-3">
+            <input type="text" id = "phone_number1" class="form-control form-control-lg" placeholder="Phone Number" aria-label="Phone_number">
+          </div>
+          <div class="mb-3">
+            <input type="password" id = "password" class="form-control form-control-lg" placeholder="Password" aria-label="Password">
+          </div>
+         
+          <div class="text-center">
+            <button type="button" id="login_submit_btn" class="btn btn-lg btn-primary btn-lg w-100 mt-4 mb-0">Sign in</button>
+          </div>
+          <div id="spinner1" style="display: none;">
+            <!-- Add your spinner HTML or image here -->
+            <div class="spinner-border" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
+        </form>
+      </div>
+      <div class="card-footer text-center pt-0 px-lg-2 px-1">
+        <p class="mb-4 text-sm mx-auto">
+          Don't have an account?
+          <p><a href="#ex2" class="text-primary text-gradient font-weight-bold" rel="modal:open">Register</a></p>
+        </p>
+
+      </div>
+    </div>
+
+  
+    
+    <a href="#" rel="modal:close">Close</a>
+    
+  
+  </div>
+  <div id="ex2" class="modal">
+    
+    
+    <div class="card card-plain">
+      <div class="card-header pb-0 text-start">
+        
+        <h4 class="font-weight-bolder">Register</h4>
+        <p id="error2" style="color: red"></p>
+        <p class="mb-0">Enter your email and password to sign in</p>
+      </div>
+      <div class="card-body">
+        <form id="register-form" role="form">
+          {% csrf_token %}
+          <div class="mb-3">
+            <input type="text" class="form-control" id = "user_name" name = "user_name" placeholder="Username" aria-label="Name">
+          </div>
+          <div class="mb-3">
+            <input type="text" class="form-control" id="phone_number2" name = "phone_number" placeholder="Phone_number" aria-label="phone_number">
+          </div>
+          <div class="mb-3">
+            <input type="password" class="form-control" id="password1" name="password1" placeholder="Password" aria-label="Password">
+          </div>
+          <div class="mb-3">
+            <input type="password" class="form-control" id="password2" name="password2" placeholder="Confirm Password" aria-label="Password">
+          </div>
+          
+          <div class="text-center">
+            <button type="button" id="register_submit_btn" class="btn bg-gradient-dark w-100 my-4 mb-2">Sign up</button>
+          </div>
+          <div id="spinner2" style="display: none;">
+            <!-- Add your spinner HTML or image here -->
+            <div class="spinner-border" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
+          <p class="text-sm mt-3 mb-0">Already have an account? <p><a href="#ex1" class="text-primary text-gradient font-weight-bold" rel="modal:open">Log In</a></p>
+
+        </form>
+      </div>
+    
+      
+    </div>
+  
+    
+    <a href="#" rel="modal:close">Close</a>
+  </div>
+  <div id="ex3" class="modal">
+  
+    
+    <div class="card card-plain" style="width: auto; height: auto;">
+      
+      <div class="card-header pb-0 text-start">
+        
+        <p id="error3" style="color: red"></p>
+        <p class="mb-0">Enter amount to deposit</p>
+      </div>
+      <div class="card-body">
+        <form id='deposit-form' role="form">
+          {% csrf_token %}
+          <div class="mb-3">
+            <input type="text" id = "deposit_amount" class="form-control form-control-lg" >
+          </div>
+          
+         
+          <div class="text-center">
+            <button type="button" id="deposit_btn" class="btn btn-lg btn-primary btn-lg w-100 mt-4 mb-0">Deposit</button>
+          </div>
+          <div id="spinner3" style="display: none;">
+            <!-- Add your spinner HTML or image here -->
+            <div class="spinner-border" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
+        </form>
+      </div>
+      
+    </div>
+
+  
+    
+    <a href="#" rel="modal:close">Close</a>
+    
+  
+  </div>
+  <div id="ex4" class="modal">
+  
+    
+    <div class="card card-plain" style="width: auto; height: auto;">
+      
+      <div class="card-header pb-0 text-start">
+        
+        <p id="error4" style="color: red"></p>
+        <p class="mb-0">Enter amount to withdraw</p>
+      </div>
+      <div class="card-body">
+        <form id='withdraw-form' role="form">
+          {% csrf_token %}
+          <div class="mb-3">
+            <input type="text" id = "withdraw_amount" class="form-control form-control-lg" >
+          </div>
+          
+         
+          <div class="text-center">
+            <button type="button" id="withdraw_btn" class="btn btn-lg btn-primary btn-lg w-100 mt-4 mb-0">Withdraw</button>
+          </div>
+          <div id="spinner4" style="display: none;">
+            <!-- Add your spinner HTML or image here -->
+            <div class="spinner-border" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
+        </form>
+      </div>
+      
+    </div>
+
+  
+    
+    <a href="#" rel="modal:close">Close</a>
+    
+  
+  </div>
+
+ 
+  <script type="text/javascript">
+    DJANGO_STATIC_URL = '{{ STATIC_URL }}';
+</script>
+  
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js" integrity="sha256-lSjKY0/srUM9BE3dPm+c4fBo1dky2v27Gdjm2uoZaL0=" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+{% comment %} <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script> {% endcomment %}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.min.js" integrity="sha384-+sLIOodYLS7CIrQpBjl+C7nPvqq+FbNUBDunl/OZv93DB7Ln/533i8e/mZXLi/P+" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.css" />
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+
+ 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/phaser/3.60.0/phaser.min.js"></script>
+  
+  {% javascript 'scripts' %}
+ 
+  
+  
+  
+</body>
+
+</html>

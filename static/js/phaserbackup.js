@@ -7,60 +7,85 @@ class Example extends Phaser.Scene
 
     preload ()
     {
-        this.load.setBaseURL('https://labs.phaser.io')
-
-        this.load.image('bg', 'assets/tweens/background.jpg');
+        this.load.image('balloon', balloon);
         
-        this.load.bitmapFont('desyrel', 'assets/fonts/bitmap/desyrel.png', 'assets/fonts/bitmap/desyrel.xml');
+
+
+        this.load.image('bg', space);
+        this.load.image('pumpUp', pumpup);
+        this.load.image('pumpDown', pumpdown);
+        
+        this.load.image('popped', popped);
+       
+        
+        this.load.bitmapFont('desyrel', 'https://labs.phaser.io/assets/fonts/bitmap/desyrel.png', 'https://labs.phaser.io/assets/fonts/bitmap/desyrel.xml');
     }
 
    async create ()
     {
         
-    
+        
         console.log('create called');
         const scene = this;
+        let backg = scene.add.image(400, 300, 'bg');
+        backg.setScale(2.7, 3.5);
 
-        const graphics = scene.add.graphics({ lineStyle: { width: 2, color: 0x00aa00 } });
-        const horizontalLine = new Phaser.Geom.Line(100, 500, 700, 500);
-        const verticalLine = new Phaser.Geom.Line(100, 500, 100, 100);
+        const loading_game = scene.add.text(400, 28, 'Game loading....').setColor('#00ff00').setFontSize(32).setShadow(2, 2).setOrigin(0.5, 0);
         
-        const counterLimit = 3.0;
+        
+        
        
         async function main(scene) {
             try {
                 
                 const wsSocket = new WebSocket("ws://" + window.location.host + "/ws/realtime/");
+                // const wsSocket = new WebSocket('ws://'
+                // + window.location.host
+                // + '/ws/real_time_updates/'
+                // + 'group_1'
+                // + '/');
                 let isCrashTriggered = false; 
-                let tween;
-                graphics.strokeLineShape(horizontalLine);
-                graphics.strokeLineShape(verticalLine); 
-
-                graphics.lineStyle(2, 0xaa0000);
-
-                scene.add.text(400, 28, '').setColor('#00ff00').setFontSize(32).setShadow(2, 2).setOrigin(0.5, 0);
+             
+                // scene.add.sprite(400, 300, 'background').play('explodeAnimation');
                 
-
-                const types = [ 'sinu.in' ];
-                let type = 0;
-                // let tween;
-
-                
-
+                let currentImage = 'pumpUp'; // Start with 'pump up'
+                let balloonsTween = null;
+                let lightsTween = null;
                 const graph = scene.add.graphics();
-                graphics.lineGradientStyle(128, 0xff0000, 0xff0000, 0x0000ff, 0x0000ff, 1);
+                let delay = 200; // Delay in milliseconds (0.1 seconds)
+               
+        
+               
+        
+                const centerX = 400;
+                const centerY = 500;
+        
+                // Create a strong point line
+                const graphics = scene.add.graphics({ lineStyle: { width: 6, color: 0x0000ff  } });
+               
+               
+               
+               
+        
+        
+               
 
-                const rect = scene.add.rectangle(100, 400, 2, 2, 0x00ff00);
-                const rt = scene.add.renderTexture(400, 300, 800, 600);
-                // const counterText = scene.add.dynamicBitmapText(400, 200, 'desyrel', '0.00').setOrigin(0.5, 0);
-                const crashText = scene.add.dynamicBitmapText(400, 200, 'desyrel', '0.00').setOrigin(0.5, 0);
                 
-                let crashInstructionProcessed = false;
-                let countAndDisplayTimer;   
-                let continueCounting = true;
-                const delayTime = 10;    
+
+                
+
+                
+                
+                
+                // const counterText = scene.add.dynamicBitmapText(400, 200, 'desyrel', '0.00').setOrigin(0.5, 0);
+                
+                
+               
+                
                 let counterText;
                 let countdownText;
+                let crashText;
+                let bet_allowed_text;
                 let cashoutclicked = false;
                
                 
@@ -70,161 +95,615 @@ class Example extends Phaser.Scene
                 let start = true;
                 const betButton = document.getElementById("bet-button");
                 let game_id;
-               
+                let balloons;
+                let light;
+                let poppedbackground;
+                let pump;
+                let Line;
+                let animationTimer;
+                let start_initial = true;
+                let roomName;
+                let groupSocket;
+                let chooseballoontext;
+                let ballooncount;
+                let start_with_balloon = true;
+                let showballoons = true;
+
                 
-                rect.setPosition(100, 500);
+
                 wsSocket.onmessage = async function (e) {
+                    console.log('received message');
+                    
+                    if(loading_game){
+                      loading_game.destroy();
+                    }
                         const data = JSON.parse(e.data);
-                        
+                        console.log(data.type);
                         if (data.type == "ongoing_synchronizer") {
                             // Use the current multiplier to render the ongoing graph
-                            const currentMultiplier = data.currentMultiplier; // Assuming the currentMultiplier is provided in the data
+                            const currentMultiplier = data.cached_multiplier; // Assuming the currentMultiplier is provided in the data
                             // Use currentMultiplier to render the ongoing graph
-                            
-                            countAndDisplay(currentMultiplier);
-                            if (counterText) {
-                                counterText.destroy();
-                            }
-                            if (crashText) {
-                                crashText.destroy();
-                            }
+                            console.log('ongoing synchronizer');
+                            countAndDisplayOngoing(currentMultiplier);
+                           
                             console.log(data)
                         }
-                         
-                        else if (data.type === "crash_instruction") {
-                            // Handle crash instruction, e.g., trigger the crash action in the game
-                            console.log(data)
-                            const crashpoint = data.crash
-                            // isCrashTriggered = true;
-                            CountingComplete(tween,graph, rect, rt, crashpoint);
-                            console.log('back to here');
-                            if (typeof globalBetAmount !== 'undefined') {
-                                globalBetAmount = 0;
-                            }
-                            
-                            betButton.disabled = false;
-                            betButton.textContent = 'BET'
+                        
+                        
+                        
 
-                            console.log('bet_amount reset');
+                        else if (data.type == "start_synchronizer") {
+                                window.allowballoonchange = true;
+                                showballoons = true;
                             
-                            
-
-                            crashInstructionProcessed = true;
-
-                        } else if (data.type == "start_synchronizer") {
                             // Start the synchronizer countdown
-                            
-                                if (tween) {
-                                    tween.stop();
+                               console.log('start_synchronizer');
+                               
+                                if (counterText) {
+                                    counterText.destroy();
                                 }
+                                if (bet_allowed_text) {
+                                    bet_allowed_text.destroy();
+                                }
+                                if (poppedbackground) {
+                                    // Destroy the existing background image
+                                    poppedbackground.destroy();
+                                }
+                               if (groupSocket){
+                                groupSocket.close();
+                               }
+    
+                                backg = scene.add.image(400, 300, 'bg').setPipeline('Light2D');
+                                backg.setScale(2.7, 3.5);
+                                console.log(data.count);
+                                const delay = 1000;  // Delay in milliseconds
+                                const updateInterval =1;
+                                const crashPoint = 10; // Adjust this value as needed
+                                // chooseballoontext = scene.add.dynamicBitmapText(400, 100, 'desyrel').setOrigin(0.5, 0);
+                                var balloons_selected = [];
+                                var selectedBalloon = null;
+                                var balloonColors = [0x54deff, 0xff0000, 0x00ff00, 0x800080]; // Blue, Red, Green, Purple
                                 
-                                crashInstructionProcessed = false;
-                                cashoutclicked = false;
+                                
+                                    let count = 10;
+                                    // Define the minimum countdown value (0 seconds)
+                                    const minCountdown = 0;
+
+                                    while (count >= minCountdown) {
+                                        if (chooseballoontext) {
+                                            chooseballoontext.destroy();
+                                        }
+                                        chooseballoontext = scene.add.dynamicBitmapText(400, 100, 'desyrel').setOrigin(0.5, 0);
+
+                                        chooseballoontext.setText(`Choose balloon in ${count}`);
+                                        
+                                        if (showballoons) {
+                                            showballoons = false;
+                                            
+                                            
+                                            for (var i = 0; i < 4; i++) {
+                                                var xPosition = 150 + i * 150; // Adjust the x position as needed
+                                                var groupName = 'group_' + (i + 1); // Create group names 'group_1', 'group_2', ...
+                                                var balloon = scene.add.image(xPosition, 300, 'balloon');
+                                                balloon.setTint(balloonColors[i]); // Set the balloon color based on the array
+                                                balloon.setInteractive();
+                                                balloon.setData('group', groupName); // Store the group name as data
+                                                balloon.setScale(0.3);
+                                                
+                                                balloon.on('pointerdown', function () {
+                                                    var group = this.getData('group');
+                                                    if (selectedBalloon !== null) {
+                                                        selectedBalloon.removeTick(); // Remove the tick from the previously selected balloon
+                                                    }
+                                                    this.addTick(); // Add a tick below the clicked balloon
+                                                    selectedBalloon = this; // Set the selected balloon
+                                                    handleBalloonClick(group); // Call the function with the group name
+                                                });
+                                                
+                                                balloon.addTick = function () {
+                                                    // Add a tick (e.g., a line) below the balloon
+                                                    var tick = scene.add.line(0, 0, 0, 20, 0, 0, 0xffffff);
+                                                    tick.setStrokeStyle(3, 0xffffff);
+                                                    tick.x = this.x;
+                                                    tick.y = this.y + this.displayHeight / 2 + 10;
+                                                    tick.setOrigin(0, 0);
+                                                    this.tick = tick;
+                                                };
+                                                
+                                                balloon.removeTick = function () {
+                                                    // Remove the tick from the balloon
+                                                    if (this.tick) {
+                                                        this.tick.destroy();
+                                                        this.tick = null;
+                                                    }
+                                                };
+                                                
+                                                balloons_selected.push(balloon);
+                                            }
+                                        }
+
+                                        
+                                        
+                                        
+                                        await new Promise(resolve => setTimeout(resolve, delay));
+                                        
+                                        // Decrease the countdown by the update interval
+                                        count -= updateInterval;
+
+                                        // Ensure the countdown doesn't go below the minimum value
+                                        if (count < minCountdown) {
+                                            count = minCountdown;
+                                        }
+
+                                        // Update the text with the remaining countdown time
+                                        // chooseballoontext.setText('Choose balloon in ' + count + 's');
+                                        if (count === 0) {
+                                            for (var i = 0; i < balloons_selected.length; i++) {
+                                                balloons_selected[i].destroy();
+                                            }
+                                            
+                                            break;
+                                        }
+                                    }
+                                
+                                chooseballoontext.destroy();
                                 game_id = data.game_id
-                                console.log(game_id);
-                                console.log(data);
-                                startgame(wsSocket);
-                                // Assuming the count is provided in the data
+                                
+
+                                    
+                                
+                                cashoutclicked = false;
+                                start = true;
+                                
+                               
+                                await startgame_official();
+                               
+                                
+                               
+                                
+                            
+                               
+                                
                             
                         
                             
                             
                         }
-                        else if (data.type == "count_initial"){
-                            if (countdownText) {
-                                countdownText.destroy();
-                            }
-                            if (tween) {
-                                tween.stop();
-                            }
-                            if (crashText) {
-                                crashText.destroy();
-                            }
-                            countAndDisplayInitial(data.count);
-
-
-                        }
-                        else if (data.type == "heartbeat"){
-                            console.log('heartbeat')
-                            wsSocket.send(JSON.stringify({ type: 'heartbeat_response' }));
-
-
-                        }
-                        
-                        else if (data.type == "count_update"){
-                            if (countdownText) {
-                                countdownText.destroy();
-                            }
-                            countAndDisplay();
-
-
-                        }
-                        else if (data.type == "heartbeat"){
-                            console.log('heartbeat')
-                            wsSocket.send(JSON.stringify({ type: 'heartbeat_response' }));
-
-
-                        }
+                       
                     }
+                    async function startgame_official(){
+                       
+                            window.allowballoonchange = true;
+                            betButton.disabled = false;
+
+                            start_with_balloon = false
+                            
+                          
+                         
+                            
+                            if (window.roomName) {
+                                roomName = window.roomName
+                                handleBalloonClick(roomName)
+                                groupSocket = new WebSocket(
+                                    'ws://'
+                                    + window.location.host
+                                    + '/ws/real_time_updates/'
+                                    + roomName
+                                    + '/'
+                                );
+                                await continuation_of_start_game_official()
+                            }
+                            else {
+                                
+                                roomName = 'group_1';
+                                handleBalloonClick(roomName)
+                                 groupSocket = new WebSocket(
+                                    'ws://'
+                                    + window.location.host
+                                    + '/ws/real_time_updates/'
+                                    + roomName
+                                    + '/'
+                                );
+                                await continuation_of_start_game_official()
+                            }
+                               
+                        }
+                    
+                            
+                    async function continuation_of_start_game_official(){
+                        window.allowballoonchange = false;
+                            
+                            
+                            groupSocket.onmessage = async function (e) {
+                                
+                                    const data = JSON.parse(e.data);
+                                    console.log(data)
+                                    
+                                   
+                                     
+                                    if (data.type === "crash_instruction") {
+                                        // Handle crash instruction, e.g., trigger the crash action in the game
+                                        console.log(data)
+                                        groupSocket.close();
+                                        
+                                        const crashpoint = data.crash
+                                        if (backg) {
+                                            // Destroy the existing background image
+                                            backg.destroy();
+                                      }
+                                        if (balloonsTween) {
+                                            balloonsTween.stop(); // Stop the balloon animation
+                                            balloonsTween = null; // Clear the tween reference
+                                        }
+                                        
+                                        // Clear any balloons that might still be visible
+                                        if (balloons) {
+                                            balloons.clear(true, true);
+                                        }
+                                        if (animationTimer) {
+                                            animationTimer.remove(); // Remove the timer
+                                            animationTimer = null; // Clear the timer reference
+                                        }
+                                        if (pump){
+                                            pump.destroy();
+                                        }
+                                        
+                                        
+                                        
+                                    
+                                        // Create a new background image with the new texture
+                                        poppedbackground = scene.add.image(400, 300, 'popped');
+                                        poppedbackground.setScale(3.5, 3.5);
+                                        switch (window.roomName) {
+                                            case 'group_1':
+                                                // No tint (default color)
+                                                break;
+                                            case 'group_2':
+                                                poppedbackground.setTint(0xff0000); // Red tint
+                                                break;
+                                            case 'group_3':
+                                                poppedbackground.setTint(0x00ff00); // Green tint
+                                                break;
+                                            case 'group_4':
+                                                poppedbackground.setTint(0x800080); // White tint
+                                                break;
+                                            default:
+                                                console.log('Invalid group name: ' + roomName);
+                                                poppedbackground.setTint(0x0000ff);
+                                               
+                                                break;
+                                        }
+                                        
+                                        // isCrashTriggered = true;
+                                        CountingComplete(crashpoint);
+                                        console.log('back to here');
+                                        if (typeof globalBetAmount !== 'undefined') {
+                                            globalBetAmount = 0;
+                                        }
+                                        
+                                        betButton.disabled = false;
+                                        betButton.textContent = 'BET'
+            
+                                        console.log('bet_amount reset');
+                                        start_initial = true;
+                                        start = true;
+                                        window.allowballoonchange = false;
+            
+                                        
+                                        start_with_balloon = true;
+                                        
+            
+                                    }
+            
+                                           
+                                            
+                                        
+                                    
+                                        
+                                        
+                                    
+                                    else if (data.type == "count_initial"){
+                                        if (start_initial){
+                                            window.allowballoonchange = false
+                                            start_initial = false;
+                                            if (poppedbackground) {
+                                                // Destroy the existing background image
+                                                poppedbackground.destroy();
+                                            }
+                                           
+                
+                                            backg = scene.add.image(400, 300, 'bg').setPipeline('Light2D');
+                                            backg.setScale(2.7, 3.5);
+                                            
+                                            
+                                            
+                                        }
+                                        
+                                        if (countdownText) {
+                                            countdownText.destroy();
+                                        }
+                                        
+                                       
+                                        if (crashText) {
+                                            crashText.destroy();
+                                        }
+                                        await countAndDisplayInitial(data.count);
+            
+            
+                                    }
+                                    
+                                    
+                                    else if (data.type == "count_update"){
+                                        if (start){
+                                            start = false;
+                                            
+                                            
+                                            startgame(scene);
+                                        }
+                                        if (countdownText) {
+                                            countdownText.destroy();
+                                        }
+                                        if (bet_allowed_text) {
+                                            bet_allowed_text.destroy();
+                                        }
+                                        countAndDisplay();
+            
+            
+                                    }
+                                    
+                                }
+                            }
+                        
+
+                    
+                
                     async function countAndDisplayInitial(count){
-                        countdownText = scene.add.dynamicBitmapText(400, 300, 'desyrel', '0.00').setOrigin(0.5, 0);
+                        if(count>15){
+                            
+                            groupSocket.close();
+                            return
+                                
+                         }
+                       
+                        if(bet_allowed_text){
+                            
+                            bet_allowed_text.destroy();
+                               
+                        }
+                        if (counterText) {
+                            counterText.destroy();
+                        }
+                        countdownText = scene.add.dynamicBitmapText(400, 400, 'desyrel', '').setOrigin(0.5, 0);
+                        bet_allowed_text = scene.add.dynamicBitmapText(400, 200, 'desyrel', '').setOrigin(0.5, 0);
                         countdownText.setText(`Game starts in ${count}`);
+                        
+                        if(count>1){
+                            
+                            bet_allowed_text.setText('Place your bet');
+                               
+                        }
+                        else {
+                            if(bet_allowed_text){
+                            
+                                bet_allowed_text.destroy();
+                                   
+                            }
+                        }
 
-                    }
+                        
+                    
+                        
+                        
+                        }
+
+
+                    
                     async function startgame(wsSocket){
                         console.log('startgame called')
+                        pump = scene.add.image(650, 450, 'pumpUp');
+                        Line = new Phaser.Geom.Line(centerX-4, centerY-2, 638, 572);
+                        graphics.strokeLineShape(Line);
+                        // graphics.strokeLineShape(verticalLine);
+                
+                        // Start the animation
+                        
+                        
+                        
+                       
+                
+                        balloons = scene.add.group({ key: 'balloon', repeat: 50 });
+                        // Function to change the tint color of balloons
+                        function changeBalloonColor(balloon, roomName) {
+                            switch (roomName) {
+                                case 'group_1':
+                                    // No tint (default color)
+                                    break;
+                                case 'group_2':
+                                    balloon.setTint(0xff0000); // Red tint
+                                    break;
+                                case 'group_3':
+                                    balloon.setTint(0x00ff00); // Green tint
+                                    break;
+                                case 'group_4':
+                                    balloon.setTint(0x800080); // White tint
+                                    break;
+                                default:
+                                    console.log('Invalid group name: ' + roomName);
+                                    balloon.setTint(0x0000ff);
+                                    // You may want to set a default tint here or clear the tint
+                                    break;
+                            }
+                        }
+
+                        // Iterate through each balloon in the group and change its color based on roomName
+                        
+                
+                        balloons.getChildren().forEach((balloon) => {
+                            changeBalloonColor(balloon, window.roomName);
+                            balloon.setOrigin(0.5, 1); // Set the anchor point to the bottom center
+                            balloon.setScale(0.5);
+                            balloon.x = centerX; // Set the initial x position to the center
+                            balloon.y = centerY+10; // Set the initial y position to the bottom
+                        });
+                
+                        
+                    
                             if (crashText) {
                                 crashText.destroy();
                             }
+                            
                             const cashoutButton = document.getElementById('cashout-button');
                             cashoutButton.disabled= false;
-                            // countdownText = scene.add.dynamicBitmapText(400, 300, 'desyrel', '0.00').setOrigin(0.5, 0);
-                            // console.log('countdownText created')
-                            // for (let countValue = countdown; countValue >= 0; countValue--) {
-                                
-                    
-                            //     countdownText.setText(`Game starts in ${countValue}`);
-                            //     await new Promise(resolve => setTimeout(resolve, 1000));
-                            // }
+                           
                             if (countdownText) {
                                 countdownText.destroy();
                             }
                             await cashout()
+                            // scene.add.sprite(400, 300, 'background').play('explodeAnimation');
+                            function animateImages() {
+                                // Switch between 'pumpUp' and 'pumpDown'
+                                currentImage = currentImage === 'pumpUp' ? 'pumpDown' : 'pumpUp';
+
+                                // Display the current image
+                                pump.setTexture(currentImage);
+
+                                // Set a timer to call this function again after the delay
+                                animationTimer = scene.time.delayedCall(delay, animateImages, [], scene);
+                            }
+
+                            animateImages.call(scene);
+                             // Create a promise for each animation
+                             const balloonsAnimationPromise = animateBalloons();
+                             const lightsAnimationPromise = animateLights();
+ 
+                             // Wait for both animations to complete before continuing
+                             await Promise.all([balloonsAnimationPromise, lightsAnimationPromise]);
+
+                        }
+
+                        async function animateBalloons() {
+                            const duration = 500000; // Set the desired animation duration in milliseconds
+                            
+                            // Your balloon animation code here...
+                            balloonsTween = scene.tweens.add({
+                                targets: balloons.getChildren(),
+                                scaleX: 2,
+                                scaleY: 2,
+                                radius: 228,
+                                ease: 'Quintic.easeOut',
+                                duration: duration, // Use the specified duration
+                                yoyo: true,
+                                repeat: -1,
+                                onUpdate: function () {
+                                    // Update the x and y positions based on the new scale
+                                    balloons.getChildren().forEach((balloon) => {
+                                        balloon.x = centerX;
+                                        balloon.y = centerY;
+                                    });
+                                },
+                                onComplete: function () {
+                                    // Resolve the promise when the animation is done
+                                    resolve();
+                                }
+                            });
                         
-                            drawgraph(scene, wsSocket);
-
-
-                    }
+                            return new Promise((resolve) => {});
+                        }
+                        
+                        async function animateLights() {
+                            const duration = 5000; // Set the desired animation duration in milliseconds
+                            
+                            // Your light animation code here...
+                            scene.lights.enable().setAmbientColor(0x555555);
+                        
+                            const hsv = Phaser.Display.Color.HSVColorWheel();
+                        
+                            const radius = 80;
+                            const intensity = 6;
+                            let x = radius;
+                            let y = 0;
+                        
+                            //  To change the total number of lights see the Game Config object
+                            const maxLights = 3;
+                        
+                            //  Create a bunch of lights
+                            for (let i = 0; i < maxLights; i++) {
+                                const color = hsv[i * 10].color;
+                        
+                                light = scene.lights.addLight(x, y, radius, color, intensity);
+                        
+                                lightsTween = scene.tweens.add({
+                                    targets: light,
+                                    y: 600,
+                                    yoyo: true,
+                                    repeat: -1,
+                                    ease: 'Sine.easeInOut',
+                                    duration: duration, // Use the specified duration
+                                    delay: i * 100,
+                                    onComplete: function () {
+                                        // Resolve the promise when the animation is done
+                                        resolve();
+                                    }
+                                });
+                        
+                                x += radius * 2;
+                        
+                                if (x > 800) {
+                                    x = radius;
+                                    y += radius;
+                                }
+                            }
+                        
+                            return new Promise((resolve) => {});
+                        }
+                        
                    
-                    
-                    async function countAndDisplay() {
-                        // Destroy the existing counterText if it exists
+                    async function countAndDisplayOngoing(multiplier) {
+                        console.log('countAndDisplay Ongoing called')
                         if (counterText) {
                             counterText.destroy();
                         }
-                        const delay = 100;  // Delay in milliseconds
+                       
+                        const delay = 50;  // Delay in milliseconds
                         const updateInterval = 0.01;
                         const crashPoint = 1000000; // Adjust this value as needed
                         counterText = scene.add.dynamicBitmapText(400, 200, 'desyrel').setOrigin(0.5, 0);
+                        bet_allowed_text = scene.add.dynamicBitmapText(400, 300, 'desyrel', '').setOrigin(0.5, 0);
+                        bet_allowed_text.setText(' Ongoing game,\n Wait for new game');
                         
+                            let count = multiplier;
+                            
+                            async function update() {
+                                while (count <= crashPoint) {
+                                    await new Promise(resolve => setTimeout(resolve, delay));
+                                    count += updateInterval;
+                                    const counted = Math.round(count * 100) / 100;
                         
-                            let count = 1;
-                            while (count <= crashPoint) {
-                                await new Promise(resolve => setTimeout(resolve, delay));
-                                count += updateInterval;
-                                const counted = Math.round(count * 100) / 100;
-                                 // Assuming you have a context with 'self' available
-                                counterText.setText('x' + counted);
-                                await updateCashoutButtonText(counterText); 
+                                    // Check if counterText is still valid before setting text
+                                    try {
+                                        if (!counterText) {
+                                            throw new Error("counterText is null.");
+                                        }
+                        
+                                        counterText.setText('x' + counted);
+                                        
+                                    } catch (error) {
+                                        console.error(`error is ${error.message}`);
+                                        break;
+                                    }
+                        
+                                    // Schedule the next update
+                                    
+                                }
                             }
+                        
+                            // Start the asynchronous update loop
+                            update();
+                        }
+                        
                           
                         
-                        // Create a new counterText
-                        
-                    
-                        // Set the text of the counterText
-                        
-                    
+                 
                         
                         
                         
@@ -232,7 +711,76 @@ class Example extends Phaser.Scene
                             
                         
                         
-                    }
+                    
+                        async function countAndDisplay() {
+                            // Destroy the existing counterText if it exists
+                            console.log('countAndDisplay called');
+                            if (counterText) {
+                                counterText.destroy();
+                            }
+                            if (bet_allowed_text) {
+                                bet_allowed_text.destroy();
+                            }
+                            const delay = 100;  // Delay in milliseconds
+                            const updateInterval = 0.01;
+                            const crashPoint = 1000000; // Adjust this value as needed
+                            counterText = scene.add.dynamicBitmapText(400, 200, 'desyrel').setOrigin(0.5, 0);
+                        
+                            let count = 1;
+                           
+                            let counted;
+                          
+                            async function update() {
+                                while (count <= crashPoint) {
+                                    await new Promise(resolve => setTimeout(resolve, delay));
+                                    count += updateInterval;
+                                    counted = Math.round(count * 100) / 100;
+                                    
+                                    
+
+                                    if (count < window.multiplier){
+                                        count = window.multiplier
+                                        counted = count.toFixed(2);
+                                        
+                                        }
+                                   
+                                        
+                                    
+                        
+                                    // Check if counterText is still valid before setting text
+                                    try {
+                                        if (!counterText) {
+                                            throw new Error("counterText is null.");
+                                        }
+                        
+                                        counterText.setText('x' + counted);
+                                        await updateCashoutButtonText(counterText);
+                                    } catch (error) {
+                                        console.error(`error is ${error.message}`);
+                                        break;
+                                    }
+                        
+                                    // Schedule the next update
+                                    
+                                }
+                            }
+                        
+                            // Start the asynchronous update loop
+                            update();
+                        }
+                        
+                        
+                                    
+                        
+                                    // Schedule the next update
+                        
+                            // Start the asynchronous update loop
+                          
+                        
+                        
+                        
+                        
+                    
                         
                     async function cashout(){
                         console.log('cashout called')
@@ -248,33 +796,15 @@ class Example extends Phaser.Scene
                             console.log('cashed_out at: ', cashOutValue);// Extract and parse the value
                             const betForm = document.getElementById("bet-form");
                             // Send the cashOutValue to the server using an API call
-                            const formData = new FormData();
-                            formData.append('type','cashout_validate' )
-                            formData.append('multiplier', cashOutValue);
-                            formData.append('game_id', game_id);
-                            wsSocket.send(JSON.stringify(formData))
+                           
+                            const formdata = {'type':'cashout_validate', 'multiplier':cashOutValue, 'game_id':game_id}
 
-                            // const csrfToken = betForm.querySelector('[name=csrfmiddlewaretoken]').value;
-                                                
-                            // fetch('/cashout/', {
-                            //     method: 'POST',
-                            //     headers: {
-                            //         'X-CSRFToken': csrfToken // Make sure to define csrfToken
-                            //     },
-                            //     body: formData
-                            // })
-                            // .then(response => response.json())
-                            // .then(data => {
-                            //     console.log('data sent', data);
-                            //     cashoutButton.textContent = 'CASH OUT';
-                            //     cashoutButton.disabled = true;
-                                
-                            //     // Update the page content using the data received from the server
-                            //     // For example, update the user's balance or display a success message
-                            // })
-                            // .catch(error => {
-                            //     console.error('Error:', error);
-                            // });
+                            
+                            const data = JSON.stringify(formdata)
+                            console.log(data)
+                            groupSocket.send(data)
+
+                           
                     }});
                     
                     }
@@ -295,79 +825,29 @@ class Example extends Phaser.Scene
                     }
                     
                         
-                    function CountingComplete(tween, graph, rect, rt, crashpoint) {
+                    function CountingComplete( crashpoint) {
                         
-                        if (tween) {
-                            tween.stop();
-                        }
-                                clearTimeout(countAndDisplayTimer);
+                        
+                               
                                 if (counterText) {
                                     counterText.destroy();
                                 }
-                                graph.clear();
-                                rt.clear();                                                        
-                            
-                                rect.setPosition(100, 500);
+                               
+                                
                                 
                                
                                 console.log('its the crashtexts font', crashpoint);
-                                let text = scene.add.text(400, 28, 'Crashed at x' + crashpoint);
-                                text.setColor('#00ff00').setFontSize(32).setShadow(2, 2).setOrigin(0.5, 0);
+                                crashText = scene.add.dynamicBitmapText(400, 200, 'desyrel').setOrigin(0.5, 0);
+                                crashText.setText('Popped at x' + crashpoint);
                                 
-                                // Schedule the text to be cleared after 5 minutes
-                                setTimeout(() => {
-                                    text.destroy();
-                                }, 2000); // 5 minutes in milliseconds                          
-     
+                              
 
                 }
                     function drawgraph(scene, wsSocket){
                         
-                        const newCrashPoint = 200;
-                        console.log("we're here", newCrashPoint);
-                        
-                       
-                        
-                        console.log("I think we crash here");
-                        // Update crash point value and re-render
-                        const crashPointValue = newCrashPoint;
-            
-                
-                        let stopValue = 600;
-                        
-
-                        if (stopValue==1){
-                            crashText.setText('Crashed at x' + stopValue.toFixed(2));
-                            setTimeout(() => {
-                                scene.scene.restart();;
-                            }, 5000);
-                            
-                        }
-                
+                                               
                 
                        
-                        // const cashOutButton = scene.add.text(400, 550, 'Cash Out', {
-                        //     color: '#ffffff',
-                        //     fontSize: 24,
-                        //     backgroundColor: '#FF0000',
-                        //     padding: {
-                        //         x: 10,
-                        //         y: 5,
-                        //     },
-                        // }).setOrigin(0.5).setInteractive();
-                        
-                            // Send a request to the server to cash out
-                            
-                        // cashOutButton.on('pointerdown', () => {
-                        //     // Send a request to the server to cash out
-                        //     const cashOutValue = parseFloat(counterText.text.substring(1)); // Extract and parse the value
-                        //     // Send the cashOutValue to the server using an API call, WebSocket, or any suitable method
-                        //     // Example using fetch:
-                        //     console.log(cashOutValue)
-                            
-                       
-                        // });
-                        
                         
                     
                                 
@@ -375,149 +855,17 @@ class Example extends Phaser.Scene
                         
                       
                       
-                        function CountingComplete () {
-                            tween.stop();
-                                    graph.clear();
-                                    rt.clear();
-                                    graph.clear();
-                                    
-                                
-                                    rect.setPosition(100, 500);
-                                    counterText.destroy();
-                                    crashText.setText('Crashed at x' + stopValue.toFixed(2));
-                                    // setTimeout(() => {
-                                    //     fetchNewCrashPointAndRender(scene);
-                                    // }, 5000);
-                        }
                         
                         
-                        
-                        
-                        function limits() {
-                            
-                            console.log('function limits called');
-                            console.log('stopValue',stopValue);
-                            
-                            let limitx = 600 - ((stopValue - 1) / 2) * 600;
-                            let limity = 400 - ((stopValue - 1) / 2) * 400;
-                            let progres =((stopValue - 1) / 2) * 700;
-                            let durationi = ((stopValue - 1) / 3) * 30000;
-                            console.log('limitx', limitx);
-                            
-                            // Ensure limity is not negative
-                            if (durationi > 60000) {
-                                durationi = 60000
-                            }
-                            if (limity < 0) {
-                                limity = 0;
-                            }
-                        
-                            // Ensure limitx is not negative
-                            if (limitx < 0) {
-                                limitx = 0;
-                            }
-                            
-                            return { limitx, limity, progres, durationi};
-                        }
                  
 
-                        const graphEase  = () => {
-                            console.log('graphEase called');
-                            
-                            crashText.destroy()
-                           
-                            const { limitx, limity, progres, durationi } = limits();
-                            if (tween) {
-                                tween.stop();
-                            }
 
-                            rt.clear();
-                            graph.clear();
-                            graph.lineStyle(1, 0x00ff00);
-                            graphics.lineGradientStyle(6, 0xffff00, 0xff00ff, 0xff0000, 0x0000ff, 1);
-                            graph.beginPath();
 
-                            rect.setPosition(100, 500);
-
-                            tween = scene.tweens.add({
-                                targets: rect,
-                                x: { value: 700 - limitx, ease: 'expo' },
-                                y: { value: 100 + limity, ease: types[type] },
-                                duration: durationi,
-                                onUpdate: (tween, target, key) => {
-                                    if (key === 'x') {
-                                        rt.draw(rect);
-                                        graph.lineTo(rect.x, rect.y);
-                                        
-                                        // Update the counter text based on tween progress
-                                        const progress1 = tween.getValue();
-                                        const progress2 = progress1-100;
-                                        const progress = progress1;
-                                        // console.log('progress',progress);
-                                        // const counterValue = ((progress / 700) * 3)+1;
-                                        // Calculate counter value based on stopValue
-                                        // counterText.setText('x'+ counterValue.toFixed(2));
-                                        
-                                        if (progress2 >= progres) { // Stop the tween when the progress reaches half (350) of the total duration
-                                            tween.stop();
-                                            graph.clear();
-                                            rt.clear();
-                                            graph.clear();
-                                            
-                                        
-                                            rect.setPosition(100, 500);
-                                            counterText.destroy();
-                                            // crashText.setText('Crashed at x' + counterValue.toFixed(2));
-                                        }
                         
-                                    }
-                                },
-                            
-                                onComplete: () => {
-                                    graph.stroke();
-                                    tween.stop();
-                                    
-                                
-                                }
-                            });
-                        }
-
-
-                        graphEase();
             
                     }
                    
-                    // function CountingComplete(tween,graph, rect, rt, counterText, crashText, crashpoint) {
-                    //     WebFont.load({
-                    //         google: {
-                    //             families: ['Droid Sans']
-                    //           },
-                    //         active: function () {
-                    //             if (tween) {
-                    //                 tween.stop();
-                    //             }
-                    //                     graph.clear();
-                    //                     rt.clear();
-                                        
-                                        
-                                    
-                    //                     rect.setPosition(100, 500);
-                    //                     counterText.destroy();
-                    //                     console.log('its the crashtexts font');
-                    //                     crashText.setText('Crashed at x' + crashpoint.toFixed(2));
-                    //                     scene.scene.restart();
-                                       
-                            
-                    //           // Your code when fonts are loaded
-                    //         },
-                    //         inactive: function () {
-                    //             console.log('inactive');
-                    //           // Your code when fonts failed to load
-                    //         }
-                    //       });
-
-                    //     }
-                          
+                   
                          
                        
                     

@@ -1,4 +1,5 @@
 from django.apps import AppConfig
+from django.core.cache import cache
 
 
 class MaiConfig(AppConfig):
@@ -6,3 +7,5 @@ class MaiConfig(AppConfig):
     name = 'crash'
     def ready(self):
         from . import signals
+        
+        

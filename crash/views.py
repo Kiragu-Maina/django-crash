@@ -1,7 +1,7 @@
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.views.generic import TemplateView
 from django.views import View
-from .models import Transactions, BettingWindow, CashoutWindow, Games, Bank
+from .models import Transactions, BettingWindow, CashoutWindow, Games, Bank, OwnersBank, GameSets
 from .utils import ServerSeedGenerator
 
 from django.contrib.messages.views import SuccessMessageMixin
@@ -14,6 +14,7 @@ from django.contrib.auth import login, logout
 from django.shortcuts import redirect, render
 import random
 import string
+import time
 from .backends import PhoneUsernameAuthenticationBackend as EoP
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_protect
@@ -24,32 +25,46 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.db import transaction
 from decimal import Decimal
-# from .tasks import run_management_command
-from django.core.management import call_command
+from django.conf import settings
+
+
 # views.py
 
 from django.views.decorators.csrf import csrf_exempt
 
 from django.views import View
 import asyncio
-from .gamemanager import GameManager  # Import your GameManager module
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer # Import your GameManager module
+from .tasks import start_game, stop_game
+from django.contrib.auth.decorators import permission_required
+import subprocess
+import os
+import logging
+from asgiref.sync import sync_to_async
+
+
+
+# Configure the logger
+logger = logging.getLogger(__name__)
 
 @method_decorator(csrf_exempt, name='dispatch')
 class StartGameView(View):
 
     async def start_game(self):
-        game_manager = GameManager.get_instance()
-        # Initialize other necessary components or services here
-
-        while True:
-            # Run your game manager here
-            await game_manager.run_game()
-            # Optionally, you can add a delay here to control how often the game restarts
-            await asyncio.sleep(10)  # Adjust the delay as needed
+        
+        channel_layer = get_channel_layer()
+        await channel_layer.group_send(
+            "realtime_group",
+            {
+                "type": "start.game",
+                
+            }
+        )  # Adjust the delay as needed
 
     async def get(self, request, *args, **kwargs):
         # Start the game in the background
-        asyncio.create_task(self.start_game())
+        await self.start_game()
         
         # Return a response indicating that the game is running
         return JsonResponse({'status': 'Game is running in the background'})
@@ -67,11 +82,15 @@ class UserRegistrationView(SuccessMessageMixin, CreateView):
         response = super().form_valid(form)
         user = form.save()
         login(self.request, user)
-        return JsonResponse({'success': True, 'redirect_url': reverse_lazy('home')}, status=200)
+        bank_account = Bank.objects.get(user=self.request.user)
+            
+        bank_balance = bank_account.balance 
+        return JsonResponse({'success': True, 'balance':bank_balance, 'username':user.user_name}, status=200)
     def form_invalid(self, form):
         messages.error(self.request, 'There was an error with your registration. Please check the form and try again.')
         return JsonResponse({'success': False, 'errors': form.errors}, status=400)
 
+@method_decorator(csrf_exempt, name='dispatch')
 class UserLoginView(FormView):
     form_class = UserLoginForm
     template_name = 'sign-in.html'
@@ -80,9 +99,13 @@ class UserLoginView(FormView):
         user = form.get_user()
         login(self.request, user)
         messages.success(self.request, 'You have successfully logged in!')
-        return JsonResponse({'success': True, 'redirect_url': reverse_lazy('home')}, status=200)
+        bank_account = Bank.objects.get(user=self.request.user)
+            
+        bank_balance = bank_account.balance 
+        return JsonResponse({'success': True, 'balance':bank_balance, 'username':user.user_name}, status=200)
 
     def form_invalid(self, form):
+        print(form.errors)
         messages.error(self.request, 'Invalid phone number or password. Please try again.')
         return JsonResponse({'success': False, 'errors': form.errors}, status=400)
 
@@ -134,12 +157,25 @@ class Home(TemplateView):
         else:
             self.username = generate_random_string(8)
             
+        last_seven_crash_points = Games.objects.exclude(crash_point='').order_by('-id')[:7]
+        
+        random_colors = ['#{:02x}{:02x}{:02x}'.format(random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)) for _ in range(len(last_seven_crash_points))]
+
+
+        # Create a dictionary to store items and their random colors
+        last_seven_dict = {}
+
+        # Update each item in last_seven_crash_points with its random color
+        for i, crash_point_data in enumerate(last_seven_crash_points):
+            last_seven_dict[crash_point_data] = random_colors[i]
+                
+            
         self.request.session['username'] = self.username
         items = self.model.objects.all()
 
        
         context = super().get_context_data(**kwargs)
-       
+        context['last_seven_dict'] = last_seven_dict
         context['items'] = items
         context['username'] = self.username
         context['balance'] = self.bank_balance
@@ -149,16 +185,39 @@ class Home(TemplateView):
        
 
         return context
-    decorators = [csrf_protect, transaction.atomic]
+    
+@method_decorator(csrf_exempt, name='dispatch')
+class PlaceBet(View):
+    decorators = [csrf_exempt, transaction.atomic]
     @method_decorator(decorators)
     def post(self, request, *args, **kwargs):
-        betting_window_state, game_id = self.get_betting_window_state()
+        
+        betting_window_state, game_id, game_set_id = self.get_betting_window_state(request.POST.get('group_name'))
         if betting_window_state:
+            
             
             if self.request.user.is_authenticated:
                 bet_amount = request.POST.get('bet_amount')
+                print(bet_amount)
+                group_name = request.POST.get('group_name')
                 user = self.request.user
                 
+                  # Check if a transaction with the same game_id exists
+                if Transactions.objects.filter(game_id=game_id, user=user).exists():
+                    # raise ValidationError("A transaction with this game_id already exists.")
+                    response_data = {
+                    'status': 'error',
+                    'message': 'A transaction with this game_id already exists',
+                        }
+                    return JsonResponse(response_data, status=400)
+                if Transactions.objects.filter(game_set_id=game_set_id, user=user).exists():
+                    # raise ValidationError("A transaction with this game_set_id already exists.")
+                    response_data = {
+                    'status': 'error',
+                    'message': 'A transaction with this game_set_id already exists',
+                        }
+                    return JsonResponse(response_data, status=400)
+                    
                 try:
                     bank_instance = Bank.objects.select_for_update().get(user=user)
                     amount = Decimal(bet_amount)
@@ -170,7 +229,12 @@ class Home(TemplateView):
                 except Bank.DoesNotExist:
                     return JsonResponse({'status': 'error', 'message': 'no_bank'}, status=400)
                 
-                bet_instance = Transactions(user=user, bet=bet_amount, multiplier=0, won=0, game_id=game_id)
+               
+               
+                     
+
+                # Create and save the transaction instance
+                bet_instance = Transactions(user=user, bet=bet_amount, multiplier=0, won=0, game_id=game_id,game_set_id=game_set_id, bet_placed=True, group_name=group_name)
                 bet_instance.save()
                 
                 response_data = {
@@ -179,6 +243,13 @@ class Home(TemplateView):
                     'bet_amount': bet_amount,
                     'username': user.user_name
                 }
+                user_count = cache.get("realtime_betting_users_count")
+                if user_count is None:
+                    user_count = 1
+                else:
+                    user_count += 1
+                cache.set("realtime_betting_users_count", user_count)
+                        
                 return JsonResponse(response_data, status=200)
             else:
                 response_data = {
@@ -194,27 +265,30 @@ class Home(TemplateView):
             }
             return JsonResponse(response_data, status=400)
     
-    def get_betting_window_state(self):
+    def get_betting_window_state(self, group_name):
         cached_state = cache.get('betting_window_state')
-        cached_game_id = cache.get('game_id')
+        cached_game_id = cache.get(f'{group_name}_game_id')
+        cache_game_set_id = cache.get('game_set_id')
         
-        if cached_state is not None and cached_game_id is not None:
-            return cached_state, cached_game_id
+        if cached_state is not None and cached_game_id is not None and cache_game_set_id is not None:
+            return cached_state, cached_game_id, cache_game_set_id
         
-        betting_window, game_id = self.database_fetch_betting_window_state()
+        betting_window, game_id, game_set_id = self.database_fetch_betting_window_state(group_name)
         
-        cache.set('betting_window_state', betting_window, timeout=3600)
-        cache.set('game_id', game_id, timeout=3600)
+       
         
-        return betting_window, game_id
+        
+        return betting_window, game_id, game_set_id
     
-    def database_fetch_betting_window_state(self):
+    def database_fetch_betting_window_state(self, group_name):
         betting_window_object = BettingWindow.objects.first()
         betting_window = betting_window_object.is_open
-        game_id_object = Games.objects.order_by('created_at').first()
+        game_id_object = Games.objects.filter(group_name= group_name).order_by('created_at').last()
+        game_set_id_object = GameSets.objects.order_by('created_at').last()
         game_id = game_id_object.game_id
+        game_set_id = game_set_id_object.game_set_id
         
-        return betting_window, game_id
+        return betting_window, game_id, game_set_id
 
     
 class CashoutView(View):
@@ -312,27 +386,451 @@ class CashoutView(View):
     
     
     
-class DepositView(TemplateView):
-    template_name = 'deposit.html'
-    
-class WithdrawView(TemplateView):
-    template_name = 'withdraw.html'
-    
-class AdminView(TemplateView):
-    template_name = 'admin.html'
-    
-
+class DepositView(View):
+    decorators = [csrf_protect, login_required, transaction.atomic]
+    @method_decorator(decorators)
     def post(self, request, *args, **kwargs):
+        
+       
+        deposit_amount = request.POST.get('deposit_amount')
+        
+        user = request.user
+        amount_to_add = Decimal(deposit_amount)
+
+        
+
+        try:
+            bank_instance = Bank.objects.select_for_update().get(user=user)
+            bank_instance.balance += amount_to_add
+            bank_instance.save()
+            response_data = {
+                        'status': 'success',
+                        'message': 'Deposit successful'
+                    }
+        except Bank.DoesNotExist:
+            response_data =  {'status': 'error', 'message': 'no_bank'}
+
+                    
+                
+        return JsonResponse(response_data, status=400 if response_data['status'] == 'error' else 200)
+    
+class WithdrawView(View):
+    decorators = [csrf_protect, login_required, transaction.atomic]
+    @method_decorator(decorators)
+    def post(self, request, *args, **kwargs):
+        
+       
+        withdraw_amount = request.POST.get('withdraw_amount')
+        
+        user = request.user
+        amount_to_subtract = Decimal(withdraw_amount)
+
+        
+
+        try:
+            bank_instance = Bank.objects.select_for_update().get(user=user)
+            bank_instance.balance -= amount_to_subtract
+            bank_instance.save()
+            response_data = {
+                        'status': 'success',
+                        'message': 'Withdrawal successful'
+                    }
+        except Bank.DoesNotExist:
+            response_data =  {'status': 'error', 'message': 'no_bank'}
+
+                    
+                
+        return JsonResponse(response_data, status=400 if response_data['status'] == 'error' else 200)
+ 
+# @method_decorator(permission_required('crash.customadminpermission', raise_exception=True), name='dispatch')
+# @method_decorator(login_required, name='dispatch')
+class AdminView(TemplateView):
+    template_name = 'admin2.html'
+
+
+    async def post(self, request, *args, **kwargs):
         action = request.POST.get('action')
 
         if action == 'start':
-            # Check if a task is already running
-            call_command('rungame')
-            print('started')
-            
+            try:
+                # Find and terminate the 'rungame' process if it's running
+                subprocess.run(['pkill', '-f', 'rungame'])
+
+                # Start the game as an asynchronous subprocess
+                process = await asyncio.create_subprocess_exec(
+                    'python', 'manage.py', 'rungame',
+                    stdout=asyncio.subprocess.PIPE,
+                    stderr=asyncio.subprocess.PIPE,
+                )
+
+                # Log the stdout output asynchronously
+                async def log_output():
+                    async for line in process.stdout:
+                        logger.info(line.decode().strip())
+
+                # Start logging the output without waiting for it to complete
+                asyncio.create_task(log_output())
+
+                response_data = {'message': 'Game started successfully.'}
+                return JsonResponse(response_data, status=200)
+            except Exception as e:
+                response_data = {'error': f'Error starting the game: {str(e)}'}
+                print(response_data)
+                return JsonResponse(response_data, status=500)
+
         elif action == 'stop':
-            call_command('run_game')
+            try:
+                # Find and kill the 'rungame' process
+                subprocess.run(['pkill', '-f', 'rungame'])
+                response_data = {'message': 'Game stopped successfully.'}
+                return JsonResponse(response_data, status=200)
+            except Exception as e:
+                response_data = {'error': f'Error stopping the game: {str(e)}'}
+                return JsonResponse(response_data, status=500)
 
-        return render(request, self.template_name)
 
+        else:
+            response_data = {'error': 'Invalid action'}
+            return JsonResponse(response_data, status=400)
+        
+
+    @sync_to_async
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        try:
+            user = self.request.user
+            owners_bank = OwnersBank.objects.get(user=user)
+            pot_amount = owners_bank.total_cash
+            profit = owners_bank.profit_to_owner
+            revenue = owners_bank.total_real
+            players_online = cache.get("realtime_group_user_count")
+            players_betting = cache.get("realtime_betting_users_count")
+            players_lost = cache.get("bets_lost_user_count")
+            players_won = cache.get("bets_won_user_count")
+            
+            context['pot_amount'] = pot_amount
+            context['profit'] = profit
+            context['revenue'] = revenue
+            context['players_online'] = players_online
+            context['players_betting'] = players_betting
+            context['players_lost'] = players_lost
+            context['players_won'] = players_won
+            
+        except OwnersBank.DoesNotExist:
+            return 
+            print("OwnersBank record does not exist for the user:", self.request.user)
+        
+        return context
+    
+      
+    async def get(self, request, *args, **kwargs):
+        
+        @sync_to_async 
+        def check_authentication(user):
+            if self.request.user.is_authenticated:
+                return True
+            
+        if await check_authentication(self.request.user):
+            context = await self.get_context_data()
+            return render(request, self.template_name, context)
+        else:
+            return render(request, 'adminlogin.html')
+        
+        
+@method_decorator(login_required, name='dispatch')
+class BalloonChosenView(View):
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        transaction_instance = Transactions.objects.filter(user=user).order_by('created_at').last()
+        games_instance = Games.objects.filter(group_name=transaction_instance.group_name).order_by('created_at').last()
+        if transaction_instance.game_id == games_instance.game_id:
+            print(transaction_instance.group_name)
+            response = {
+                'group_name': transaction_instance.group_name
+                
+            }
+        else:
+            response = {
+                'group_name': ''
+                
+            }
+        
+        return JsonResponse(response)
+    
+class TestView(View):
+    
+    async def post(self, request, *args, **kwargs):
+        action = request.POST.get('action')
+         
+     
+
+        if action == 'start':
+            try:
+                # Retrieve data from the POST request
+                num_users = int(request.POST.get('num_users'))
+                risk_factor = int(request.POST.get('risk_factor'))
+
+                    
+                        # Find and terminate the 'simulations' process if it's running
+                subprocess.run(['pkill', '-f', 'simulations'])
+
+                    # Define the log file path
+                file_path = os.path.join(settings.MEDIA_ROOT, 'simulationslog.txt')
+
+                # Open the log file in append mode
+                with open(file_path, 'a') as log_file:
+                    # Start the game as an asynchronous subprocess and redirect stdout to the log file
+                    process = await asyncio.create_subprocess_exec(
+                        'python', 'manage.py', 'simulations',
+                        f'--risk_factor={risk_factor}', f'--num_users={num_users}',
+                        stdout=log_file,  # Redirect stdout to the log file
+                        
+                    )
+                    
+                    
+                    
+            
+                
+
+                response_data = {'message': 'Simulation started'}
+                return JsonResponse(response_data, status=200)
+            except Exception as e:
+                response_data = {'error': f'Error starting the simulation: {str(e)}'}
+                print(response_data)
+                return JsonResponse(response_data, status=500)
+
+        elif action == 'stop':
+            try:
+                # Find and kill the 'rungame' process
+                subprocess.run(['pkill', '-f', 'simulations'])
+                response_data = {'message': 'Test stopped successfully.'}
+                return JsonResponse(response_data, status=200)
+            except Exception as e:
+                response_data = {'error': f'Error stopping the game: {str(e)}'}
+                return JsonResponse(response_data, status=500)
+
+
+        else:
+            response_data = {'error': 'Invalid action'}
+            return JsonResponse(response_data, status=400)
   
+  
+@login_required   
+def download_users_json(request):
+    file_path = os.path.join(settings.MEDIA_ROOT, 'simulationslog.txt')
+
+    # Check if the file exists
+    if os.path.exists(file_path):
+        with open(file_path, 'rb') as file:
+            response = HttpResponse(file.read(), content_type='text/plain')  # Use 'text/plain' for a plain text file
+            response['Content-Disposition'] = f'attachment; filename=simulationslog.txt'  # Correct filename
+            return response
+    else:
+        return HttpResponse('The file does not exist.', status=404)   
+        
+# @login_required   
+# def download_users_json(request):
+#     # Path to the users.json file in the media directory
+#     file_path = os.path.join(settings.MEDIA_ROOT, 'users.json')
+
+#     # Check if the file exists
+#     if os.path.exists(file_path):
+#         with open(file_path, 'rb') as file:
+#             response = HttpResponse(file.read(), content_type='application/json')
+#             response['Content-Disposition'] = f'attachment; filename=users.json'
+#             return response
+#     else:
+#         return HttpResponse('The file does not exist.', status=404)
+
+class AdminViewWithRespawn(TemplateView):
+    template_name = 'theadminwithrespawn.html'
+
+
+    async def post(self, request, *args, **kwargs):
+        action = request.POST.get('action')
+        respawn = request.POST.get('respawn')
+        if respawn == 'true':
+            try:
+                # Find and terminate the 'rungame' process if it's running
+                subprocess.run(['pkill', '-f', 'respawn'])
+
+                # Start the game as an asynchronous subprocess
+                process = await asyncio.create_subprocess_exec(
+                    'python', 'manage.py', 'respawn',
+                    stdout=asyncio.subprocess.PIPE,
+                    stderr=asyncio.subprocess.PIPE,
+                )
+
+                # Log the stdout output asynchronously
+                async def log_output():
+                    async for line in process.stdout:
+                        logger.info(line.decode().strip())
+
+                # Start logging the output without waiting for it to complete
+                asyncio.create_task(log_output())
+
+                response_data = {'message': 'Respawn started successfully.'}
+                return JsonResponse(response_data, status=200)
+            except Exception as e:
+                response_data = {'error': f'Error starting the respawn: {str(e)}'}
+                print(response_data)
+                return JsonResponse(response_data, status=500)
+        elif respawn == 'false':
+            try:
+                # Find and kill the 'rungame' process
+                subprocess.run(['pkill', '-f', 'respawn'])
+                response_data = {'message': 'respawn stopped successfully.'}
+                return JsonResponse(response_data, status=200)
+            except Exception as e:
+                response_data = {'error': f'Error stopping the respawn: {str(e)}'}
+                return JsonResponse(response_data, status=500)
+            
+
+        if action == 'start':
+            try:
+                # Find and terminate the 'rungame' process if it's running
+                subprocess.run(['pkill', '-f', 'rungame'])
+
+                # Start the game as an asynchronous subprocess
+                process = await asyncio.create_subprocess_exec(
+                    'python', 'manage.py', 'rungame',
+                    stdout=asyncio.subprocess.PIPE,
+                    stderr=asyncio.subprocess.PIPE,
+                )
+
+                # Log the stdout output asynchronously
+                async def log_output():
+                    async for line in process.stdout:
+                        logger.info(line.decode().strip())
+
+                # Start logging the output without waiting for it to complete
+                asyncio.create_task(log_output())
+
+                response_data = {'message': 'Game started successfully.'}
+                return JsonResponse(response_data, status=200)
+            except Exception as e:
+                response_data = {'error': f'Error starting the game: {str(e)}'}
+                print(response_data)
+                return JsonResponse(response_data, status=500)
+
+        elif action == 'stop':
+            try:
+                # Find and kill the 'rungame' process
+                subprocess.run(['pkill', '-f', 'rungame'])
+                response_data = {'message': 'Game stopped successfully.'}
+                return JsonResponse(response_data, status=200)
+            except Exception as e:
+                response_data = {'error': f'Error stopping the game: {str(e)}'}
+                return JsonResponse(response_data, status=500)
+
+
+        else:
+            response_data = {'error': 'Invalid action'}
+            return JsonResponse(response_data, status=400)
+        
+
+    @sync_to_async
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        try:
+            user = self.request.user
+            owners_bank = OwnersBank.objects.get(user=user)
+            pot_amount = owners_bank.total_cash
+            profit = owners_bank.profit_to_owner
+            revenue = owners_bank.total_real
+            players_online = cache.get("realtime_group_user_count")
+            players_betting = cache.get("realtime_betting_users_count")
+            players_lost = cache.get("bets_lost_user_count")
+            players_won = cache.get("bets_won_user_count")
+            
+            context['pot_amount'] = pot_amount
+            context['profit'] = profit
+            context['revenue'] = revenue
+            context['players_online'] = players_online
+            context['players_betting'] = players_betting
+            context['players_lost'] = players_lost
+            context['players_won'] = players_won
+            
+        except OwnersBank.DoesNotExist:
+            return 
+            print("OwnersBank record does not exist for the user:", self.request.user)
+        
+        return context
+    
+      
+    async def get(self, request, *args, **kwargs):
+        
+        @sync_to_async 
+        def check_authentication(user):
+            if self.request.user.is_authenticated:
+                return True
+            
+        if await check_authentication(self.request.user):
+            context = await self.get_context_data()
+            return render(request, self.template_name, context)
+        else:
+            return render(request, 'adminlogin.html')
+class TopWinnersView(View):
+    def get(self, request, *args, **kwargs):
+        # Get the top 5 transactions with the highest 'won' values
+        top_5_transactions = Transactions.objects.filter(game_played=True).order_by('-won')[:5]
+
+        # Serialize the transaction data to JSON
+        top_winners_data = [{
+            'user': transaction.user.user_name,
+            'bet': transaction.bet,
+            'multiplier': float(transaction.multiplier),
+            'won': float(transaction.won),
+            'balloon': self.get_balloon_color(transaction.group_name),
+            # Add other fields as needed
+        } for transaction in top_5_transactions]
+        
+        # print(top_winners_data)
+
+        # Return the data as JSON response
+        return JsonResponse(top_winners_data, safe=False)
+    
+    def get_balloon_color(self, group_name):
+        if group_name == 'group_1':
+            return 'blue'
+        elif group_name == 'group_2':
+            return 'red'
+        elif group_name == 'group_3':
+            return 'green'
+        else:
+            return 'purple'
+    
+    
+@method_decorator(login_required, name='dispatch')
+class UserBetsView(View):
+    def get(self, request, *args, **kwargs):
+        user = self.request.user
+
+        # Retrieve the top 10 transactions for the logged-in user
+        top_10_transactions = Transactions.objects.filter(user=user, game_played=True).order_by('-created_at')[:10]
+
+        # Serialize the transaction data to JSON
+        user_bets_data = [{
+            'created_at': transaction.created_at.strftime('%Y-%m-%d %H:%M:%S'),  # Format the date as needed
+            'game_id': transaction.game_id,
+            'stake': float(transaction.bet),
+            'multiplier': float(transaction.multiplier),
+            'balloon': self.get_balloon_color(transaction.group_name),
+            'won': float(transaction.won),
+            # Add other fields as needed
+        } for transaction in top_10_transactions]
+
+        # Return the data as JSON response
+        return JsonResponse(user_bets_data, safe=False)
+
+    def get_balloon_color(self, group_name):
+        if group_name == 'group_1':
+            return 'blue'
+        elif group_name == 'group_2':
+            return 'red'
+        elif group_name == 'group_3':
+            return 'green'
+        else:
+            return 'purple'
