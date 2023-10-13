@@ -109,6 +109,20 @@ class Transactions(models.Model):
     def __str__(self):
         return str(self.user)
     
+class TransactionsForLastGameBet(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    balloon_betted_on = models.CharField(max_length=200,default='')
+    game_id = models.CharField(max_length=200)
+    game_set_id = models.CharField(max_length=200)
+    created_at = models.DateTimeField(auto_now=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    game_played = models.BooleanField(default=False)
+    bet_placed = models.BooleanField(default=False)
+    
+    def __str__(self):
+        return str(self.user)
+    
+    
 
 class Bank(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

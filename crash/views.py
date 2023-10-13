@@ -834,3 +834,109 @@ class UserBetsView(View):
             return 'green'
         else:
             return 'purple'
+
+@method_decorator(login_required, name='dispatch')
+class BetOnLastBalloon(View):
+   
+    def post(self, request, *args, **kwargs):
+        user = self.request.user
+        print(request.POST.get('group_name'))
+        
+        betting_window_state, game_id, game_set_id = self.get_betting_window_state(request.POST.get('group_name'))
+        if betting_window_state:
+            if self.request.user.is_authenticated:
+            
+                group_name = request.POST.get('group_name')
+                bet_amount = request.POST.get('bet_amount')
+                user = self.request.user
+                
+                  # Check if a transaction with the same game_id exists
+                if TransactionsForLastGameBet.objects.filter(game_id=game_id, user=user).exists():
+                    # raise ValidationError("A transaction with this game_id already exists.")
+                    response_data = {
+                    'status': 'error',
+                    'message': 'A transaction with this game_id already exists',
+                        }
+                    return JsonResponse(response_data, status=400)
+                if TransactionsForLastGameBet.objects.filter(game_set_id=game_set_id, user=user).exists():
+                    # raise ValidationError("A transaction with this game_set_id already exists.")
+                    response_data = {
+                    'status': 'error',
+                    'message': 'A transaction with this game_set_id already exists',
+                        }
+                    return JsonResponse(response_data, status=400)
+                    
+                try:
+                    bank_instance = Bank.objects.select_for_update().get(user=user)
+                    amount = Decimal(bet_amount)
+                    if bank_instance.balance >= amount:
+                        bank_instance.balance -= amount
+                        bank_instance.save()
+                    else:
+                        return JsonResponse({'status': 'error', 'message': 'insufficient_funds'}, status=400)
+                except Bank.DoesNotExist:
+                    return JsonResponse({'status': 'error', 'message': 'no_bank'}, status=400)
+                
+               
+               
+                     
+
+                # Create and save the transaction instance
+                bet_instance = TransactionsForLastGameBet(user=user, bet=bet_amount, game_id=game_id,game_set_id=game_set_id, bet_placed=True, balloon_betted_on=group_name)
+                bet_instance.save()
+                
+                response_data = {
+                    'status': 'success',
+                    'message': 'Bet placed successfully',
+                    'bet_amount': bet_amount,
+                    'username': user.user_name
+                }
+                user_count = cache.get("realtime_betting_users_count")
+                if user_count is None:
+                    user_count = 1
+                else:
+                    user_count += 1
+                cache.set("realtime_betting_users_count", user_count)
+                        
+                return JsonResponse(response_data, status=200)
+            else:
+                response_data = {
+                    'status': 'error',
+                    'message': 'Please login to place bet',
+                    
+                }
+                return JsonResponse(response_data, status=400)
+        else:
+            response_data = {
+                'status': 'error',
+                'message': 'Bet not placed, betting window closed'
+            }
+            return JsonResponse(response_data, status=400)
+        
+        
+        
+    def get_betting_window_state(self, group_name):
+        cached_state = cache.get('betting_window_state')
+        cached_game_id = cache.get(f'{group_name}_game_id')
+        cache_game_set_id = cache.get('game_set_id')
+        
+        if cached_state is not None and cached_game_id is not None and cache_game_set_id is not None:
+            return cached_state, cached_game_id, cache_game_set_id
+        
+        # betting_window, game_id, game_set_id = self.database_fetch_betting_window_state(group_name)
+        
+       
+        
+        
+        # return betting_window, game_id, game_set_id
+    
+    def database_fetch_betting_window_state(self, group_name):
+        betting_window_object = BettingWindow.objects.first()
+        betting_window = betting_window_object.is_open
+        game_id_object = Games.objects.filter(group_name= group_name).order_by('created_at').last()
+        game_set_id_object = GameSets.objects.order_by('created_at').last()
+        game_id = game_id_object.game_id
+        game_set_id = game_set_id_object.game_set_id
+        
+        return betting_window, game_id, game_set_id
+    

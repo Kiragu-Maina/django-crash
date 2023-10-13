@@ -189,29 +189,7 @@
              
             <div class="col-md-4">
               
-              <div class="balloon-container">
-                
-                <!-- Balloon 1 -->
-                <div id="balloon1" class="balloon" onclick="handleBalloonClick('group_1')">
-                    <img src="{% static 'assets/balloon1.png' %}" alt="Balloon 1">
-                </div>
-    
-                <!-- Balloon 2 -->
-                <div id="balloon2" class="balloon" onclick="handleBalloonClick('group_2')">
-                    <img src="{% static 'assets/balloon2.png' %}" alt="Balloon 2">
-                </div>
-    
-                <!-- Balloon 3 -->
-                <div id="balloon3" class="balloon" onclick="handleBalloonClick('group_3')">
-                    <img src="{% static 'assets/balloon3.png' %}" alt="Balloon 3">
-                </div>
-    
-                <!-- Balloon 4 -->
-                <div id="balloon4" class="balloon" onclick="handleBalloonClick('group_4')">
-                    <img src="{% static 'assets/balloon4.png' %}" alt="Balloon 4">
-                </div>
-            </div>
-              <form id="bet-form" method='post'>
+                       <form id="bet-form" method='post'>
                 {% csrf_token %}
                     
                       <div class="row">
@@ -252,13 +230,43 @@
                       <input type="hidden" id="betAmount" name="bet_amount">
 
                   </form>
-                  <div class="col-md-7 mb-3">
-                    <button class="btn btn-primary btn-block" id="cashout-button">CASH OUT</button>
-                </div>
-                <div class="col-md-7 mb-3">
-                  <span  class="nav-link text-red font-weight-bold px-0" id="error-text" style="font-style: italic; display: none;"><span>
-              </div>
-                 
+                  
+            <div class="col-md-7 mb-3" style="padding:5px;">
+              <button class="btn btn-primary btn-block" id="cashout-button">CASH OUT</button>
+          </div>
+          <div id="bet_on_last_game_to_crash" style="display:none">
+            
+              <p>Enter amount and click last balloon to crash for 2X</p>
+              {% comment %} <p class="ad-text">Simply enter the amount and click on the balloon you think will crash last</p> {% endcomment %}
+          
+          
+            <div class="col-md-7 mb-3">
+              <input type="number" class="form-control" id="selected-bet-amount">
+          </div>
+            <div class="new-balloon-row">
+              
+          <div id="new-balloonA" class="balloon" onclick="handleNewBalloonClick('group_1')">
+              <img src="{% static 'assets/balloon1.png' %}" alt="New Balloon A">
+          </div>
+      
+          <div id="new-balloonB" class="balloon" onclick="handleNewBalloonClick('group_2')">
+              <img src="{% static 'assets/balloon2.png' %}" alt="New Balloon B">
+          </div>
+      
+          <div id="new-balloonC" class="balloon" onclick="handleNewBalloonClick('group_3')">
+              <img src="{% static 'assets/balloon3.png' %}" alt="New Balloon C">
+          </div>
+      
+          <div id="new-balloonD" class="balloon" onclick="handleNewBalloonClick('group_4')">
+              <img src="{% static 'assets/balloon4.png' %}" alt="New Balloon D">
+          </div>
+      </div>
+    </div>
+          <div class="col-md-7 mb-3">
+            <span  class="nav-link text-red font-weight-bold px-0" id="error-text" style="font-style: italic; display: none;"><span>
+        </div>
+       
+      
               </div>
               </div>
               <!-- Add a div for the table here -->
@@ -622,6 +630,7 @@ var withdraw = '{% url "withdraw" %}';
 var bet_placement = '{% url "placebet" %}';
 var top_winners = '{% url "top_winners" %}';
 var my_bets = '{% url "user_bets" %}';
+var betonlastballoon = '{% url "bet_on_last_balloon" %}';
 
 
     

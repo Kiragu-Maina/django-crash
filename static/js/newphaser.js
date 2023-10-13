@@ -1,1 +1,1067 @@
-const _0x2c684c=_0x9432;function _0x9432(_0x148510,_0x407871){const _0x3c8e58=_0x3c8e();return _0x9432=function(_0x943229,_0x172eda){_0x943229=_0x943229-0xba;let _0xe2b710=_0x3c8e58[_0x943229];return _0xe2b710;},_0x9432(_0x148510,_0x407871);}(function(_0x19f185,_0xba48a8){const _0x56fdd8=_0x9432,_0x289408=_0x19f185();while(!![]){try{const _0x216954=parseInt(_0x56fdd8(0x129))/0x1+-parseInt(_0x56fdd8(0xe4))/0x2*(-parseInt(_0x56fdd8(0x120))/0x3)+parseInt(_0x56fdd8(0x131))/0x4+-parseInt(_0x56fdd8(0x133))/0x5+parseInt(_0x56fdd8(0xf6))/0x6*(-parseInt(_0x56fdd8(0x102))/0x7)+parseInt(_0x56fdd8(0x109))/0x8*(parseInt(_0x56fdd8(0xcb))/0x9)+-parseInt(_0x56fdd8(0xf4))/0xa;if(_0x216954===_0xba48a8)break;else _0x289408['push'](_0x289408['shift']());}catch(_0x3aec80){_0x289408['push'](_0x289408['shift']());}}}(_0x3c8e,0xc9b99));function _0x3c8e(){const _0x17f302=['group_1','balloon','destroy','substring','roomName','bet-form','game_id','setPipeline','CASHOUT\x20(','#00ff00','setScale','dynamicBitmapText','771570jEFVWN','addEventListener','2194350PDJRfq','push','Place\x20your\x20bet','Geom','type','Between','GameObjects','send','pumpUp','popped','setTint','group_','14niKoBZ','disabled','text','lineStyle','Line','setText','Scene','8hifqPk','setTexture','create','setColor','/ws/realtime/','toFixed','group_name','wss://','pumpgreen','displayHeight','ongoing_synchronizer','removeTick','Popped\x20at\x20x','enable','click','ongoing','HSVColorWheel','tweens','pumpblueup','crash_instruction','cashout_validate','host','Error\x20clearing\x20balloons:','99KBIHea','Wait\x20for\x20new\x20game','cashout-button','Error\x20fetching\x20new\x20crash\x20point:','load','setInteractive','tick','error\x20is\x20','mid_start_synchronizer','765180eKkBfU','image','preload','Choose\x20balloon\x20in\x20','count_initial','message','close','pumppurpledown','2313596aldNie','allowballoonchange','3112690sCEIdq','initialScale','setOrigin','lights','Math','line','pumpbluedown','location','data','/ws/real_time_updates/','addLight','setData','group_4','clear','Animation\x20was\x20cancelled.','log','Choose\x20balloon.\x0a\x20Game\x20starts\x20soon.','desyrel','strokeLineShape','group_2','stop','forEach','counterText\x20is\x20null.','multiplier','round','group_3','parse','main\x20called','pumpredup','getElementById','pumpgreendown','onmessage','7438617rrdYVP','Color','Group','getChildren','crash_point','all','count','error','cached_multiplier','pumppurpleup','add','lights\x20called','pumpreddown','textContent','Light2D','length','setStrokeStyle','scaleX','Game\x20loading....','group','setAmbientColor','Game\x20starts\x20in\x20','count_update','Display','pumpgreenup','5292OnocDC','crashed','pointerdown','undefined'];_0x3c8e=function(){return _0x17f302;};return _0x3c8e();}class Example extends Phaser[_0x2c684c(0x108)]{[_0x2c684c(0x12b)](){const _0x3e06d3=_0x2c684c;this['load']['image']('balloon',balloon),this['load'][_0x3e06d3(0x12a)]('bg',space),this[_0x3e06d3(0x124)][_0x3e06d3(0x12a)](_0x3e06d3(0x11b),pumpblueup),this[_0x3e06d3(0x124)]['image'](_0x3e06d3(0x139),pumpbluedown),this['load'][_0x3e06d3(0x12a)](_0x3e06d3(0xc7),pumpredup),this[_0x3e06d3(0x124)]['image'](_0x3e06d3(0xd7),pumpreddown),this[_0x3e06d3(0x124)][_0x3e06d3(0x12a)](_0x3e06d3(0xe3),pumpgreenup),this[_0x3e06d3(0x124)][_0x3e06d3(0x12a)](_0x3e06d3(0xc9),pumpgreendown),this[_0x3e06d3(0x124)]['image']('pumppurpleup',pumppurpleup),this[_0x3e06d3(0x124)][_0x3e06d3(0x12a)](_0x3e06d3(0x130),pumppurpledown),this[_0x3e06d3(0x124)]['image']('popped',popped),this['load']['bitmapFont'](_0x3e06d3(0xbc),desyrelpng,desyrelxml);}async[_0x2c684c(0x10b)](){const _0x4bb9e0=_0x2c684c,_0xda34d1=this;let _0x471311=_0xda34d1[_0x4bb9e0(0xd5)][_0x4bb9e0(0x12a)](0x190,0x12c,'bg');_0x471311[_0x4bb9e0(0xf2)](2.7,3.5);const _0x18bb10=_0xda34d1[_0x4bb9e0(0xd5)][_0x4bb9e0(0x104)](0x190,0x1c,_0x4bb9e0(0xdd))[_0x4bb9e0(0x10c)](_0x4bb9e0(0xf1))['setFontSize'](0x20)['setShadow'](0x2,0x2)[_0x4bb9e0(0x135)](0.5,0x0);let _0xd1adab=_0x4bb9e0(0xfe),_0x41143f=null,_0x3abfcc=null;const _0x580344=_0xda34d1[_0x4bb9e0(0xd5)]['graphics'](),_0x6a6446=0xc8,_0x338cb1=0x190,_0x5b0f9e=0x1f4,_0x465a35=_0xda34d1[_0x4bb9e0(0xd5)]['graphics']({'lineStyle':{'width':0x6,'color':0xff}});let _0x30f81a,_0x555e6e,_0x540c02,_0x59c541,_0x5653cf=![],_0x3bb29f=!![];const _0x3f3b28=document[_0x4bb9e0(0xc8)]('bet-button');let _0x2fd869,_0x14f8e2,_0x32b787,_0x1dc8e6,_0x3177fa,_0x41f07f,_0x532028,_0x2ae799=!![],_0x2226a6,_0x1e43cc,_0x3fca73,_0x49b3da,_0x587bd1=!![],_0x1ba079=!![];const _0x295206=![];let _0x4e2bc4=null,_0x312f84=[],_0x3860ae=![],_0x2db2fa=![],_0x41eea5=![],_0x2b2312=![],_0x4e5039=[];_0x28178c(_0xda34d1),_0x3913ef();async function _0x3913ef(){const _0xa9715=_0x4bb9e0;console[_0xa9715(0xba)](_0xa9715(0xd6)),_0x471311=_0xda34d1[_0xa9715(0xd5)]['image'](0x190,0x12c,'bg')[_0xa9715(0xef)](_0xa9715(0xd9)),_0x471311['setScale'](2.7,3.5);const _0x4cd878=0x1388;_0xda34d1[_0xa9715(0x136)][_0xa9715(0x116)]()[_0xa9715(0xdf)](0x555555);const _0x27226a=Phaser[_0xa9715(0xe2)][_0xa9715(0xcc)][_0xa9715(0x119)](),_0x2a6465=0x50,_0x41bcf3=0x6;let _0x4fd61d=_0x2a6465,_0x38daf1=0x0;const _0x2ed0a3=0x6,_0x14575f=[];for(let _0x2a88f9=0x0;_0x2a88f9<_0x2ed0a3;_0x2a88f9++){const {color:_0x28dbe2}=_0x27226a[_0x2a88f9*0xa];_0x32b787=_0xda34d1[_0xa9715(0x136)][_0xa9715(0x13d)](_0x4fd61d,_0x38daf1,_0x2a6465,_0x28dbe2,_0x41bcf3);const _0x35545a=new Promise(_0x31b545=>{const _0x252c6a=_0xa9715,_0x3ccc71=_0xda34d1[_0x252c6a(0x11a)][_0x252c6a(0xd5)]({'targets':_0x32b787,'y':0x258,'yoyo':!![],'repeat':-0x1,'ease':'Sine.easeInOut','duration':_0x4cd878,'delay':_0x2a88f9*0x64,'onComplete'(){_0x31b545();}});});_0x14575f[_0xa9715(0xf7)](_0x35545a),_0x4fd61d+=_0x2a6465*0x2,_0x4fd61d>0x320&&(_0x4fd61d=_0x2a6465,_0x38daf1+=_0x2a6465);}await Promise[_0xa9715(0xd0)](_0x14575f);}async function _0x28178c(_0x3b50cd){const _0x2d4c0f=_0x4bb9e0;try{console[_0x2d4c0f(0xba)](_0x2d4c0f(0xc6));const _0x94eee2=new WebSocket(_0x2d4c0f(0x110)+window[_0x2d4c0f(0x13a)][_0x2d4c0f(0x11e)]+_0x2d4c0f(0x10d));_0x94eee2[_0x2d4c0f(0xca)]=async function(_0x248dcc){const _0x5bc99d=_0x2d4c0f;_0x18bb10&&_0x18bb10[_0x5bc99d(0xea)]();const _0x18a307=JSON['parse'](_0x248dcc[_0x5bc99d(0x13b)]);console[_0x5bc99d(0xba)](_0x18a307);if(_0x18a307[_0x5bc99d(0xfa)]===_0x5bc99d(0x113)){if(_0x18a307[_0x5bc99d(0x12e)]===_0x5bc99d(0xe5)){if(!_0x2b2312){_0x1dc8e6&&_0x1dc8e6[_0x5bc99d(0xea)]();_0x5e88ac();const _0x1575b5=_0x18a307[_0x5bc99d(0xcf)],_0x2b0a0a=_0x18a307[_0x5bc99d(0x10f)];_0xcb6f03(_0x1575b5,_0x2b0a0a);}else{const _0x39dc7c=_0x18a307[_0x5bc99d(0x10f)],_0x45ae9d=_0x18a307[_0x5bc99d(0xcf)],_0x171f80=Phaser[_0x5bc99d(0x137)][_0x5bc99d(0xfb)](0x64,0x258),_0x24887c=Phaser['Math'][_0x5bc99d(0xfb)](0x64,0x96),_0x6312ac=_0x3b50cd['add'][_0x5bc99d(0x12a)](_0x171f80,_0x24887c,_0x5bc99d(0xff));_0x540c02=_0x3b50cd[_0x5bc99d(0xd5)]['dynamicBitmapText'](_0x171f80,_0x24887c,_0x5bc99d(0xbc))['setOrigin'](0.5,0x0),_0x540c02['setText']('x'+_0x45ae9d),_0x4e5039[_0x5bc99d(0xf7)]({'background':_0x6312ac,'text':_0x540c02});switch(_0x39dc7c){case _0x5bc99d(0xe8):break;case _0x5bc99d(0xbe):_0x6312ac['setTint'](0xff0000);break;case _0x5bc99d(0xc4):_0x6312ac[_0x5bc99d(0x100)](0xff00);break;case _0x5bc99d(0x13f):_0x6312ac['setTint'](0x800080);break;default:_0x6312ac[_0x5bc99d(0x100)](0xff);break;}setTimeout(()=>{const _0x2b035b=_0x5bc99d;_0x4e5039[_0x2b035b(0xc0)](({background:_0x190317,text:_0x53ee30})=>{const _0x534256=_0x2b035b;_0x190317['destroy'](),_0x53ee30[_0x534256(0xea)]();});},0x7d0);}}else{if(_0x18a307[_0x5bc99d(0x12e)]===_0x5bc99d(0x118)){if(!_0x2b2312){_0x1dc8e6&&_0x1dc8e6[_0x5bc99d(0xea)]();const _0x4534aa=_0x18a307[_0x5bc99d(0xd3)],_0x555f1b=_0x18a307[_0x5bc99d(0x10f)];_0x4bc45c(_0x4534aa,_0x555f1b),_0x525736(_0x4534aa);}}}}else{if(_0x18a307[_0x5bc99d(0xfa)]==='start_synchronizer'){_0x1e43cc&&_0x1e43cc[_0x5bc99d(0x12f)]();_0x3fca73&&_0x3fca73['destroy']();_0x41143f&&(_0x41143f['stop'](),_0x41143f=null);try{_0x14f8e2&&_0x14f8e2 instanceof Phaser[_0x5bc99d(0xfc)][_0x5bc99d(0xcd)]&&_0x14f8e2['clear'](!![],!![]);}catch(_0x5a0db8){console[_0x5bc99d(0xd2)](_0x5bc99d(0x11f),_0x5a0db8);}_0x532028&&(clearTimeout(_0x532028),_0x532028=null),_0x3177fa&&_0x3177fa[_0x5bc99d(0xea)](),_0x1dc8e6&&_0x1dc8e6[_0x5bc99d(0xea)](),await _0x5e88ac(),_0x471311=_0x3b50cd[_0x5bc99d(0xd5)][_0x5bc99d(0x12a)](0x190,0x12c,'bg')[_0x5bc99d(0xef)](_0x5bc99d(0xd9)),_0x471311[_0x5bc99d(0xf2)](2.7,3.5),_0x3860ae=![],window['allowballoonchange']=!![],_0x1ba079=!![],_0x2b2312=!![],_0x3fca73=_0x3b50cd[_0x5bc99d(0xd5)]['dynamicBitmapText'](0x190,0x64,_0x5bc99d(0xbc))[_0x5bc99d(0x135)](0.5,0x0),_0x3fca73[_0x5bc99d(0x107)](_0x5bc99d(0xbb));}else _0x18a307[_0x5bc99d(0xfa)]===_0x5bc99d(0x128)&&(_0x3fca73&&_0x3fca73['destroy'](),_0x41143f&&(_0x41143f[_0x5bc99d(0xbf)](),_0x41143f=null),_0x532028&&(clearTimeout(_0x532028),_0x532028=null),_0x3177fa&&_0x3177fa[_0x5bc99d(0xea)](),_0x1dc8e6&&_0x1dc8e6['destroy'](),_0x465a35[_0x5bc99d(0x140)](),window[_0x5bc99d(0x132)]=!![],_0x1ba079=!![],_0x20239b(_0x18a307[_0x5bc99d(0x13b)]));}};}catch(_0x52360b){console[_0x2d4c0f(0xd2)](_0x2d4c0f(0x123),_0x52360b);}}async function _0x20239b(_0xcbc3cf){const _0x210c5b=_0x4bb9e0;_0x540c02&&_0x540c02[_0x210c5b(0xea)]();_0x3fca73&&_0x3fca73[_0x210c5b(0xea)]();_0x540c02&&_0x540c02[_0x210c5b(0xea)]();_0x30f81a&&_0x30f81a[_0x210c5b(0xea)]();_0x59c541&&_0x59c541[_0x210c5b(0xea)]();_0x1dc8e6&&_0x1dc8e6[_0x210c5b(0xea)]();if(_0x312f84)for(var _0x4feedd=0x0;_0x4feedd<_0x312f84['length'];_0x4feedd++){_0x312f84[_0x4feedd][_0x210c5b(0xea)]();}const _0x310e3c=0x3e8,_0x5af4e3=0x1,_0x43b209=0xa;let _0x140a6f;const _0x954e26=[0x54deff,0xff0000,0xff00,0x800080],_0xc22079=0x2,_0x2620b4=_0xcbc3cf['count'];if(_0x2620b4>=_0xc22079){_0x3fca73&&_0x3fca73[_0x210c5b(0xea)]();_0x3fca73=_0xda34d1['add'][_0x210c5b(0xf3)](0x190,0x64,_0x210c5b(0xbc))[_0x210c5b(0x135)](0.5,0x0),_0x3fca73[_0x210c5b(0x107)](_0x210c5b(0x12c)+(_0x2620b4-0x1));if(_0x1ba079){_0x1ba079=![];for(let _0xc60656=0x0;_0xc60656<0x4;_0xc60656++){const _0x19fa84=0x96+_0xc60656*0x96,_0x1a7a2b=_0x210c5b(0x101)+(_0xc60656+0x1);_0x140a6f=_0xda34d1[_0x210c5b(0xd5)]['image'](_0x19fa84,0x12c,_0x210c5b(0xe9)),_0x140a6f[_0x210c5b(0x100)](_0x954e26[_0xc60656]),_0x140a6f[_0x210c5b(0x125)](),_0x140a6f[_0x210c5b(0x13e)](_0x210c5b(0xde),_0x1a7a2b),_0x140a6f[_0x210c5b(0xf2)](0.3),_0x140a6f['on'](_0x210c5b(0xe6),function(){const _0x4f5996=_0x210c5b,_0x27e8d4=this['getData'](_0x4f5996(0xde));_0x4e2bc4!==null&&_0x4e2bc4[_0x4f5996(0x114)](),this['addTick'](),_0x4e2bc4=this,handleBalloonClick(_0x27e8d4);}),_0x140a6f['addTick']=function(){const _0x38ded9=_0x210c5b,_0x443c91=_0xda34d1[_0x38ded9(0xd5)][_0x38ded9(0x138)](0x0,0x0,0x0,0x14,0x0,0x0,0xffffff);_0x443c91[_0x38ded9(0xdb)](0x3,0xffffff),_0x443c91['x']=this['x'],_0x443c91['y']=this['y']+this[_0x38ded9(0x112)]/0x2+0xa,_0x443c91['setOrigin'](0x0,0x0),this[_0x38ded9(0x126)]=_0x443c91;},_0x140a6f['removeTick']=function(){const _0x1f6fb3=_0x210c5b;this[_0x1f6fb3(0x126)]&&(this[_0x1f6fb3(0x126)]['destroy'](),this[_0x1f6fb3(0x126)]=null);},_0x312f84[_0x210c5b(0xf7)](_0x140a6f);}}return;}_0x3fca73&&_0x3fca73['destroy'](),_0xda34d1[_0x210c5b(0x126)]&&_0xda34d1[_0x210c5b(0x126)][_0x210c5b(0xea)](),_0x2fd869=_0xcbc3cf[_0x210c5b(0xee)],_0x5653cf=![],_0x3bb29f=!![],await _0x4111c4();}async function _0x4111c4(){const _0x538f68=_0x4bb9e0;!_0x3860ae&&(_0x3860ae=!![],window[_0x538f68(0x132)]=!![],_0x3f3b28[_0x538f68(0x103)]=![],_0x587bd1=![],window[_0x538f68(0xec)]?(_0x2226a6=window[_0x538f68(0xec)],handleBalloonClick(_0x2226a6),_0x1e43cc=new WebSocket(_0x538f68(0x110)+window[_0x538f68(0x13a)][_0x538f68(0x11e)]+'/ws/real_time_updates/'+_0x2226a6+'/'),await _0x499529()):(_0x2226a6=_0x538f68(0xe8),handleBalloonClick(_0x2226a6),_0x1e43cc=new WebSocket(_0x538f68(0x110)+window[_0x538f68(0x13a)][_0x538f68(0x11e)]+_0x538f68(0x13c)+_0x2226a6+'/'),await _0x499529()));}async function _0x499529(){const _0x455141=_0x4bb9e0;window[_0x455141(0x132)]=![],_0x59c541=_0xda34d1[_0x455141(0xd5)][_0x455141(0xf3)](0x190,0xc8,_0x455141(0xbc),'')['setOrigin'](0.5,0x0),_0x59c541['setText'](_0x455141(0xf8)),_0x1e43cc['onmessage']=async function(_0x19eb13){const _0x11315e=_0x455141,_0x2ea7ac=JSON[_0x11315e(0xc5)](_0x19eb13['data']);if(_0x2ea7ac[_0x11315e(0xfa)]===_0x11315e(0x11c)){const _0x3d3897=_0x2ea7ac[_0x11315e(0xcf)],_0x399eec=_0x2ea7ac[_0x11315e(0x10f)];_0x2b2312=![],_0xcb6f03(_0x3d3897,_0x399eec);}else{if(_0x2ea7ac[_0x11315e(0xfa)]==_0x11315e(0x12d))_0x2ae799&&(window[_0x11315e(0x132)]=![],_0x2ae799=![],_0x1dc8e6&&_0x1dc8e6[_0x11315e(0xea)](),_0x471311=_0xda34d1['add'][_0x11315e(0x12a)](0x190,0x12c,'bg')[_0x11315e(0xef)](_0x11315e(0xd9)),_0x471311[_0x11315e(0xf2)](2.7,3.5)),_0x555e6e&&_0x555e6e[_0x11315e(0xea)](),_0x540c02&&_0x540c02[_0x11315e(0xea)](),await _0x41691b(_0x2ea7ac[_0x11315e(0xd1)]);else{if(_0x2ea7ac[_0x11315e(0xfa)]==_0x11315e(0xe1)){if(_0x3bb29f){_0x3bb29f=![];const _0x3770b9=0.5;_0x4bc45c(_0x3770b9,_0x2226a6);}_0x555e6e&&_0x555e6e[_0x11315e(0xea)](),_0x59c541&&_0x59c541[_0x11315e(0xea)](),_0x277e5b();}}}};}async function _0x5e88ac(){const _0x2f01ac=_0x4bb9e0;console['log']('cleargamescene\x20called');_0x1dc8e6&&_0x1dc8e6['destroy']();_0x41143f&&(_0x41143f[_0x2f01ac(0xbf)](),_0x41143f=null);_0x14f8e2&&_0x14f8e2[_0x2f01ac(0x140)](!![],!![]);_0x540c02&&_0x540c02[_0x2f01ac(0xea)]();_0x59c541&&_0x59c541[_0x2f01ac(0xea)]();_0x30f81a&&_0x30f81a[_0x2f01ac(0xea)]();if(_0x312f84)for(var _0x100cb2=0x0;_0x100cb2<_0x312f84[_0x2f01ac(0xda)];_0x100cb2++){_0x312f84[_0x100cb2][_0x2f01ac(0xea)]();}_0x532028&&(clearTimeout(_0x532028),_0x532028=null),_0x3177fa&&_0x3177fa[_0x2f01ac(0xea)](),_0x465a35[_0x2f01ac(0x140)]();}async function _0xcb6f03(_0x4c466d,_0x294472){const _0x970fba=_0x4bb9e0;await _0x3633e5();_0x1e43cc&&_0x1e43cc[_0x970fba(0x12f)]();_0x59c541&&_0x59c541[_0x970fba(0xea)]();_0x30f81a&&_0x30f81a[_0x970fba(0xea)]();_0x540c02&&_0x540c02[_0x970fba(0xea)]();_0x471311&&_0x471311['destroy']();_0x41143f&&(_0x41143f[_0x970fba(0xbf)](),_0x41143f=null);_0x14f8e2>0x0&&_0x14f8e2[_0x970fba(0x140)](!![],!![]);if(_0x312f84)for(var _0x30dda4=0x0;_0x30dda4<_0x312f84[_0x970fba(0xda)];_0x30dda4++){_0x312f84[_0x30dda4]['destroy']();}_0x532028&&(clearTimeout(_0x532028),_0x532028=null);_0x3177fa&&_0x3177fa['destroy']();_0x465a35['clear'](),_0x1dc8e6=_0xda34d1[_0x970fba(0xd5)][_0x970fba(0x12a)](0x190,0x12c,'popped'),_0x1dc8e6[_0x970fba(0xf2)](3.5,3.5);switch(_0x294472){case _0x970fba(0xe8):break;case _0x970fba(0xbe):_0x1dc8e6[_0x970fba(0x100)](0xff0000);break;case _0x970fba(0xc4):_0x1dc8e6[_0x970fba(0x100)](0xff00);break;case _0x970fba(0x13f):_0x1dc8e6[_0x970fba(0x100)](0x800080);break;default:_0x1dc8e6['setTint'](0xff);break;}_0x3bdf1e(_0x4c466d),typeof globalBetAmount!==_0x970fba(0xe7)&&(globalBetAmount=0x0),_0x3f3b28['disabled']=![],_0x3f3b28[_0x970fba(0xd8)]='BET',_0x2ae799=!![],_0x3bb29f=!![],window[_0x970fba(0x132)]=![],_0x587bd1=!![];}async function _0x41691b(_0x5e03da){const _0x1efdd4=_0x4bb9e0;if(_0x5e03da>0x14){_0x1e43cc[_0x1efdd4(0x12f)]();return;}_0x59c541&&_0x59c541['destroy']();_0x30f81a&&_0x30f81a[_0x1efdd4(0xea)]();_0x555e6e=_0xda34d1['add'][_0x1efdd4(0xf3)](0x190,0x190,'desyrel','')[_0x1efdd4(0x135)](0.5,0x0),_0x59c541=_0xda34d1['add']['dynamicBitmapText'](0x190,0xc8,'desyrel','')[_0x1efdd4(0x135)](0.5,0x0),_0x555e6e[_0x1efdd4(0x107)](_0x1efdd4(0xe0)+_0x5e03da);if(_0x5e03da>0x1)_0x59c541[_0x1efdd4(0x107)](_0x1efdd4(0xf8));else _0x59c541&&_0x59c541[_0x1efdd4(0xea)]();}async function _0x4bc45c(_0x3e3e41,_0xa56b3f){const _0x2e8077=_0x4bb9e0;_0x2db2fa=![],_0x41eea5=![],_0x41f07f=new Phaser[(_0x2e8077(0xf9))][(_0x2e8077(0x106))](_0x338cb1-0x4,_0x5b0f9e-0x2,0x27e,0x23c);switch(_0xa56b3f){case _0x2e8077(0xe8):console[_0x2e8077(0xba)](_0x2e8077(0xe8)),_0x3177fa=_0xda34d1[_0x2e8077(0xd5)][_0x2e8077(0x12a)](0x28a,0x1c2,'pumpblueup'),_0x465a35[_0x2e8077(0x105)](0x2,0xff);break;case _0x2e8077(0xbe):console[_0x2e8077(0xba)](_0x2e8077(0xbe)),_0x3177fa=_0xda34d1['add'][_0x2e8077(0x12a)](0x28a,0x1c2,'pumpredup'),_0x465a35[_0x2e8077(0x105)](0x2,0xff0000);break;case _0x2e8077(0xc4):console[_0x2e8077(0xba)](_0x2e8077(0xc4)),_0x3177fa=_0xda34d1[_0x2e8077(0xd5)][_0x2e8077(0x12a)](0x28a,0x1c2,_0x2e8077(0xe3)),_0x465a35[_0x2e8077(0x105)](0x2,0xff00);break;case _0x2e8077(0x13f):console[_0x2e8077(0xba)]('group_4'),_0x3177fa=_0xda34d1['add']['image'](0x28a,0x1c2,_0x2e8077(0xd4)),_0x465a35[_0x2e8077(0x105)](0x2,0x800080);break;default:console[_0x2e8077(0xba)]('default'),_0x3177fa=_0xda34d1[_0x2e8077(0xd5)][_0x2e8077(0x12a)](0x28a,0x1c2,_0x2e8077(0x11b)),_0x465a35[_0x2e8077(0x105)](0x2,0xff);break;}_0x465a35[_0x2e8077(0xbd)](_0x41f07f),_0x14f8e2=_0xda34d1[_0x2e8077(0xd5)][_0x2e8077(0xde)]({'key':_0x2e8077(0xe9),'repeat':0x5});function _0x141b5b(_0x1c773b,_0x19772f){const _0x48f78f=_0x2e8077;switch(_0x19772f){case _0x48f78f(0xe8):break;case'group_2':_0x1c773b[_0x48f78f(0x100)](0xff0000);break;case'group_3':_0x1c773b[_0x48f78f(0x100)](0xff00);break;case _0x48f78f(0x13f):_0x1c773b[_0x48f78f(0x100)](0x800080);break;default:_0x1c773b['setTint'](0xff);break;}}_0x14f8e2[_0x2e8077(0xce)]()[_0x2e8077(0xc0)](_0x2c6db9=>{_0x141b5b(_0x2c6db9,_0xa56b3f),_0x2c6db9['setOrigin'](0.5,0x1),_0x2c6db9['setScale'](0.5),_0x2c6db9['x']=_0x338cb1,_0x2c6db9['y']=_0x5b0f9e+0xa;});_0x540c02&&_0x540c02[_0x2e8077(0xea)]();const _0x57dddf=document['getElementById'](_0x2e8077(0x122));_0x57dddf[_0x2e8077(0x103)]=![];_0x555e6e&&_0x555e6e[_0x2e8077(0xea)]();await _0x578771();function _0x4b21ee(){const _0x3a331d=_0x2e8077;console[_0x3a331d(0xba)]('group_name\x20is',_0xa56b3f);switch(_0xa56b3f){case _0x3a331d(0xe8):_0xd1adab=_0xd1adab===_0x3a331d(0x11b)?'pumpbluedown':_0x3a331d(0x11b);break;case _0x3a331d(0xbe):_0xd1adab=_0xd1adab===_0x3a331d(0xc7)?_0x3a331d(0xd7):_0x3a331d(0xc7);break;case _0x3a331d(0xc4):console[_0x3a331d(0xba)](_0x3a331d(0x111)),_0xd1adab=_0xd1adab===_0x3a331d(0xe3)?_0x3a331d(0xc9):_0x3a331d(0xe3);break;case'group_4':_0xd1adab=_0xd1adab===_0x3a331d(0xd4)?'pumppurpledown':'pumppurpleup';break;default:_0xd1adab=_0xd1adab==='pumpblueup'?'pumpbluedown':_0x3a331d(0x11b);break;}_0x3177fa[_0x3a331d(0x10a)](_0xd1adab),_0x532028=setTimeout(()=>_0x4b21ee(),0x12c);}_0x4b21ee();const _0x294094=_0x3c7f8f(_0x3e3e41);await Promise[_0x2e8077(0xd0)]([_0x294094]);}async function _0x3c7f8f(_0x3d270b){const _0x20993b=_0x4bb9e0,_0x521fef=0x493e0,_0x342599=0x1f4,_0x282fde=0.5,_0x10ca54=0x2,_0x3da610=_0x282fde+(_0x10ca54-_0x282fde)*(_0x3d270b/_0x342599);return console[_0x20993b(0xba)](_0x20993b(0x134),_0x3da610),_0x14f8e2['getChildren']()[_0x20993b(0xc0)](_0x4ad9e6=>{const _0xebfcd4=_0x20993b;_0x4ad9e6[_0xebfcd4(0xdc)]=_0x3da610,_0x4ad9e6['scaleY']=_0x3da610;}),_0x41143f=_0xda34d1[_0x20993b(0x11a)][_0x20993b(0xd5)]({'targets':_0x14f8e2[_0x20993b(0xce)](),'scaleX':_0x10ca54,'scaleY':_0x10ca54,'radius':0xe4,'ease':'Linear','duration':_0x521fef,'yoyo':![],'onUpdate'(){const _0x1bd458=_0x20993b;_0x41eea5?(_0x41143f[_0x1bd458(0xbf)](),reject(new Error(_0x1bd458(0x141)))):_0x14f8e2[_0x1bd458(0xce)]()[_0x1bd458(0xc0)](_0x4ab39b=>{_0x4ab39b['x']=_0x338cb1,_0x4ab39b['y']=_0x5b0f9e;});},'onComplete'(){resolve();}}),new Promise(_0x6b29fc=>{});}async function _0x525736(_0x17eb0e){const _0xa814d7=_0x4bb9e0;_0x30f81a&&_0x30f81a[_0xa814d7(0xea)]();_0x59c541&&_0x59c541['destroy']();const _0x1b6322=0x6e,_0x1970c2=0.01,_0x5ce348=0xf4240;_0x30f81a=_0xda34d1[_0xa814d7(0xd5)][_0xa814d7(0xf3)](0x190,0xc8,_0xa814d7(0xbc))[_0xa814d7(0x135)](0.5,0x0),_0x59c541=_0xda34d1[_0xa814d7(0xd5)]['dynamicBitmapText'](0x12c,0x1f4,_0xa814d7(0xbc),'')['setOrigin'](0.5,0x0),_0x59c541[_0xa814d7(0x107)](_0xa814d7(0x121));let _0x147c03=_0x17eb0e;async function _0x28b836(){const _0x42b667=_0xa814d7;while(_0x147c03<=_0x5ce348){await new Promise(_0x58c69b=>setTimeout(_0x58c69b,_0x1b6322)),_0x147c03+=_0x1970c2;let _0x2a89e0=Math['round'](_0x147c03*0x64)/0x64;_0x147c03<window['multiplier']&&(_0x147c03=window[_0x42b667(0xc2)],_0x2a89e0=_0x147c03[_0x42b667(0x10e)](0x2));try{if(!_0x30f81a)throw new Error(_0x42b667(0xc1));_0x30f81a['setText']('x'+_0x2a89e0);}catch(_0x4f560f){console['error']('error\x20is\x20'+_0x4f560f['message']);break;}}}_0x28b836();}async function _0x277e5b(){const _0x3a0a1f=_0x4bb9e0;_0x30f81a&&_0x30f81a[_0x3a0a1f(0xea)]();_0x59c541&&_0x59c541[_0x3a0a1f(0xea)]();const _0x16be95=0x6e,_0x5191c4=0.01,_0x297929=0xf4240;_0x30f81a=_0xda34d1['add'][_0x3a0a1f(0xf3)](0x190,0xc8,_0x3a0a1f(0xbc))[_0x3a0a1f(0x135)](0.5,0x0);let _0x4250ec=0x1;window[_0x3a0a1f(0xc2)]!==undefined&&(window[_0x3a0a1f(0xc2)]=0x1);async function _0x64edb2(){const _0x1ee86e=_0x3a0a1f;while(!_0x2db2fa&&_0x4250ec<=_0x297929){await new Promise(_0x2c8cbf=>setTimeout(_0x2c8cbf,_0x16be95)),_0x4250ec+=_0x5191c4;let _0x3cd4f8=Math[_0x1ee86e(0xc3)](_0x4250ec*0x64)/0x64;_0x4250ec>1.5&&(_0x4250ec<window['multiplier']&&(_0x4250ec=window[_0x1ee86e(0xc2)],_0x3cd4f8=_0x4250ec[_0x1ee86e(0x10e)](0x2)));try{if(!_0x30f81a)throw new Error(_0x1ee86e(0xc1));_0x30f81a['setText']('x'+_0x3cd4f8),await _0x3ea8e9(_0x30f81a);}catch(_0x1c027a){console[_0x1ee86e(0xd2)](_0x1ee86e(0x127)+_0x1c027a[_0x1ee86e(0x12e)]);break;}}}await _0x64edb2();}function _0x3633e5(){_0x2db2fa=!![],_0x41eea5=!![];}async function _0x578771(){const _0x5c7a87=_0x4bb9e0,_0x4045b8=document[_0x5c7a87(0xc8)]('cashout-button');_0x4045b8[_0x5c7a87(0xf5)](_0x5c7a87(0x117),()=>{const _0x3b9f6a=_0x5c7a87;if(!_0x5653cf){_0x5653cf=!![];const _0x3e21ea=parseFloat(_0x30f81a[_0x3b9f6a(0x104)][_0x3b9f6a(0xeb)](0x1)),_0x1ee9d2=document['getElementById'](_0x3b9f6a(0xed)),_0x2c7ef2={'type':_0x3b9f6a(0x11d),'multiplier':_0x3e21ea,'game_id':_0x2fd869},_0x5347a5=JSON['stringify'](_0x2c7ef2);_0x1e43cc[_0x3b9f6a(0xfd)](_0x5347a5);}});}async function _0x3ea8e9(_0x2ee7b7){const _0x1c82b0=_0x4bb9e0;let _0x39a5b2=0x0;typeof globalBetAmount!=='undefined'&&(_0x39a5b2=globalBetAmount);const _0x244ef6=document[_0x1c82b0(0xc8)]('cashout-button'),_0xe55fde=parseFloat(_0x2ee7b7[_0x1c82b0(0x104)]['substring'](0x1)),_0x58a154=Math['floor'](_0x39a5b2*_0xe55fde);_0x244ef6[_0x1c82b0(0xd8)]=_0x1c82b0(0xf0)+_0x58a154+')';}function _0x3bdf1e(_0x3d38df){const _0x3230d6=_0x4bb9e0;_0x30f81a&&_0x30f81a[_0x3230d6(0xea)](),_0x540c02=_0xda34d1[_0x3230d6(0xd5)][_0x3230d6(0xf3)](0x190,0xc8,_0x3230d6(0xbc))[_0x3230d6(0x135)](0.5,0x0),_0x540c02[_0x3230d6(0x107)](_0x3230d6(0x115)+_0x3d38df);}}}
+
+class Example extends Phaser.Scene {
+	preload() {
+		this.load.image('balloon', balloon);
+
+		this.load.image('bg', space);
+		this.load.image('pumpblueup', pumpblueup);
+		this.load.image('pumpbluedown', pumpbluedown);
+		this.load.image('pumpredup', pumpredup);
+		this.load.image('pumpreddown', pumpreddown);
+		this.load.image('pumpgreenup', pumpgreenup);
+		this.load.image('pumpgreendown', pumpgreendown);
+		this.load.image('pumppurpleup', pumppurpleup);
+		this.load.image('pumppurpledown', pumppurpledown);
+
+		this.load.image('popped', popped);
+
+		this.load.bitmapFont('desyrel', desyrelpng, desyrelxml);
+	}
+
+	async create() {
+		const scene = this;
+		let backg = scene.add.image(400, 300, 'bg');
+		backg.setScale(2.7, 3.5);
+
+		const loading_game = scene.add.text(400, 28, 'Game loading....').setColor('#00ff00').setFontSize(32).setShadow(2, 2).setOrigin(0.5, 0);
+
+		let currentImage = 'pumpUp'; // Start with 'pump up'
+		let balloonsTween = null;
+		let lightsTween = null;
+		const graph = scene.add.graphics();
+		const delay = 200; // Delay in milliseconds (0.1 seconds)
+
+		const centerX = 400;
+		const centerY = 500;
+
+		// Create a strong point line
+		const graphics = scene.add.graphics({ lineStyle: { width: 6, color: 0x0000ff } });
+
+		// Const counterText = scene.add.dynamicBitmapText(400, 200, 'desyrel', '0.00').setOrigin(0.5, 0);
+
+		let counterText;
+		let countdownText;
+		let crashText;
+		let bet_allowed_text;
+		let cashoutclicked = false;
+
+		let start = true;
+		const betButton = document.getElementById('bet-button');
+		let game_id;
+		let balloons;
+		let light;
+		let poppedbackground;
+		let pump;
+		let Line;
+		let animationTimer;
+		let start_initial = true;
+		let roomName;
+		let groupSocket;
+		let chooseballoontext;
+		let ballooncount;
+		let start_with_balloon = true;
+		let showballoons = true;
+		const isCrashTriggered = false;
+		let selectedBalloon = null;
+		let balloons_to_show = [];
+		let balloonsalreadychosen = false;
+        let stopCounting = false;
+        let isAnimationCancelled = false;
+		let ongoinggame = false;
+		let poppedBackgroundsArray = [];
+		
+		
+		
+		main(scene); // Render the main content
+		animateLights();
+		async function animateLights() {
+			console.log('lights called');
+			backg = scene.add.image(400, 300, 'bg').setPipeline('Light2D');
+			backg.setScale(2.7, 3.5);
+			const duration = 5000;
+			scene.lights.enable().setAmbientColor(0x555555);
+		
+			const hsv = Phaser.Display.Color.HSVColorWheel();
+		
+			const radius = 80;
+			const intensity = 6;
+			let x = radius;
+			let y = 0;
+		
+			const maxLights = 6;
+		
+			const lightPromises = [];
+		
+			for (let i = 0; i < maxLights; i++) {
+				const { color } = hsv[i * 10];
+		
+				light = scene.lights.addLight(x, y, radius, color, intensity);
+		
+				const lightsPromise = new Promise(resolve => {
+					const lightsTween = scene.tweens.add({
+						targets: light,
+						y: 600,
+						yoyo: true,
+						repeat: -1,
+						ease: 'Sine.easeInOut',
+						duration,
+						delay: i * 100,
+						onComplete() {
+							resolve();
+						},
+					});
+				});
+		
+				lightPromises.push(lightsPromise);
+		
+				x += radius * 2;
+		
+				if (x > 800) {
+					x = radius;
+					y += radius;
+				}
+			}
+		
+			await Promise.all(lightPromises);
+		}
+			
+		
+	
+        
+	
+
+
+		
+        
+       
+
+		async function main(scene) {
+			try {
+				
+				console.log('main called')
+				const wsSocket = new WebSocket('ws://' + window.location.host + '/ws/realtime/');
+				// Const wsSocket = new WebSocket('ws://'
+				// + window.location.host
+				// + '/ws/real_time_updates/'
+				// + 'group_1'
+				// + '/');
+
+				// Scene.add.sprite(400, 300, 'background').play('explodeAnimation');
+
+				
+
+				wsSocket.onmessage = async function (e) {
+					if (loading_game) {
+						loading_game.destroy();
+					}
+
+					const data = JSON.parse(e.data);
+					console.log(data);
+
+					if (data.type === 'ongoing_synchronizer') {
+						// Use the current multiplier to render the ongoing graph
+						if (data.message === 'crashed'){
+						if (!ongoinggame){
+							if (poppedbackground){
+								poppedbackground.destroy();
+							}
+							cleargamescene();
+							const crashpoint = data.crash_point
+							const group_name = data.group_name
+							killeverything(crashpoint, group_name);
+						}
+						else {
+							const group_name = data.group_name;
+							const crashpoint = data.crash_point;
+							const x = Phaser.Math.Between(100, 600); // Random X coordinate between 100 and 600
+							const y = Phaser.Math.Between(100, 150); // Random Y coordinate between 100 and 150
+
+							const poppedbackground = scene.add.image(x, y, 'popped');
+
+							crashText = scene.add.dynamicBitmapText(x, y, 'desyrel').setOrigin(0.5, 0);
+							crashText.setText('x' + crashpoint);
+							poppedBackgroundsArray.push({ background: poppedbackground, text: crashText });
+    
+							switch (group_name) {
+								case 'group_1':
+									// No tint (default color)
+									break;
+								case 'group_2':
+									poppedbackground.setTint(0xff0000); // Red tint
+									break;
+								case 'group_3':
+									poppedbackground.setTint(0x00ff00); // Green tint
+									break;
+								case 'group_4':
+									poppedbackground.setTint(0x800080); // purple tint
+									break;
+								default:
+				
+									poppedbackground.setTint(0x0000ff);
+				
+									break;
+							}
+							setTimeout(() => {
+								// Destroy the poppedbackgrounds and their associated crashText
+								poppedBackgroundsArray.forEach(({ background, text }) => {
+									background.destroy();
+									text.destroy();
+								});
+							}, 2000);
+
+						}
+							
+						}
+						else if (data.message === 'ongoing'){
+							if (!ongoinggame){
+							if (poppedbackground){
+								poppedbackground.destroy();
+							}
+							const currentMultiplier = data.cached_multiplier; // Assuming the currentMultiplier is provided in the data
+						// Use currentMultiplier to render the ongoing graph
+							const group_name = data.group_name;
+							startgame(currentMultiplier, group_name);
+
+							countAndDisplayOngoing(currentMultiplier);
+
+						}
+					}
+
+						
+					} else if (data.type === 'start_synchronizer') {
+						if (groupSocket) {
+							groupSocket.close();
+						}
+						if (chooseballoontext) {
+							chooseballoontext.destroy();
+						}
+
+						if (balloonsTween) {
+							balloonsTween.stop(); // Stop the balloon animation
+							balloonsTween = null; // Clear the tween reference
+						}
+						try {
+							// Check if "balloons" exists and has a "clear" method
+							if (balloons && balloons instanceof Phaser.GameObjects.Group) {
+								balloons.clear(true, true);
+							}
+						} catch (error) {
+							// Handle any errors or exceptions that occur during clearing
+							console.error('Error clearing balloons:', error);
+						}
+						
+
+						if (animationTimer) {
+							clearTimeout(animationTimer);// Remove the timer
+							animationTimer = null; // Clear the timer reference
+						}
+
+						if (pump) {
+							pump.destroy();
+						}
+						if (poppedbackground){
+							poppedbackground.destroy();
+						}
+						await cleargamescene();
+						backg = scene.add.image(400, 300, 'bg').setPipeline('Light2D');
+						backg.setScale(2.7, 3.5);
+
+
+
+						balloonsalreadychosen = false;
+						window.allowballoonchange = true;
+						showballoons = true;
+						ongoinggame = true;
+						chooseballoontext = scene.add.dynamicBitmapText(400, 100, 'desyrel').setOrigin(0.5, 0);
+
+						chooseballoontext.setText('Choose balloon.\n Game starts soon.');
+					} else if (data.type === 'mid_start_synchronizer') {
+						if (chooseballoontext) {
+							chooseballoontext.destroy();
+						}
+
+						if (balloonsTween) {
+							balloonsTween.stop(); // Stop the balloon animation
+							balloonsTween = null; // Clear the tween reference
+						}
+
+						
+
+						if (animationTimer) {
+							clearTimeout(animationTimer); // Remove the timer
+							animationTimer = null; // Clear the timer reference
+						}
+
+						if (pump) {
+							pump.destroy();
+						}
+						if (poppedbackground){
+							poppedbackground.destroy();
+						}
+						graphics.clear();
+
+						window.allowballoonchange = true;
+						showballoons = true;
+						choose_balloon(data.data);
+					}
+					// } else if (data.type === 'game_already_started') {
+					// 	bet_allowed_text = scene.add.dynamicBitmapText(400, 100, 'desyrel').setOrigin(0.5, 0);
+
+					// 	bet_allowed_text.setText('Wait for new game');
+					// }
+				};
+			} catch (error) {
+				console.error('Error fetching new crash point:', error);
+			}
+		}
+
+		
+		async function choose_balloon(data) {
+			// Start the synchronizer countdown
+
+			if (crashText) {
+				crashText.destroy();
+			}
+			if (chooseballoontext) {
+				chooseballoontext.destroy();
+			}
+			if (crashText){
+				crashText.destroy();
+			}
+
+			if (counterText) {
+				counterText.destroy();
+			}
+
+			// if (balloons_to_show) {
+			// 	balloons_to_show.clear(true, true);
+			// }
+		
+
+			if (bet_allowed_text) {
+				bet_allowed_text.destroy();
+			}
+
+			if (poppedbackground) {
+				// Destroy the existing background image
+				poppedbackground.destroy();
+			}
+
+
+			if (balloons_to_show) {
+				for (var i = 0; i < balloons_to_show.length; i++) {
+					balloons_to_show[i].destroy();
+				}
+
+			}
+
+			const delay = 1000; // Delay in milliseconds
+			const updateInterval = 1;
+			const crashPoint = 10; // Adjust this value as needed
+			// chooseballoontext = scene.add.dynamicBitmapText(400, 100, 'desyrel').setOrigin(0.5, 0);
+
+			let balloon_to_add;
+
+			const balloonColors = [0x54deff, 0xff0000, 0x00ff00, 0x800080]; // Blue, Red, Green, Purple
+
+			// Define the minimum countdown value (0 seconds)
+			const minCountdown = 2;
+			const count = data.count;
+
+			if (count >= minCountdown) {
+				if (chooseballoontext) {
+					chooseballoontext.destroy();
+				}
+
+				chooseballoontext = scene.add.dynamicBitmapText(400, 100, 'desyrel').setOrigin(0.5, 0);
+
+				chooseballoontext.setText(`Choose balloon in ${count - 1}`);
+
+				if (showballoons) {
+					showballoons = false;
+
+					for (let i = 0; i < 4; i++) {
+						const xPosition = 150 + i * 150; // Adjust the x position as needed
+						const groupName = 'group_' + (i + 1); // Create group names 'group_1', 'group_2', ...
+						balloon_to_add = scene.add.image(xPosition, 300, 'balloon');
+						balloon_to_add.setTint(balloonColors[i]); // Set the balloon color based on the array
+						balloon_to_add.setInteractive();
+						balloon_to_add.setData('group', groupName); // Store the group name as data
+						balloon_to_add.setScale(0.3);
+
+						balloon_to_add.on('pointerdown', function () {
+							const group = this.getData('group');
+							if (selectedBalloon !== null) {
+								selectedBalloon.removeTick(); // Remove the tick from the previously selected balloon
+							}
+
+							this.addTick(); // Add a tick below the clicked balloon
+							selectedBalloon = this; // Set the selected balloon
+							handleBalloonClick(group); // Call the function with the group name
+						});
+
+						balloon_to_add.addTick = function () {
+							// Add a tick (e.g., a line) below the balloon
+							const tick = scene.add.line(0, 0, 0, 20, 0, 0, 0xffffff);
+							tick.setStrokeStyle(3, 0xffffff);
+							tick.x = this.x;
+							tick.y = this.y + this.displayHeight / 2 + 10;
+							tick.setOrigin(0, 0);
+							this.tick = tick;
+						};
+
+						balloon_to_add.removeTick = function () {
+							// Remove the tick from the balloon
+							if (this.tick) {
+								this.tick.destroy();
+								this.tick = null;
+							}
+						};
+
+						balloons_to_show.push(balloon_to_add);
+					}
+				}
+
+				return;
+
+				// Ensure the countdown doesn't go below the minimum value
+
+				// Update the text with the remaining countdown time
+				// chooseballoontext.setText('Choose balloon in ' + count + 's');
+			}
+
+			if (chooseballoontext) {
+				chooseballoontext.destroy();
+			}
+			if (scene.tick) {
+				scene.tick.destroy();
+
+			}
+			
+			game_id = data.game_id;
+
+			cashoutclicked = false;
+			start = true;
+
+			await startgame_official();
+
+
+
+
+
+
+		}
+
+		async function startgame_official() {
+			if (!balloonsalreadychosen) {
+				balloonsalreadychosen = true;
+				window.allowballoonchange = true;
+				betButton.disabled = false;
+
+				start_with_balloon = false;
+
+				if (window.roomName) {
+					roomName = window.roomName;
+					handleBalloonClick(roomName);
+					groupSocket = new WebSocket(
+						'ws://'
+						+ window.location.host
+						+ '/ws/real_time_updates/'
+						+ roomName
+						+ '/',
+					);
+					await continuation_of_start_game_official();
+				} else {
+					roomName = 'group_1';
+					handleBalloonClick(roomName);
+					groupSocket = new WebSocket(
+						'ws://'
+						+ window.location.host
+						+ '/ws/real_time_updates/'
+						+ roomName
+						+ '/',
+					);
+					await continuation_of_start_game_official();
+				}
+			}
+		}
+
+		async function continuation_of_start_game_official() {
+			window.allowballoonchange = false;
+			const betonballoon = document.getElementById("bet_on_last_game_to_crash");
+			betonballoon.style.display = 'block';
+			bet_allowed_text = scene.add.dynamicBitmapText(400, 200, 'desyrel', '').setOrigin(0.5, 0);
+
+			bet_allowed_text.setText('Place your bet');
+
+			groupSocket.onmessage = async function (e) {
+				const data = JSON.parse(e.data);
+
+				if (data.type === 'crash_instruction') {
+					const crashpoint = data.crash_point;
+					const group_name = data.group_name;
+					ongoinggame = false;
+					killeverything(crashpoint, group_name);
+					
+					
+				} else if (data.type == 'count_initial') {
+					if (start_initial) {
+						window.allowballoonchange = false;
+						window.allowballooncrashlastbetting = true;
+						
+						start_initial = false;
+						if (poppedbackground) {
+							// Destroy the existing background image
+							poppedbackground.destroy();
+						}
+
+						backg = scene.add.image(400, 300, 'bg').setPipeline('Light2D');
+						backg.setScale(2.7, 3.5);
+					}
+
+					if (countdownText) {
+						countdownText.destroy();
+					}
+
+					if (crashText) {
+						crashText.destroy();
+					}
+
+					await countAndDisplayInitial(data.count);
+				} else if (data.type == 'count_update') {
+					if (start) {
+						start = false;
+						const count = 0.5;
+
+						startgame(count, roomName);
+					}
+
+					if (countdownText) {
+						countdownText.destroy();
+					}
+
+					if (bet_allowed_text) {
+						bet_allowed_text.destroy();
+					}
+					window.allowballooncrashlastbetting = false;
+					const betonballoon = document.getElementById("bet_on_last_game_to_crash");
+					betonballoon.style.display = 'none';
+
+					countAndDisplay();
+				}
+			};
+
+
+		}
+		async function cleargamescene(){
+			console.log('cleargamescene called');
+			
+		
+			if (poppedbackground) {
+				poppedbackground.destroy();
+			}
+
+			if (balloonsTween) {
+				balloonsTween.stop(); // Stop the balloon animation
+				balloonsTween = null; // Clear the tween reference
+			}
+			if (balloons) {
+				balloons.clear(true, true);
+			}
+
+			if (crashText) {
+				crashText.destroy();
+			}
+
+			if (bet_allowed_text) {
+				bet_allowed_text.destroy();
+			}
+
+			if (counterText) {
+				counterText.destroy();
+			}
+
+
+
+			// Clear any balloons that might still be visible
+			if (balloons_to_show) {
+				for (var i = 0; i < balloons_to_show.length; i++) {
+					balloons_to_show[i].destroy();
+				}
+
+			}
+			if (animationTimer) {
+				clearTimeout(animationTimer);// Remove the timer
+				animationTimer = null; // Clear the timer reference
+			}
+
+			if (pump) {
+				pump.destroy();
+			}
+			graphics.clear(); // This will remove all drawn elements, including the line
+
+		}
+		async function killeverything(crashpoint, group_name){
+			// Handle crash instruction, e.g., trigger the crash action in the game
+			await stopCountingAndBalloonsFunction();
+			if (groupSocket){
+				groupSocket.close();
+			}
+
+			if (bet_allowed_text) {
+				bet_allowed_text.destroy();
+			}
+
+			if (counterText) {
+				counterText.destroy();
+			}
+
+			if (crashText) {
+				crashText.destroy();
+			}
+
+		
+
+			
+			if (backg) {
+				// Destroy the existing background image
+				backg.destroy();
+			}
+
+			if (balloonsTween) {
+				balloonsTween.stop(); // Stop the balloon animation
+				balloonsTween = null; // Clear the tween reference
+			}
+			if (balloons > 0) {
+				balloons.clear(true, true);
+			}
+
+
+			// Clear any balloons that might still be visible
+			if (balloons_to_show) {
+				for (var i = 0; i < balloons_to_show.length; i++) {
+					balloons_to_show[i].destroy();
+				}
+
+			}
+			if (animationTimer) {
+				clearTimeout(animationTimer);// Remove the timer
+				animationTimer = null; // Clear the timer reference
+			}
+
+			if (pump) {
+				pump.destroy();
+			}
+			graphics.clear(); // This will remove all drawn elements, including the line
+
+				
+
+			// Create a new background image with the new texture
+			poppedbackground = scene.add.image(400, 300, 'popped');
+			poppedbackground.setScale(3.5, 3.5);
+			switch (group_name) {
+				case 'group_1':
+					// No tint (default color)
+					break;
+				case 'group_2':
+					poppedbackground.setTint(0xff0000); // Red tint
+					break;
+				case 'group_3':
+					poppedbackground.setTint(0x00ff00); // Green tint
+					break;
+				case 'group_4':
+					poppedbackground.setTint(0x800080); // purple tint
+					break;
+				default:
+
+					poppedbackground.setTint(0x0000ff);
+
+					break;
+			}
+
+			// IsCrashTriggered = true;
+			CountingComplete(crashpoint);
+
+			if (typeof globalBetAmount !== 'undefined') {
+				globalBetAmount = 0;
+			}
+
+			betButton.disabled = false;
+			betButton.textContent = 'BET';
+
+			start_initial = true;
+			start = true;
+			window.allowballoonchange = false;
+
+			start_with_balloon = true;
+			
+			
+		}
+
+		async function countAndDisplayInitial(count) {
+			if (count > 20) {
+				groupSocket.close();
+				return;
+			}
+
+			if (bet_allowed_text) {
+				bet_allowed_text.destroy();
+			}
+
+			if (counterText) {
+				counterText.destroy();
+			}
+
+			countdownText = scene.add.dynamicBitmapText(400, 400, 'desyrel', '').setOrigin(0.5, 0);
+			bet_allowed_text = scene.add.dynamicBitmapText(400, 200, 'desyrel', '').setOrigin(0.5, 0);
+			countdownText.setText(`Game starts in ${count}`);
+
+			if (count > 1) {
+				bet_allowed_text.setText('Place your bet');
+			} else if (bet_allowed_text) {
+				bet_allowed_text.destroy();
+			}
+		}
+
+		async function startgame(count, group_name) {
+		    stopCounting = false;
+		    isAnimationCancelled = false;
+			Line = new Phaser.Geom.Line(centerX - 4, centerY - 2, 638, 572);
+			
+			
+		
+			switch (group_name) {
+				case 'group_1':
+					// No tint (default color)
+					console.log('group_1');
+					pump = scene.add.image(650, 450, 'pumpblueup');
+					graphics.lineStyle(2, 0x0000FF);
+
+					break;
+				case 'group_2':
+					console.log('group_2');
+					pump = scene.add.image(650, 450, 'pumpredup');
+					graphics.lineStyle(2, 0xFF0000);
+					break;
+				case 'group_3':
+					console.log('group_3');
+					pump = scene.add.image(650, 450, 'pumpgreenup');
+					graphics.lineStyle(2, 0x00FF00);
+					break;
+				case 'group_4':
+					console.log('group_4');
+					pump = scene.add.image(650, 450, 'pumppurpleup');// Purple tint
+					graphics.lineStyle(2, 0x800080);
+					break;
+				default:
+					console.log('default');
+					pump = scene.add.image(650, 450, 'pumpblueup');
+					graphics.lineStyle(2, 0x0000FF);
+
+					
+					break;
+			}
+			graphics.strokeLineShape(Line);
+			
+			
+			
+			
+			
+
+			balloons = scene.add.group({ key: 'balloon', repeat: 5 });
+			// Function to change the tint color of balloons
+			function changeBalloonColor(balloon, group_name) {
+				switch (group_name) {
+					case 'group_1':
+						// No tint (default color)
+						break;
+					case 'group_2':
+						balloon.setTint(0xff0000); // Red tint
+						break;
+					case 'group_3':
+						balloon.setTint(0x00ff00); // Green tint
+						break;
+					case 'group_4':
+						balloon.setTint(0x800080); // Purple tint
+						break;
+					default:
+
+						balloon.setTint(0x0000ff);
+						// You may want to set a default tint here or clear the tint
+						break;
+				}
+			}
+
+			// Iterate through each balloon in the group and change its color based on roomName
+
+			balloons.getChildren().forEach(balloon => {
+				changeBalloonColor(balloon, group_name);
+				balloon.setOrigin(0.5, 1); // Set the anchor point to the bottom center
+				balloon.setScale(0.5);
+				balloon.x = centerX; // Set the initial x position to the center
+				balloon.y = centerY + 10; // Set the initial y position to the bottom
+			});
+
+			if (crashText) {
+				crashText.destroy();
+			}
+
+			const cashoutButton = document.getElementById('cashout-button');
+			cashoutButton.disabled = false;
+
+			if (countdownText) {
+				countdownText.destroy();
+			}
+
+			await cashout();
+			// Scene.add.sprite(400, 300, 'background').play('explodeAnimation');
+			function animateImages() {
+				// Switch between 'pumpUp' and 'pumpDown'
+				console.log('group_name is', group_name)
+				switch (group_name) {
+					case 'group_1':
+						// No tint (default color)
+						currentImage = currentImage === 'pumpblueup' ? 'pumpbluedown' : 'pumpblueup';
+						break;
+					case 'group_2':
+						currentImage = currentImage === 'pumpredup' ? 'pumpreddown' : 'pumpredup';
+						break;
+					case 'group_3':
+						console.log('pumpgreen');
+						currentImage = currentImage === 'pumpgreenup' ? 'pumpgreendown' : 'pumpgreenup';
+						break;
+					case 'group_4':
+						currentImage = currentImage === 'pumppurpleup' ? 'pumppurpledown' : 'pumppurpleup';
+						break;
+					default:
+						currentImage = currentImage === 'pumpblueup' ? 'pumpbluedown' : 'pumpblueup';
+
+						
+						break;
+				}
+				
+				
+				// Display the current image
+				pump.setTexture(currentImage);
+
+			
+				// Set a timer to call this function again after the delay
+				animationTimer = setTimeout(() => animateImages(), 300);
+			}
+			
+			// Start the animation
+			animateImages();
+			// Create a promise for each animation
+			const balloonsAnimationPromise = animateBalloons(count);
+			
+
+			// Wait for both animations to complete before continuing
+			await Promise.all([balloonsAnimationPromise]);
+		}
+
+		async function animateBalloons(count) {
+			const duration = 300000; // Set the desired animation duration in milliseconds
+			const maxCount = 500; // The maximum value of count
+			const minScale = 0.5; // The minimum scale
+			const maxScale = 2; // The maximum scale
+			const initialScale = minScale + (maxScale - minScale) * (count / maxCount);
+			console.log('initialScale', initialScale);
+		
+			// Set the initial scale of the balloons based on the count
+			balloons.getChildren().forEach(balloon => {
+				balloon.scaleX = initialScale;
+				balloon.scaleY = initialScale;
+			});
+		
+			// Your balloon animation code here...
+			balloonsTween = scene.tweens.add({
+				targets: balloons.getChildren(),
+				scaleX: maxScale,
+				scaleY: maxScale,
+				radius: 228,
+				ease: 'Linear',
+				duration, // Use the specified duration
+				yoyo: false,
+		
+				onUpdate() {
+					// Check for cancellation within the onUpdate function
+					if (isAnimationCancelled) {
+						balloonsTween.stop();
+						reject(new Error('Animation was cancelled.'));
+					} else {
+						// Update the x and y positions based on the new scale
+						balloons.getChildren().forEach(balloon => {
+							balloon.x = centerX;
+							balloon.y = centerY;
+						});
+					}
+				},
+				onComplete() {
+					// Resolve the promise when the animation is done
+					resolve();
+				},
+			});
+		
+			return new Promise(resolve => {});
+		}
+		
+		
+
+		async function countAndDisplayOngoing(multiplier) {
+			if (counterText) {
+				counterText.destroy();
+			}
+
+			if (bet_allowed_text) {
+				bet_allowed_text.destroy();
+			}
+
+			const delay = 110; // Delay in milliseconds
+			const updateInterval = 0.01;
+			const crashPoint = 1000000; // Adjust this value as needed
+			counterText = scene.add.dynamicBitmapText(400, 200, 'desyrel').setOrigin(0.5, 0);
+			bet_allowed_text = scene.add.dynamicBitmapText(300, 500, 'desyrel', '').setOrigin(0.5, 0);
+			bet_allowed_text.setText('Wait for new game');
+
+			let count = multiplier;
+
+			async function update() {
+				while (count <= crashPoint) {
+					await new Promise(resolve => setTimeout(resolve, delay));
+					count += updateInterval;
+					let counted = Math.round(count * 100) / 100;
+					if (count < window.multiplier) {
+						count = window.multiplier;
+						counted = count.toFixed(2);
+					}
+
+					// Check if counterText is still valid before setting text
+					try {
+						if (!counterText) {
+							throw new Error('counterText is null.');
+						}
+
+						counterText.setText('x' + counted);
+					} catch (error) {
+						console.error(`error is ${error.message}`);
+						break;
+					}
+
+					// Schedule the next update
+				}
+			}
+
+			// Start the asynchronous update loop
+			update();
+		}
+
+		async function countAndDisplay() {
+			// Destroy the existing counterText if it exists
+
+			if (counterText) {
+				counterText.destroy();
+			}
+
+			if (bet_allowed_text) {
+				bet_allowed_text.destroy();
+			}
+
+			const delay = 110; // Delay in milliseconds
+			const updateInterval = 0.01;
+			const crashPoint = 1000000; // Adjust this value as needed
+			counterText = scene.add.dynamicBitmapText(400, 200, 'desyrel').setOrigin(0.5, 0);
+
+			let count = 1;
+			if (window.multiplier !== undefined) {
+				window.multiplier = 1;
+			}
+
+			
+
+			async function update() {
+                while (!stopCounting && count <= crashPoint) {
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                    count += updateInterval;
+                    let counted = Math.round(count * 100) / 100;
+                    if (count > 1.5) {
+                        if (count < window.multiplier) {
+                            count = window.multiplier;
+                            counted = count.toFixed(2);
+                        }
+                    }
+
+                    // Check if counterText is still valid before setting text
+                    try {
+                        if (!counterText) {
+                            throw new Error('counterText is null.');
+                        }
+
+                        counterText.setText('x' + counted);
+                        await updateCashoutButtonText(counterText);
+                    } catch (error) {
+                        console.error(`error is ${error.message}`);
+                        break;
+                    }
+
+                    // Schedule the next update
+                }
+            }
+
+            // Start the asynchronous update loop
+            await update(); // Wait for the update function to complete
+        }
+
+        // To stop counting, set stopCounting to true from outside the function
+        function stopCountingAndBalloonsFunction() {
+            stopCounting = true;
+            isAnimationCancelled = true;
+        }
+
+
+		async function cashout() {
+			// Add a click event listener to the cashoutButton
+			const cashoutButton = document.getElementById('cashout-button');
+
+			cashoutButton.addEventListener('click', () => {
+				if (!cashoutclicked) {
+					cashoutclicked = true;
+
+					const cashOutValue = parseFloat(counterText.text.substring(1));
+
+					const betForm = document.getElementById('bet-form');
+					// Send the cashOutValue to the server using an API call
+
+					const formdata = { type: 'cashout_validate', multiplier: cashOutValue, game_id };
+
+					const data = JSON.stringify(formdata);
+
+					groupSocket.send(data);
+				}
+			});
+		}
+
+		async function updateCashoutButtonText(counterText) {
+			let bet_amount = 0;
+
+			if (typeof globalBetAmount !== 'undefined') {
+				bet_amount = globalBetAmount;
+			}
+
+			const cashoutButton = document.getElementById('cashout-button');
+			const counterValue = parseFloat(counterText.text.substring(1)); // Assuming counterText contains something like "$1.23"
+
+			const cashoutAmount = Math.floor(bet_amount * counterValue);
+
+			cashoutButton.textContent = `CASHOUT (${cashoutAmount})`;
+		}
+
+		function CountingComplete(crashpoint) {
+			if (counterText) {
+				counterText.destroy();
+			}
+
+			crashText = scene.add.dynamicBitmapText(400, 200, 'desyrel').setOrigin(0.5, 0);
+			crashText.setText('Popped at x' + crashpoint);
+		}
+	}
+}
