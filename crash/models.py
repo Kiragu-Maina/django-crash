@@ -112,6 +112,9 @@ class Transactions(models.Model):
 class TransactionsForLastGameBet(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     balloon_betted_on = models.CharField(max_length=200,default='')
+    bet = models.IntegerField()
+    won = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    
     game_id = models.CharField(max_length=200)
     game_set_id = models.CharField(max_length=200)
     created_at = models.DateTimeField(auto_now=True)

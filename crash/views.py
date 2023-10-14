@@ -1,7 +1,7 @@
 from django.http import JsonResponse, HttpResponse
 from django.views.generic import TemplateView
 from django.views import View
-from .models import Transactions, BettingWindow, CashoutWindow, Games, Bank, OwnersBank, GameSets
+from .models import Transactions, BettingWindow, CashoutWindow, Games, Bank, OwnersBank, GameSets, TransactionsForLastGameBet
 from .utils import ServerSeedGenerator
 
 from django.contrib.messages.views import SuccessMessageMixin
@@ -845,6 +845,7 @@ class BetOnLastBalloon(View):
         print(request.POST.get('group_name'))
         
         betting_window_state, game_id, game_set_id = self.get_betting_window_state(request.POST.get('group_name'))
+        
         if betting_window_state:
             if self.request.user.is_authenticated:
             
@@ -869,13 +870,14 @@ class BetOnLastBalloon(View):
                     return JsonResponse(response_data, status=400)
                     
                 try:
-                    bank_instance = Bank.objects.select_for_update().get(user=user)
-                    amount = Decimal(bet_amount)
-                    if bank_instance.balance >= amount:
-                        bank_instance.balance -= amount
-                        bank_instance.save()
-                    else:
-                        return JsonResponse({'status': 'error', 'message': 'insufficient_funds'}, status=400)
+                    with transaction.atomic():
+                        bank_instance = Bank.objects.select_for_update().get(user=user)
+                        amount = Decimal(bet_amount)
+                        if bank_instance.balance >= amount:
+                            bank_instance.balance -= amount
+                            bank_instance.save()
+                        else:
+                            return JsonResponse({'status': 'error', 'message': 'insufficient_funds'}, status=400)
                 except Bank.DoesNotExist:
                     return JsonResponse({'status': 'error', 'message': 'no_bank'}, status=400)
                 

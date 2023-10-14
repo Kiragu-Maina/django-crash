@@ -25,6 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	// Prevent the form from submitting when the "BET" button is clicked
 	const betForm = document.getElementById('bet-form');
+	const last_balloon_form =  document.getElementById('last-balloon-form');
 	const betAmountInput = document.getElementById('betAmount');
 	betAmountInput.value = selectedAmountInput.value;
 	const hideErrorandResetBet = () => {
@@ -71,6 +72,60 @@ document.addEventListener('DOMContentLoaded', () => {
 			.catch(error => {
 				console.error('Error:', error);
 			});
-	});
-});
 
+	});
+	last_balloon_form.addEventListener('submit', event => {
+		event.preventDefault();
+
+		const bet_amount = document.getElementById('selected-bet2-amount').value;
+		var groupName = document.getElementById('selected-balloon').value;
+
+
+        // Prepare data to send to the server
+        // const data = {
+        //     group_name: groupName,
+		// 	bet_amount: bet_amount
+        // };
+		const formData = new FormData();
+		formData.append('group_name', groupName);
+		formData.append('bet_amount', bet_amount)
+	
+		var csrfToken = getCSRFToken();
+		console.log('csrf_token is', csrfToken);
+
+        // Send an AJAX POST request to the server
+		fetch(betonlastballoon, {
+			method: 'POST',
+			headers: {
+				'X-CSRFToken': csrfToken,
+			},
+			body: formData,
+		})
+			.then(response => response.json())
+			.then(data => {
+				console.log('data sent', data);
+				if (data.status == 'success') {
+					window.globalBetAmount = parseFloat(data.bet_amount);
+					betButton.textContent = 'BET Placed';
+					betButton.disabled = true;
+				} else {
+					betButton.textContent = 'BET Not Placed';
+					errorText.innerHTML = data.message;
+					errorText.style.display = 'block';
+					setTimeout(hideErrorandResetBet, 5000);
+				}// Update the page content using the data received from the server
+				// For example, update the user's balance or display a success message
+			})
+			.catch(error => {
+				console.error('Error:', error);
+			});
+		});
+		function getCSRFToken() {
+			console.log('getcsrftokencalled');
+			var csrfTokenDiv = document.getElementById("csrf_token");
+			var csrfToken = csrfTokenDiv.querySelector("[name=csrfmiddlewaretoken]").value;	  
+			return csrfToken; // Return null if the meta tag is not found
+		}
+		
+
+});

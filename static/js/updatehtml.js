@@ -41,7 +41,13 @@ document.addEventListener('DOMContentLoaded', () => {
 			type = 'lost';
 
 			await updateTable(data, type);
-		} else if (data.type == 'new_game') {
+		}
+		else if (data.type == 'last_balloon_placed_update'){
+			type = 'bettingonlast';
+
+			await updateTable(data, type);
+		}
+		else if (data.type == 'new_game') {
 			const tableBody1 = document.getElementById('bet-table-body');
 			const tableBody2 = document.getElementById('bets-table-body');
 			tableBody1.innerHTML = '';
@@ -102,7 +108,24 @@ document.addEventListener('DOMContentLoaded', () => {
 		`;
 			newRow.style.color = 'white'; // Default color
 		} else if (type == 'lost') {
+			newRow.innerHTML = `
+			<td style="font-size: 0.6em;">${updatedItem.user}</td>
+			<td style="font-size: 0.6em;">${updatedItem.bet}</td>
+			<td style="font-size: 0.6em;">${updatedItem.multiplier}</td>
+			<td style="font-size: 0.6em;">${parseFloat(updatedItem.won).toFixed(2)}</td>
+			<td style="font-size: 0.6em;">${updatedItem.balloon}</td>
+		`;
 			newRow.style.color = 'red';
+		}
+		else if (type == 'bettingonlast') {
+			newRow.innerHTML = `
+			<td style="font-size: 0.6em;">${updatedItem.user}</td>
+			<td style="font-size: 0.6em;">${updatedItem.bet}</td>
+			<td style="font-size: 0.6em;">special2x</td>
+			<td style="font-size: 0.6em;">--</td>
+			<td style="font-size: 0.6em;">${updatedItem.balloon}</td>
+		`;
+			newRow.style.color = 'yellow'; // Default color
 		}
 		// Clone the row for the second table body
 		const newRow2 = newRow.cloneNode(true);

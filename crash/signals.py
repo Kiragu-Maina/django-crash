@@ -1,6 +1,6 @@
 from django.db.models.signals import post_save
 from django.dispatch import Signal, receiver
-from .models import Transactions, User, Bank, Clients, Games, OwnersBank, GameSets
+from .models import Transactions, User, Bank, Clients, Games, OwnersBank, GameSets, TransactionsForLastGameBet
 
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
@@ -59,6 +59,90 @@ def transaction_saved(sender, instance, **kwargs):
             "user": str(instance.user),
             "bet": instance.bet,
             "multiplier": str(instance.multiplier),
+            "won": str(instance.won),
+            "balloon":balloon,
+            "type":data_type,
+            
+        }
+     
+        return data
+        
+   
+    def send_data_to_websocket(data):
+        # Send the update using Channels' channel layer
+        channel_layer = get_channel_layer()
+        async_to_sync(channel_layer.group_send)(
+            "table_updates",
+            {
+                "type": "table.update",
+                "data": data,
+            }
+        )
+       
+
+    # Define a function to be called when the transaction is successfully committed
+    def on_commit_callback():
+        data = update_table(instance)  # Call the update_table function
+       
+        send_data_to_websocket(data)
+        data_to_admin.delay()
+        
+        
+        
+        
+
+    # Use transaction.on_commit to ensure the callback is executed after the transaction
+    transaction.on_commit(on_commit_callback)
+
+@receiver(post_save, sender=TransactionsForLastGameBet)
+def transaction_for_last_balloon_saved(sender, instance, **kwargs):
+    # Construct the data that you want to send to the WebSocket consumer
+    
+    def update_table(instance):
+
+        if instance.game_played == True:
+            if instance.won > 0:
+                data_type ="table_update"
+                user_count = cache.get("bets_won_user_count")
+                if user_count is None:
+                    user_count = 1
+                else:
+                    user_count += 1
+                cache.set("bets_won_user_count", user_count)
+        
+                
+            elif instance.won == 0:
+                data_type ="lose_update"
+                user_count = cache.get("bets_lost_user_count")
+                if user_count is None:
+                    user_count = 1
+                else:
+                    user_count += 1
+                cache.set("bets_lost_user_count", user_count)
+            else:
+                data_type ="lose_update"
+                user_count = cache.get("bets_lost_user_count")
+                if user_count is None:
+                    user_count = 1
+                else:
+                    user_count += 1
+                cache.set("bets_lost_user_count", user_count)
+        else:
+            data_type = "last_balloon_placed_update"
+            
+        if str(instance.balloon_betted_on) == 'group_1':
+            balloon = 'blue'
+        elif str(instance.balloon_betted_on) == 'group_2':
+            balloon = 'red'
+        elif str(instance.balloon_betted_on) == 'group_3':
+            balloon = 'green'
+        elif str(instance.balloon_betted_on) == 'group_4':
+            balloon = 'purple'
+            
+        data = {
+            "user": str(instance.user),
+            "bet": instance.bet,
+            "multiplier": 'special2xbet',
             "won": str(instance.won),
             "balloon":balloon,
             "type":data_type,

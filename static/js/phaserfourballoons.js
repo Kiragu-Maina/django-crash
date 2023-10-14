@@ -59,16 +59,13 @@ function getCSRFToken() {
   // Example usage:
 
 function handleNewBalloonClick(groupName) {
-    console.log('Handle balloon click called.');
+    console.log('Handle new balloon click called.');
 
     // Check if balloon clicking is allowed
     if (window.allowballooncrashlastbetting) {
 
         // Deselect the previously selected balloon, if any
-        if (selectedBalloon) {
-            selectedBalloon.classList.remove("highlighted");
-        }
-
+       
         // Find and select the balloon based on the provided groupName
         let balloon;
         switch (groupName) {
@@ -91,57 +88,43 @@ function handleNewBalloonClick(groupName) {
 
         // Highlight the selected balloon and update the selectedBalloon variable
         balloon.classList.add("highlighted");
-        selectedBalloon = balloon;
+        
 		console.log(groupName)
 
         // Flag that a balloon has been selected
         isBalloonSelected = true;
-		const bet_amount = document.getElementById('selected-bet-amount').value;
+		const balloonsRow = document.getElementById('new-balloon-row');
+		const selected_balloon = document.getElementById('selected-balloon');
+		const betEntry = document.getElementById('selected-bet2-amount');
+		const submitBtn = document.getElementById('last-balloon-submit');
+
+		// Assuming groupName is defined somewhere before this code
+		selected_balloon.value = groupName;
+
+		// Hide the balloon row
+		balloonsRow.style.display = 'none';
+
+		// Show the bet entry field
+		betEntry.style.display = 'block';
+		betEntry.value = '';
+		submitBtn.style.display='block';
+
+		
+		setTimeout(function() {
+			// Show the balloon row
+			balloon.classList.remove("highlighted");
+			
+			balloonsRow.style.display = 'flex';
+		
+			// Hide the bet entry field and submit button
+			betEntry.style.display = 'none';
+			submitBtn.style.display = 'none';
+		}, 10000);
 
 
-        // Prepare data to send to the server
-        // const data = {
-        //     group_name: groupName,
-		// 	bet_amount: bet_amount
-        // };
-		const formData = new FormData();
-		formData.append('group_name', groupName);
-		formData.append('bet_amount', bet_amount)
-	
-		var csrfToken = getCSRFToken();
-		console.log('csrf_token is', csrfToken);
 
-        // Send an AJAX POST request to the server
-		fetch(betonlastballoon, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				'X-CSRFToken': csrfToken,
+		
 
-			},
-			body: formData
-		})
-			.then(function (response) {
-				if (response.ok) {
-					return response.json();
-				} else {
-					throw new Error('Network response was not ok');
-				}
-			})
-			.then(function (responseData) {
-				// Handle the server response on success
-				console.log('Response received:');
-				console.log(responseData);
-			})
-			.catch(function (error) {
-				// Handle errors on failure
-				console.error('Error:', error);
-				// Update the error message on the page
-				document.getElementById("error1").innerHTML = "An error occurred.";
-			});
-        // Remove the highlight from the selected balloon after a delay
-        
-        // selectedBalloon.classList.remove("highlighted");
        
     }
 }

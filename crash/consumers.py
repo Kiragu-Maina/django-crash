@@ -7,7 +7,7 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 
 import time
 
-from .models import Clients, Transactions, Bank, Games, User
+from .models import Clients, Transactions, Bank, Games, User, TransactionsForLastGameBet
 from channels.db import database_sync_to_async
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
@@ -19,6 +19,10 @@ from .tasks import start_game, stop_game, data_to_admin
 
 
 class RealtimeUpdatesConsumer(AsyncWebsocketConsumer):
+	def __init__(self, *args, **kwargs):
+		super().__init__(*args, **kwargs)
+		self.count = 0
+
 	async def connect(self):
 		
 		self.group_name = "realtime_group"
@@ -94,32 +98,65 @@ class RealtimeUpdatesConsumer(AsyncWebsocketConsumer):
 	@database_sync_to_async
 	def update_game_on_crash(self, group_name, game_id):
 		
-		with transaction.atomic():
-			try:
+		try:
+			with transaction.atomic():
+				if self.count > 4:
+					self.count = 0
+				self.count += 1
+				print(self.count)
 				users_transactions = Transactions.objects.filter(group_name=group_name, game_id=game_id)
 
-				for new_transaction in users_transactions:
-					if not new_transaction.game_played:
-						new_transaction.game_played = True
+				self.update_transactions(users_transactions, 1)
+				if self.count == 4:
+					self.count = 0
+					game_set_id = cache.get('game_set_id')
+					
+					last_game_transactions = TransactionsForLastGameBet.objects.filter(game_set_id=game_set_id)
+
+					print(last_game_transactions)
+					last_balloon_transactions = TransactionsForLastGameBet.objects.filter(balloon_betted_on=group_name, game_id=game_id)
+					print(last_balloon_transactions)
+
+					self.update_transactions(last_game_transactions, 2, last_balloon_transactions)
+				
+		except Exception as e:
+			print("An error occurred:", str(e))
+   
+   
+	def update_transactions(self, transactions, multiplier, last_balloon_transactions=None):
+		print('update_transactions_called')
+		try:
+			for new_transaction in transactions:
+				if not new_transaction.game_played:
+					new_transaction.game_played = True
+					if multiplier == 1:
+						print('multiplier=1')
+						new_transaction.save()
+					elif multiplier == 2:
+						print('multiplier=2')
+						if new_transaction in last_balloon_transactions:
+							new_transaction.won = Decimal(new_transaction.bet) * multiplier
+						else:
+							print('userlostbet')
+							new_transaction.won = 0
 						new_transaction.save()
 
-						# Update the user's bank record
-						user_bank = Bank.objects.get(user=new_transaction.user)
+					# Update the user's bank record
+					user_bank = Bank.objects.get(user=new_transaction.user)
+					if multiplier == 1:
 						user_bank.losses_by_user += Decimal(new_transaction.bet)
-						user_bank.save()
-						
-				
-						
-			except Transactions.DoesNotExist:
-				# Handle the case where there are no transactions for the given conditions.
-				print("Transaction does not exist.")
-				pass
-			except Bank.DoesNotExist:
-				# Handle the case where there is no bank record for a user.
-				print("Bank does not exist.")
-				pass
-			except Exception as e:
-				print("An error occurred:", str(e))
+					elif multiplier == 2:
+						if new_transaction in last_balloon_transactions:
+							user_bank.balance += Decimal(new_transaction.won)
+							user_bank.profit_to_user += Decimal(new_transaction.won)
+						else:
+							user_bank.losses_by_user += Decimal(new_transaction.bet)
+					user_bank.save()
+		except Transactions.DoesNotExist:
+			print("Transaction does not exist.")
+		except Bank.DoesNotExist:
+			print("Bank does not exist.")
+
 				
 	task = None 
 	async def game_crashed(self, event):

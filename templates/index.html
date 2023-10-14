@@ -5,10 +5,11 @@
 <head>
   {% load static %}
  
+ 
   
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta name="csrf-token" content="{% csrf_token %}">
+  
   <link rel="apple-touch-icon" sizes="76x76" href="{% static 'img/apple-icon.png' %}">
   <link rel="icon" type="image/png" href="{% static 'img/favicon.png' %}">
   <title>
@@ -17,11 +18,12 @@
   <!--     Fonts and icons     -->
 
   <!-- Font Awesome Icons -->
-  {% comment %} <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script> {% endcomment %}
+  <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
   
   
   <!-- CSS Files -->
   <link id="pagestyle" href="{% static 'css/argon-dashboard.css' %}" rel="stylesheet" />
+  
   
 </head>
 
@@ -31,6 +33,7 @@
  
   
   {{ room_name|json_script:"room-name" }}
+ 
   <div class="min-height-300 bg-primary position-absolute w-100"></div>
   <aside class="sidenav bg-white navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-4 " id="sidenav-main">
     <div class="sidenav-header">
@@ -237,31 +240,40 @@
           </div>
           <div id="bet_on_last_game_to_crash" style="display:none">
             
-              <p>Enter amount and click last balloon to crash for 2X</p>
+              <p>Special--2X--</p>
               {% comment %} <p class="ad-text">Simply enter the amount and click on the balloon you think will crash last</p> {% endcomment %}
           
           
-            <div class="col-md-7 mb-3">
-              <input type="number" class="form-control" id="selected-bet-amount">
-          </div>
-            <div class="new-balloon-row">
+           
+              <form id="last-balloon-form" method="POST">
+                <div class="new-balloon-row" id="new-balloon-row">
+                  <div id="new-balloonA" class="balloon" onclick="handleNewBalloonClick('group_1', 'Balloon A')">
+                    <img src="{% static 'assets/balloon1.png' %}" alt="New Balloon A">
+                  </div>
               
-          <div id="new-balloonA" class="balloon" onclick="handleNewBalloonClick('group_1')">
-              <img src="{% static 'assets/balloon1.png' %}" alt="New Balloon A">
-          </div>
+                  <div id="new-balloonB" class="balloon" onclick="handleNewBalloonClick('group_2', 'Balloon B')">
+                    <img src="{% static 'assets/balloon2.png' %}" alt="New Balloon B">
+                  </div>
+              
+                  <div id="new-balloonC" class="balloon" onclick="handleNewBalloonClick('group_3', 'Balloon C')">
+                    <img src="{% static 'assets/balloon3.png' %}" alt="New Balloon C">
+                  </div>
+              
+                  <div id="new-balloonD" class="balloon" onclick="handleNewBalloonClick('group_4', 'Balloon D')">
+                    <img src="{% static 'assets/balloon4.png' %}" alt="New Balloon D">
+                  </div>
+                </div>
+              
+                
+                  <input type="hidden" id="selected-balloon" name="selected_balloon">
+                  <input type="number" class="form-control" id="selected-bet2-amount" name="bet_amount" style="display: none">
+                  <button id="last-balloon-submit" style="display: none" class="btn btn-primary btn-block" type="submit">Submit</button>
+                
+              
+              
+              </form>
+              
       
-          <div id="new-balloonB" class="balloon" onclick="handleNewBalloonClick('group_2')">
-              <img src="{% static 'assets/balloon2.png' %}" alt="New Balloon B">
-          </div>
-      
-          <div id="new-balloonC" class="balloon" onclick="handleNewBalloonClick('group_3')">
-              <img src="{% static 'assets/balloon3.png' %}" alt="New Balloon C">
-          </div>
-      
-          <div id="new-balloonD" class="balloon" onclick="handleNewBalloonClick('group_4')">
-              <img src="{% static 'assets/balloon4.png' %}" alt="New Balloon D">
-          </div>
-      </div>
     </div>
           <div class="col-md-7 mb-3">
             <span  class="nav-link text-red font-weight-bold px-0" id="error-text" style="font-style: italic; display: none;"><span>
@@ -579,13 +591,16 @@
       </div>
       
     </div>
-
+    
   
     
     <a href="#" rel="modal:close">Close</a>
     
   
   </div>
+  <div id="csrf_token">
+    {% csrf_token %}
+    <div>
 
 
  

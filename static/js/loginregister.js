@@ -23,10 +23,18 @@
                   url: login,  // Replace with your actual login URL
                   type: 'POST',
                   data: data,
-                  success: function (response) {
+                  success: function (response, status, xhr) {
                       // Handle the response from the server, e.g., redirect or show a success message
                       console.log('here');
                       console.log(response);
+                      var newCsrfToken = getCookie("csrftoken");
+                      console.log('newcsrf,', newCsrfToken);
+
+                      // Update the CSRF token in your JavaScript code
+                      if (newCsrfToken) {
+                          // Assuming you have a function to update the CSRF token
+                          updateCsrfToken(newCsrfToken);
+                      }
                       updateNavigationMenu(true, response.balance, response.username)
                       const loginmodal = document.getElementById("closeloginmodal")
                       loginmodal.click();
@@ -77,9 +85,16 @@
                 url: register,  // Replace with your actual login URL
                 type: 'POST',
                 data: data,
-                success: function (response) {
+                success: function (response, xhr, status) {
                     // Handle the response from the server, e.g., redirect or show a success message
                     console.log(response);
+                    var newCsrfToken = getCookie("csrftoken");
+
+                    // Update the CSRF token in your JavaScript code
+                    if (newCsrfToken) {
+                        // Assuming you have a function to update the CSRF token
+                        updateCsrfToken(newCsrfToken);
+                    }
                     updateNavigationMenu(true, response.balance, response.username)
                     $("#register_submit_btn").show();
                     $("#spinner2").hide();
@@ -200,6 +215,18 @@
             });
         });
       });
+      function getCookie(name) {
+        var value = "; " + document.cookie;
+        var parts = value.split("; " + name + "=");
+        if (parts.length == 2) return parts.pop().split(";").shift();
+    }
+      function updateCsrfToken(newToken) {
+        var csrfTokenDiv = document.getElementById("csrf_token");
+	      var csrfToken = csrfTokenDiv.querySelector("[name=csrfmiddlewaretoken]")
+        if (csrfToken) {
+            csrfToken.setAttribute('value', newToken);
+        }
+    }
   
       function updateNavigationMenu(isAuthenticated, balance = null, username) {
         const navMenu = document.getElementById('nav-menu');

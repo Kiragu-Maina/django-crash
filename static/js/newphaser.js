@@ -43,6 +43,7 @@ class Example extends Phaser.Scene {
 		let countdownText;
 		let crashText;
 		let bet_allowed_text;
+		let bet_allowed_text2;
 		let cashoutclicked = false;
 
 		let start = true;
@@ -341,6 +342,11 @@ class Example extends Phaser.Scene {
 			if (bet_allowed_text) {
 				bet_allowed_text.destroy();
 			}
+			
+
+			if (bet_allowed_text2) {
+				bet_allowed_text2.destroy();
+			}
 
 			if (poppedbackground) {
 				// Destroy the existing background image
@@ -576,6 +582,10 @@ class Example extends Phaser.Scene {
 			if (bet_allowed_text) {
 				bet_allowed_text.destroy();
 			}
+			if (bet_allowed_text2) {
+				bet_allowed_text2.destroy();
+			}
+
 
 			if (counterText) {
 				counterText.destroy();
@@ -611,6 +621,10 @@ class Example extends Phaser.Scene {
 			if (bet_allowed_text) {
 				bet_allowed_text.destroy();
 			}
+			if (bet_allowed_text2) {
+				bet_allowed_text2.destroy();
+			}
+
 
 			if (counterText) {
 				counterText.destroy();
@@ -707,6 +721,10 @@ class Example extends Phaser.Scene {
 			if (bet_allowed_text) {
 				bet_allowed_text.destroy();
 			}
+			if (bet_allowed_text2) {
+				bet_allowed_text2.destroy();
+			}
+
 
 			if (counterText) {
 				counterText.destroy();
@@ -714,13 +732,35 @@ class Example extends Phaser.Scene {
 
 			countdownText = scene.add.dynamicBitmapText(400, 400, 'desyrel', '').setOrigin(0.5, 0);
 			bet_allowed_text = scene.add.dynamicBitmapText(400, 200, 'desyrel', '').setOrigin(0.5, 0);
+			bet_allowed_text2 = scene.add.dynamicBitmapText(400, 500, 'desyrel', '', 40).setOrigin(0.5, 0);
 			countdownText.setText(`Game starts in ${count}`);
 
 			if (count > 1) {
 				bet_allowed_text.setText('Place your bet');
+				bet_allowed_text2.setText('Try special2X \n Bet on last balloon to pop -->');
+
+
 			} else if (bet_allowed_text) {
 				bet_allowed_text.destroy();
+				bet_allowed_text2.destroy();
 			}
+			 // Function to fade the text in and out
+			async function fadeTextInAndOut(textObject, fadeInDuration, fadeOutDuration) {
+				while (true) {
+				for (let alpha = 0; alpha <= 1; alpha += 0.01) {
+					textObject.setAlpha(alpha);
+					await new Promise((resolve) => setTimeout(resolve, fadeInDuration / 100));
+				}
+				await new Promise((resolve) => setTimeout(resolve, 1000)); // Wait for 1 second
+				for (let alpha = 1; alpha >= 0; alpha -= 0.01) {
+					textObject.setAlpha(alpha);
+					await new Promise((resolve) => setTimeout(resolve, fadeOutDuration / 100));
+				}
+				}
+			}
+
+			// Start the fading effect for bet_allowed_text2
+			fadeTextInAndOut(bet_allowed_text2, 2000, 2000);
 		}
 
 		async function startgame(count, group_name) {
@@ -915,6 +955,10 @@ class Example extends Phaser.Scene {
 			if (bet_allowed_text) {
 				bet_allowed_text.destroy();
 			}
+			if (bet_allowed_text2) {
+				bet_allowed_text2.destroy();
+			}
+
 
 			const delay = 110; // Delay in milliseconds
 			const updateInterval = 0.01;
@@ -965,6 +1009,10 @@ class Example extends Phaser.Scene {
 			if (bet_allowed_text) {
 				bet_allowed_text.destroy();
 			}
+			if (bet_allowed_text2) {
+				bet_allowed_text2.destroy();
+			}
+
 
 			const delay = 110; // Delay in milliseconds
 			const updateInterval = 0.01;

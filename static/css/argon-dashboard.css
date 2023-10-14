@@ -16786,14 +16786,14 @@ button:not(:disabled) {
 
 /* CSS styles for individual balloons */
 .balloon {
-  margin: 0 4px; /* Add margin between balloons horizontally */
+  margin: 0 3px; /* Add margin between balloons horizontally */
   cursor: pointer; /* Make balloons clickable */
   transition: transform 0.2s; /* Add a smooth transition effect */
 }
 
 /* CSS styles for balloon images */
 .balloon img {
-  width: 50px; /* Adjust the width of balloons as needed */
+  width: 30px; /* Adjust the width of balloons as needed */
   height: auto; /* Maintain aspect ratio */
 }
 
@@ -16934,8 +16934,8 @@ cursor: pointer;
 }
 
 .new-balloon {
-    width: 40px;  /* Adjust the width to make the balloons small */
-    height: 40px; /* Adjust the height to make the balloons small */
+    width: 30px;  /* Adjust the width to make the balloons small */
+    height: 30px; /* Adjust the height to make the balloons small */
     cursor: pointer;
     border-radius: 50%; /* Makes the balloons circular */
     background-color: #FF5733; /* Change the background color as desired */
