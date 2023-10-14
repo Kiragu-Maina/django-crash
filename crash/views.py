@@ -840,6 +840,8 @@ class BetOnLastBalloon(View):
    
     def post(self, request, *args, **kwargs):
         user = self.request.user
+        print(self.request)
+        print(request.POST)
         print(request.POST.get('group_name'))
         
         betting_window_state, game_id, game_set_id = self.get_betting_window_state(request.POST.get('group_name'))
