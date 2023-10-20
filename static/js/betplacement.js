@@ -78,6 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		event.preventDefault();
 
 		const bet_amount = document.getElementById('selected-bet2-amount').value;
+		
 		var groupName = document.getElementById('selected-balloon').value;
 
 
