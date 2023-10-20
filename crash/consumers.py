@@ -266,7 +266,7 @@ class RealtimeUpdatesConsumer(AsyncWebsocketConsumer):
 
 	async def ongoing_send(self):
 		try:
-			await asyncio.sleep(5)  # Sleep for 5 seconds
+			await asyncio.sleep(1)  # Sleep for 1 seconds
 			print("Task completed")
 			
 			# Dictionary that maps group names to cache keys
