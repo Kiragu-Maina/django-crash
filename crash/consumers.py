@@ -31,33 +31,63 @@ class RealtimeUpdatesConsumer(AsyncWebsocketConsumer):
 	   # Increment the user count when a new user connects
 		await self.increment_user_count()
 		
+		# Dictionary that maps group names to cache keys
 		group_game_multipliers = {
 			'group_1': 'group_1_game_multiplier',
 			'group_2': 'group_2_game_multiplier',
 			'group_3': 'group_3_game_multiplier',
 			'group_4': 'group_4_game_multiplier',
 		}
-		
+
+		# Initialize an empty tuple to store valid group names
+		validgames = []
+
+		# Iterate through the group_game_multipliers
 		for group, cache_key in group_game_multipliers.items():
-			cached_multiplier = cache.get(cache_key)
-			print(cached_multiplier)
+			cached_multiplier = cache.get(cache_key)  # Retrieve the cached multiplier
+			print(cached_multiplier)  # For debugging purposes
+
+			# Check the value of the cached multiplier and take appropriate action
 			if cached_multiplier == 'Popped':
-				pass
+				pass  # Do nothing for 'Popped'
 			elif cached_multiplier == 'Wait for new game':
-				pass
+				pass  # Do nothing for 'Wait for new game'
 			elif cached_multiplier is None:
-				pass
+				pass  # Do nothing if the multiplier is None
 			else:
-				
-				print(group, cached_multiplier)
-				await self.send(text_data=json.dumps({
-					'type': 'ongoing_synchronizer',
-					'cached_multiplier': cached_multiplier,
-					'group_name': group,
-					'message': 'ongoing',
-				}))
-				break
+				validgames.append(group)  # Add the group to validgames if the multiplier is valid
+    
+		if validgames:
+
+			# Get the cached multiplier for the first valid group
+			
+			cached_multiplier = cache.get(f"{validgames[0]}_game_multiplier")
+			# Create a tuple of valid balloon colors based on group names
+			valid_balloons = []
+			for group in validgames:
+     
+				if group == 'group_1':
+					valid_balloons.append('0x54deff')
+				elif group == 'group_2':
+					valid_balloons.append('0xff0000')
+				elif group == 'group_3':
+					valid_balloons.append('0x00ff00')
+				elif group == 'group_4':
+					valid_balloons.append('0x800080')
+			print(valid_balloons)
+			# Send a message with relevant data
+			await self.send(text_data=json.dumps({
+				'type': 'ongoing_synchronizer',
+				'cached_multiplier': cached_multiplier,
+				'group_name': validgames[0],
+				'valid_balloons': valid_balloons,
+				'message': 'ongoing',
+			}))
+
 		
+	
+		
+
 		data_to_admin.delay()
 		
 		
@@ -169,12 +199,67 @@ class RealtimeUpdatesConsumer(AsyncWebsocketConsumer):
 		game_id = data['game_id']
 		crash_point = data['crash_point']
 		await self.update_game_on_crash(group_name, game_id)
-		await self.send(text_data=json.dumps({
-			'type': 'ongoing_synchronizer',
-			'crash_point': crash_point,
-			'group_name': group_name,
-			'message': 'crashed',
-		}))
+		# Dictionary that maps group names to cache keys
+		group_game_multipliers = {
+			'group_1': 'group_1_game_multiplier',
+			'group_2': 'group_2_game_multiplier',
+			'group_3': 'group_3_game_multiplier',
+			'group_4': 'group_4_game_multiplier',
+		}
+
+		# Initialize an empty tuple to store valid group names
+		validgames = []
+
+		# Iterate through the group_game_multipliers
+		for group, cache_key in group_game_multipliers.items():
+			cached_multiplier = cache.get(cache_key)  # Retrieve the cached multiplier
+			print(cached_multiplier)  # For debugging purposes
+
+			# Check the value of the cached multiplier and take appropriate action
+			if cached_multiplier == 'Popped':
+				pass  # Do nothing for 'Popped'
+			elif cached_multiplier == 'Wait for new game':
+				pass  # Do nothing for 'Wait for new game'
+			elif cached_multiplier is None:
+				pass  # Do nothing if the multiplier is None
+			else:
+				validgames.append(group)  # Add the group to validgames if the multiplier is valid
+	
+		if validgames:
+
+			# Get the cached multiplier for the first valid group
+			
+			cached_multiplier = cache.get(f"{validgames[0]}_game_multiplier")
+			# Create a tuple of valid balloon colors based on group names
+			valid_balloons = []
+			for group in validgames:
+	
+				if group == 'group_1':
+					valid_balloons.append('0x54deff')
+				elif group == 'group_2':
+					valid_balloons.append('0xff0000')
+				elif group == 'group_3':
+					valid_balloons.append('0x00ff00')
+				elif group == 'group_4':
+					valid_balloons.append('0x800080')
+			print(valid_balloons)
+
+			
+			await self.send(text_data=json.dumps({
+				'type': 'ongoing_synchronizer',
+				'crash_point': crash_point,
+				'group_name': group_name,
+				'valid_balloons': valid_balloons,
+				'message': 'crashed',
+			}))
+		else:
+			await self.send(text_data=json.dumps({
+				'type': 'ongoing_synchronizer',
+				'crash_point': crash_point,
+				'group_name': group_name,
+				
+				'message': 'crashed',
+			}))
 
 		# Create a new task for ongoing_send
 		self.task = asyncio.create_task(self.ongoing_send())
@@ -183,6 +268,8 @@ class RealtimeUpdatesConsumer(AsyncWebsocketConsumer):
 		try:
 			await asyncio.sleep(5)  # Sleep for 5 seconds
 			print("Task completed")
+			
+			# Dictionary that maps group names to cache keys
 			group_game_multipliers = {
 				'group_1': 'group_1_game_multiplier',
 				'group_2': 'group_2_game_multiplier',
@@ -190,24 +277,52 @@ class RealtimeUpdatesConsumer(AsyncWebsocketConsumer):
 				'group_4': 'group_4_game_multiplier',
 			}
 
+			# Initialize an empty tuple to store valid group names
+			validgames = []
+
+			# Iterate through the group_game_multipliers
 			for group, cache_key in group_game_multipliers.items():
-				cached_multiplier = cache.get(cache_key)
-				print(cached_multiplier)
+				cached_multiplier = cache.get(cache_key)  # Retrieve the cached multiplier
+				print(cached_multiplier)  # For debugging purposes
+
+				# Check the value of the cached multiplier and take appropriate action
 				if cached_multiplier == 'Popped':
-					pass
+					pass  # Do nothing for 'Popped'
 				elif cached_multiplier == 'Wait for new game':
-					pass
+					pass  # Do nothing for 'Wait for new game'
 				elif cached_multiplier is None:
-					pass
+					pass  # Do nothing if the multiplier is None
 				else:
-					print(group, cached_multiplier)
-					await self.send(text_data=json.dumps({
-						'type': 'ongoing_synchronizer',
-						'cached_multiplier': cached_multiplier,
-						'group_name': group,
-						'message': 'ongoing',
-					}))
-					break
+					validgames.append(group)  # Add the group to validgames if the multiplier is valid
+		
+			if validgames:
+
+				# Get the cached multiplier for the first valid group
+				
+				cached_multiplier = cache.get(f"{validgames[0]}_game_multiplier")
+				# Create a tuple of valid balloon colors based on group names
+				valid_balloons = []
+				for group in validgames:
+		
+					if group == 'group_1':
+						valid_balloons.append('0x54deff')
+					elif group == 'group_2':
+						valid_balloons.append('0xff0000')
+					elif group == 'group_3':
+						valid_balloons.append('0x00ff00')
+					elif group == 'group_4':
+						valid_balloons.append('0x800080')
+				print(valid_balloons)
+
+				# Send a message with relevant data
+				await self.send(text_data=json.dumps({
+					'type': 'ongoing_synchronizer',
+					'cached_multiplier': cached_multiplier,
+					'group_name': validgames[0],
+					'valid_balloons': valid_balloons,
+					'message': 'ongoing',
+				}))
+
 		except asyncio.CancelledError:
 			print("Task was cancelled")
 		

@@ -65,6 +65,7 @@ class Example extends Phaser.Scene {
 		const isCrashTriggered = false;
 		let selectedBalloon = null;
 		let balloons_to_show = [];
+		let balloonsToShow = [];
 		let balloonsalreadychosen = false;
         let stopCounting = false;
         let isAnimationCancelled = false;
@@ -182,7 +183,14 @@ class Example extends Phaser.Scene {
 							crashText = scene.add.dynamicBitmapText(x, y, 'desyrel').setOrigin(0.5, 0);
 							crashText.setText('x' + crashpoint);
 							poppedBackgroundsArray.push({ background: poppedbackground, text: crashText });
-    
+
+							if (balloonsToShow) {
+								for (var i = 0; i < balloonsToShow.length; i++) {
+									balloonsToShow[i].destroy();
+								}
+
+							}
+							
 							switch (group_name) {
 								case 'group_1':
 									// No tint (default color)
@@ -202,6 +210,8 @@ class Example extends Phaser.Scene {
 				
 									break;
 							}
+							showOngoingBalloons(data.valid_balloons);
+    
 							setTimeout(() => {
 								// Destroy the poppedbackgrounds and their associated crashText
 								poppedBackgroundsArray.forEach(({ background, text }) => {
@@ -221,9 +231,17 @@ class Example extends Phaser.Scene {
 							const currentMultiplier = data.cached_multiplier; // Assuming the currentMultiplier is provided in the data
 						// Use currentMultiplier to render the ongoing graph
 							const group_name = data.group_name;
+							const valid_balloons = data.valid_balloons;
 							startgame(currentMultiplier, group_name);
 
 							countAndDisplayOngoing(currentMultiplier);
+							if (balloonsToShow) {
+								for (var i = 0; i < balloonsToShow.length; i++) {
+									balloonsToShow[i].destroy();
+								}
+
+							}
+							showOngoingBalloons(valid_balloons);
 
 						}
 					}
@@ -539,6 +557,7 @@ class Example extends Phaser.Scene {
 						const count = 0.5;
 
 						startgame(count, roomName);
+						showOngoingBalloons([0x54deff, 0xff0000, 0x00ff00, 0x800080]);
 					}
 
 					if (countdownText) {
@@ -694,7 +713,7 @@ class Example extends Phaser.Scene {
 			if (typeof globalBetAmount !== 'undefined') {
 				globalBetAmount = 0;
 			}
-			
+
 			if (typeof window.roomName !== 'undefined') {
 				window.roomName = NaN; // Use 'NaN' with a lowercase 'n'
 			}
@@ -713,7 +732,7 @@ class Example extends Phaser.Scene {
 		}
 
 		async function countAndDisplayInitial(count) {
-			if (count > 20) {
+			if (count > 25) {
 				groupSocket.close();
 				return;
 			}
@@ -766,7 +785,7 @@ class Example extends Phaser.Scene {
 		async function startgame(count, group_name) {
 		    stopCounting = false;
 		    isAnimationCancelled = false;
-			Line = new Phaser.Geom.Line(centerX - 4, centerY - 2, 638, 572);
+			Line = new Phaser.Geom.Line(centerX - 4, centerY - 17, 638, 572);
 			
 			
 		
@@ -897,6 +916,7 @@ class Example extends Phaser.Scene {
 
 			// Wait for both animations to complete before continuing
 			await Promise.all([balloonsAnimationPromise]);
+			
 		}
 
 		async function animateBalloons(count) {
@@ -943,6 +963,27 @@ class Example extends Phaser.Scene {
 			});
 		
 			return new Promise(resolve => {});
+		}
+		
+		async function showOngoingBalloons(valid_balloons) {
+			
+			const balloonss = valid_balloons
+			
+			// const balloonColors = [0x54deff, 0xff0000, 0x00ff00, 0x800080]; 
+		
+			for (let i = 0; i < balloonss.length; i++) {
+				console.log(valid_balloons[i]);
+				const xPosition = 70 + i * 50;
+				// const xPosition = 200 + i * 150; // Adjust the y position as needed
+		
+				const balloonToAdd = scene.add.image(xPosition, 450, 'balloon');
+				balloonToAdd.setTint(balloonss[i]); // Set the balloon color based on the array
+				balloonToAdd.setScale(0.1);
+		
+				balloonsToShow.push(balloonToAdd);
+			}
+		
+			return balloonsToShow;
 		}
 		
 		
