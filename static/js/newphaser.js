@@ -985,7 +985,7 @@ class Example extends Phaser.Scene {
 		
 				const balloonToAdd = scene.add.image(xPosition, 450, 'balloon');
 				balloonToAdd.setTint(balloonss[i]); // Set the balloon color based on the array
-				balloonToAdd.setScale(0.1);
+				balloonToAdd.setScale(0.2);
 		
 				balloonsToShow.push(balloonToAdd);
 			}
