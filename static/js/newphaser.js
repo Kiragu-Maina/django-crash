@@ -220,7 +220,7 @@ class Example extends Phaser.Scene {
 								});
 							}, 2000);
 
-						}
+						
 							
 						}
 						else if (data.message === 'ongoing'){
