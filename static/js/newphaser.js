@@ -618,6 +618,12 @@ class Example extends Phaser.Scene {
 				}
 
 			}
+			if (balloonsToShow) {
+				for (var i = 0; i < balloonsToShow.length; i++) {
+					balloonsToShow[i].destroy();
+				}
+
+			}
 			if (animationTimer) {
 				clearTimeout(animationTimer);// Remove the timer
 				animationTimer = null; // Clear the timer reference
@@ -672,6 +678,7 @@ class Example extends Phaser.Scene {
 				}
 
 			}
+			
 			if (animationTimer) {
 				clearTimeout(animationTimer);// Remove the timer
 				animationTimer = null; // Clear the timer reference
