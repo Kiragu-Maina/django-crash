@@ -163,16 +163,16 @@ class Example extends Phaser.Scene {
 					if (data.type === 'ongoing_synchronizer') {
 						// Use the current multiplier to render the ongoing graph
 						if (data.message === 'crashed'){
-						// if (!ongoinggame){
-						// 	if (poppedbackground){
-						// 		poppedbackground.destroy();
-						// 	}
-						// 	cleargamescene();
-						// 	const crashpoint = data.crash_point
-						// 	const group_name = data.group_name
-						// 	killeverything(crashpoint, group_name);
-						// }
-						// else {
+						if (!ongoinggame){
+							if (poppedbackground){
+								poppedbackground.destroy();
+							}
+							cleargamescene();
+							const crashpoint = data.crash_point
+							const group_name = data.group_name
+							killeverything(crashpoint, group_name);
+						}
+						else {
 							const group_name = data.group_name;
 							const crashpoint = data.crash_point;
 							const x = Phaser.Math.Between(100, 600); // Random X coordinate between 100 and 600
@@ -220,7 +220,7 @@ class Example extends Phaser.Scene {
 								});
 							}, 2000);
 
-						
+						}
 							
 						}
 						else if (data.message === 'ongoing'){
