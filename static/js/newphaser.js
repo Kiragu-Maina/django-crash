@@ -74,7 +74,7 @@ class Example extends Phaser.Scene {
 		
 		
 		main(scene); // Render the main content
-		animateLights();
+		// animateLights();
 		async function animateLights() {
 			console.log('lights called');
 			backg = scene.add.image(400, 300, 'bg').setPipeline('Light2D');
