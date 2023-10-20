@@ -46,11 +46,7 @@ CSRF_TRUSTED_ORIGINS = ["https://django-crash-production.up.railway.app"]
 
 CORS_ALLOW_ALL_ORIGINS = False
 
-# FORM SUBMISSION
-# Comment out the following line and place your railway URL, and your production URL in the array.
-# CSRF_TRUSTED_ORIGINS = ["*"]
 
-# Application definition
 
 
 INSTALLED_APPS = [
@@ -113,6 +109,7 @@ REDISHOST = os.environ["REDISHOST"]
 REDISPORT = os.environ["REDISPORT"]
 REDISPASSWORD = os.environ["REDISPASSWORD"]
 REDISUSER = os.environ["REDISUSER"]
+
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
@@ -124,15 +121,12 @@ CACHES = {
         },
     }
 }
+
 CELERY_BROKER_URL = f"redis://:{REDISPASSWORD}@{REDISHOST}:{REDISPORT}"
 CELERY_RESULT_BACKEND = f"redis://:{REDISPASSWORD}@{REDISHOST}:{REDISPORT}"
 AUTH_USER_MODEL = 'crash.User'
-# CACHES = {
-#     "default": {
-#         "BACKEND": "django_redis.cache.RedisCache",
-#         "LOCATION": "redis://127.0.0.1:6379/1",
-#         },
-#         }
+
+
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
@@ -176,6 +170,7 @@ TEMPLATES = [
         },
     },
 ]
+
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.SessionAuthentication',
@@ -185,38 +180,6 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ],
 }
-
-# PIPELINE = {
-#     'PIPELINE_ENABLED': True,
-#     'PIPELINE_COLLECTOR_ENABLED':True,
-    
-#     'JAVASCRIPT': {
-#         'scripts': {
-#             'source_filenames': (
-#               'js/adminupdates.js',
-#               'js/argon-dashboard.js',
-#               'js/betplacement.js',
-#               'js/darkenbody.js',
-#               'js/loginregister.js',
-              
-#               'js/main.js',
-#                'js/phaserfourballoons.js',
-#               'js/updatehtml.js',
-              
-#               'js/phaserconfig.js'
-#               'js/newphaser.js',
-              
-             
-#             ),
-#             'output_filename': 'js/scripts.js',
-#         }
-#     }
-# }
-
-# PIPELINE.update({
-#     'CLOSURE_BINARY': os.path.join(BASE_DIR, 'closure-compiler.sh'),
-# })
-# PIPELINE['JS_COMPRESSOR'] = 'pipeline.compressors.closure.ClosureCompressor'
 
 
 
