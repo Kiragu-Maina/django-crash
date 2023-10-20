@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-	const socket = new WebSocket('ws://' + window.location.host + '/ws/admin_updates/');
+	const socket = new WebSocket('wss://' + window.location.host + '/ws/admin_updates/');
 
 	// Adjust the WebSocket URL
 
