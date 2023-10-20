@@ -264,8 +264,7 @@ class Example extends Phaser.Scene {
 							poppedbackground.destroy();
 						}
 						await cleargamescene();
-						backg = scene.add.image(400, 300, 'bg').setPipeline('Light2D');
-						backg.setScale(2.7, 3.5);
+						
 
 
 
@@ -521,8 +520,7 @@ class Example extends Phaser.Scene {
 							poppedbackground.destroy();
 						}
 
-						backg = scene.add.image(400, 300, 'bg').setPipeline('Light2D');
-						backg.setScale(2.7, 3.5);
+					
 					}
 
 					if (countdownText) {
@@ -637,11 +635,7 @@ class Example extends Phaser.Scene {
 		
 
 			
-			if (backg) {
-				// Destroy the existing background image
-				backg.destroy();
-			}
-
+		
 			if (balloonsTween) {
 				balloonsTween.stop(); // Stop the balloon animation
 				balloonsTween = null; // Clear the tween reference
