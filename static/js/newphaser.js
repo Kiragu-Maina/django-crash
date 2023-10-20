@@ -757,7 +757,7 @@ class Example extends Phaser.Scene {
 			}
 
 			countdownText = scene.add.dynamicBitmapText(400, 400, 'desyrel', '').setOrigin(0.5, 0);
-			bet_allowed_text = scene.add.dynamicBitmapText(400, 200, 'desyrel', '').setOrigin(0.5, 0);
+			bet_allowed_text = scene.add.dynamicBitmapText(400, 100, 'desyrel', '').setOrigin(0.5, 0);
 			bet_allowed_text2 = scene.add.dynamicBitmapText(400, 500, 'desyrel', '', 40).setOrigin(0.5, 0);
 			countdownText.setText(`Game starts in ${count}`);
 
