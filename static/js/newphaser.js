@@ -56,7 +56,7 @@ class Example extends Phaser.Scene {
 		let Line;
 		let animationTimer;
 		let start_initial = true;
-		let roomName;
+		// let roomName;
 		let groupSocket;
 		let chooseballoontext;
 		let ballooncount;
@@ -464,6 +464,7 @@ class Example extends Phaser.Scene {
 				betButton.disabled = false;
 
 				start_with_balloon = false;
+				let roomName;
 
 				if (window.roomName) {
 					roomName = window.roomName;
@@ -693,7 +694,11 @@ class Example extends Phaser.Scene {
 			if (typeof globalBetAmount !== 'undefined') {
 				globalBetAmount = 0;
 			}
-
+			
+			if (typeof window.roomName !== 'undefined') {
+				window.roomName = NaN; // Use 'NaN' with a lowercase 'n'
+			}
+			
 			betButton.disabled = false;
 			betButton.textContent = 'BET';
 
@@ -702,6 +707,7 @@ class Example extends Phaser.Scene {
 			window.allowballoonchange = false;
 
 			start_with_balloon = true;
+			
 			
 			
 		}

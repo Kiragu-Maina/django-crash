@@ -411,7 +411,7 @@ class BettingCashoutManager:
             
             await asyncio.sleep(1)  # All
         
-        for count in range(11, 0, -1):
+        for count in range(21, 0, -1):
            
             await self.send_instruction({"type": "count_initial", "count": count })
          
