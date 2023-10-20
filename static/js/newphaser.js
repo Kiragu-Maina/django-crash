@@ -761,21 +761,26 @@ class Example extends Phaser.Scene {
 			bet_allowed_text2 = scene.add.dynamicBitmapText(400, 500, 'desyrel', '', 40).setOrigin(0.5, 0);
 			countdownText.setText(`Game starts in ${count}`);
 
-			if (count > 1) {
-				bet_allowed_text.setText('Place your bet');
+			if (count > 10) {
+				bet_allowed_text.setText('Place your bet-->');
 				
 
 
 			} 
-			else if (count<10) {
+			else if (count>1) {
 				if (bet_allowed_text) {
 						bet_allowed_text.destroy();
 						
 					}
+				if(countdownText){
+					countdownText.destroy();
+				}
+				countdownText = scene.add.dynamicBitmapText(400, 200, 'desyrel', '').setOrigin(0.5, 0);
+				countdownText.setText(`Game starts in ${count}`);
 				bet_allowed_text2.setText('Try special2X \n Which balloon will crash last? -->');
 				
 			}
-			else if (bet_allowed_text) {
+			else{
 				bet_allowed_text.destroy();
 				bet_allowed_text2.destroy();
 			}
