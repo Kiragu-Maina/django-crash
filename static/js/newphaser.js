@@ -54,6 +54,7 @@ class Example extends Phaser.Scene {
 		let poppedbackground;
 		let pump;
 		let Line;
+		let tick;
 		let animationTimer;
 		let start_initial = true;
 		// let roomName;
@@ -425,8 +426,8 @@ class Example extends Phaser.Scene {
 
 						balloon_to_add.addTick = function () {
 							// Add a tick (e.g., a line) below the balloon
-							const tick = scene.add.line(0, 0, 0, 20, 0, 0, 0xffffff);
-							tick.setStrokeStyle(3, 0xffffff);
+							tick = scene.add.line(0, 0, 0, 20, 0, 0, 0xffffff);
+							tick.setStrokeStyle(8, 0xffffff);
 							tick.x = this.x;
 							tick.y = this.y + this.displayHeight / 2 + 10;
 							tick.setOrigin(0, 0);
@@ -459,6 +460,9 @@ class Example extends Phaser.Scene {
 			if (scene.tick) {
 				scene.tick.destroy();
 
+			}
+			if(tick){
+				tick.destroy();
 			}
 			
 			game_id = data.game_id;
