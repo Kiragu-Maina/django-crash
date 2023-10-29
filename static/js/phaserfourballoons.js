@@ -6,27 +6,27 @@ var selectedBalloon = null; // Keep track of the currently selected balloon
 function handleBalloonClick(groupName) {
 	console.log('handle balloon clicked called')
 	if (window.allowballoonchange) {
-		// if (selectedBalloon) {
-		// 	// Remove the "highlighted" class from the previously selected balloon
-		// 	selectedBalloon.classList.remove("highlighted");
-		// }
+		if (selectedBalloon) {
+			// Remove the "highlighted" class from the previously selected balloon
+			selectedBalloon.classList.remove("highlighted");
+		}
 
 		var balloon;
 		switch (groupName) {
 			case 'group_1':
-				// balloon = document.getElementById('balloon1');
+				balloon = document.getElementById('balloon1');
 				window.roomName = 'group_1';
 				break;
 			case 'group_2':
-				// balloon = document.getElementById('balloon2');
+				balloon = document.getElementById('balloon2');
 				window.roomName = 'group_2';
 				break;
 			case 'group_3':
-				// balloon = document.getElementById('balloon3');
+				balloon = document.getElementById('balloon3');
 				window.roomName = 'group_3';
 				break;
 			case 'group_4':
-				// balloon = document.getElementById('balloon4');
+				balloon = document.getElementById('balloon4');
 				window.roomName = 'group_4';
 				break;
 			default:
@@ -35,10 +35,10 @@ function handleBalloonClick(groupName) {
 		}
 
 		// Set the "highlighted" class on the newly selected balloon
-		// balloon.classList.add("highlighted");
-		// selectedBalloon = balloon; // Update the selectedBalloon variable
+		balloon.classList.add("highlighted");
+		selectedBalloon = balloon; // Update the selectedBalloon variable
 
-		// isBalloonSelected = true; // Set the flag to true
+		isBalloonSelected = true; // Set the flag to true
 	}
 }
 

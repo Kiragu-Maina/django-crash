@@ -766,6 +766,7 @@ class Example extends Phaser.Scene {
 			countdownText.setText(`Game starts in ${count}`);
 			const bet_form = document.getElementById('bet-form');
 			const cashout_button = document.getElementById('cashout-button');
+			const first_balloon_container = document.getElementById('first-balloon-container');
 
 			if (count > 10) {
 				bet_allowed_text.setText('Place your bet');
@@ -782,13 +783,14 @@ class Example extends Phaser.Scene {
 				bet_allowed_text2.setText('Try special2X \n Which balloon will crash last? ');
 				bet_form.style.display = 'none';
 				cashout_button.style.display = 'none';
-				
+				first_balloon_container.style.display = 'none';
 			}
 			else{
 				bet_allowed_text.destroy();
 				bet_allowed_text2.destroy();
 				bet_form.style.display = '';
 				cashout_button.style.display = '';
+				first_balloon_container.style.display = '';
 			}
 			 
 			

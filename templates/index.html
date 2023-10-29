@@ -193,6 +193,29 @@
              
             <div class="col-md-4">
               
+                <div class="balloon-container" id="first-balloon-container">
+                  
+                  <!-- Balloon 1 -->
+                  <div id="balloon1" class="balloon" onclick="handleBalloonClick('group_1')">
+                      <img src="{% static 'assets/balloon1.png' %}" alt="Balloon 1">
+                  </div>
+      
+                  <!-- Balloon 2 -->
+                  <div id="balloon2" class="balloon" onclick="handleBalloonClick('group_2')">
+                      <img src="{% static 'assets/balloon2.png' %}" alt="Balloon 2">
+                  </div>
+      
+                  <!-- Balloon 3 -->
+                  <div id="balloon3" class="balloon" onclick="handleBalloonClick('group_3')">
+                      <img src="{% static 'assets/balloon3.png' %}" alt="Balloon 3">
+                  </div>
+      
+                  <!-- Balloon 4 -->
+                  <div id="balloon4" class="balloon" onclick="handleBalloonClick('group_4')">
+                      <img src="{% static 'assets/balloon4.png' %}" alt="Balloon 4">
+                  </div>
+              </div>
+              
                        <form id="bet-form" method='post'>
                 {% csrf_token %}
                     
