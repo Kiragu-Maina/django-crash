@@ -1,7 +1,7 @@
 from django.http import JsonResponse, HttpResponse
 from django.views.generic import TemplateView
 from django.views import View
-from .models import Transactions, BettingWindow, CashoutWindow, Games, Bank, OwnersBank, GameSets, TransactionsForLastGameBet
+from .models import Transactions, BettingWindow, CashoutWindow, Games, Bank, OwnersBank, GameSets, TransactionsForLastGameBet, UsersDepositsandWithdrawals, User
 from .utils import ServerSeedGenerator
 
 from django.contrib.messages.views import SuccessMessageMixin
@@ -42,6 +42,13 @@ import subprocess
 import os
 import logging
 from asgiref.sync import sync_to_async
+
+from django.db.models import Max, Min, Sum, F, ExpressionWrapper, DecimalField, Count, Value
+from django.db.models.functions import TruncDate
+
+import json
+from django.core.paginator import Paginator
+
 
 
 
@@ -403,12 +410,16 @@ class DepositView(View):
             bank_instance = Bank.objects.select_for_update().get(user=user)
             bank_instance.balance += amount_to_add
             bank_instance.save()
+            deposit_instance = UsersDepositsandWithdrawals.objects.create(user=user, deposit=amount_to_add)
+
+            
             response_data = {
                         'status': 'success',
                         'message': 'Deposit successful'
                     }
         except Bank.DoesNotExist:
             response_data =  {'status': 'error', 'message': 'no_bank'}
+            
 
                     
                 
@@ -431,6 +442,8 @@ class WithdrawView(View):
             bank_instance = Bank.objects.select_for_update().get(user=user)
             bank_instance.balance -= amount_to_subtract
             bank_instance.save()
+            withdrawal_instance = UsersDepositsandWithdrawals.objects.create(user=user, withdrawal=amount_to_subtract)
+
             response_data = {
                         'status': 'success',
                         'message': 'Withdrawal successful'
@@ -492,8 +505,7 @@ class AdminView(TemplateView):
         else:
             response_data = {'error': 'Invalid action'}
             return JsonResponse(response_data, status=400)
-        
-
+   
     @sync_to_async
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -501,14 +513,154 @@ class AdminView(TemplateView):
         try:
             user = self.request.user
             owners_bank = OwnersBank.objects.get(user=user)
+            
             pot_amount = owners_bank.total_cash
             profit = owners_bank.profit_to_owner
             revenue = owners_bank.total_real
+            deposits = owners_bank.total_deposits
+            withdrawals = owners_bank.total_withdrawals
             players_online = cache.get("realtime_group_user_count")
             players_betting = cache.get("realtime_betting_users_count")
             players_lost = cache.get("bets_lost_user_count")
             players_won = cache.get("bets_won_user_count")
+            withdrawals_data = UsersDepositsandWithdrawals.objects.filter(withdrawal__gt=0)
+            deposits_data = UsersDepositsandWithdrawals.objects.filter(deposit__gt=0)
+            users_data = User.objects.all()
+            all_bets_in_all_transactions = Transactions.objects.all()
+            all_beta_in_all_last_balloon_transactions = TransactionsForLastGameBet.objects.all()
             
+                
+            
+        
+            all_withdrawals = []
+            all_deposits = []
+            all_users = []
+            all_bets = []
+            
+            for withdrawal in withdrawals_data:
+                original_created_at = withdrawal.created_at  # Replace with your actual field
+                formatted_created_at = original_created_at.strftime("%Y-%m-%d %H:%M:%S")
+                original_uid = str(withdrawal.uid)  # Convert UUID to string
+                formatted_uid = original_uid[:8]
+
+                withdrawal_dict = {
+                    'id': withdrawal.id,
+                    'uid': formatted_uid,
+                    'created_at': formatted_created_at,  # Update 'created_at' with the formatted datetime
+                    'phone_number': withdrawal.user.phone_number,
+                    'status': withdrawal.status,
+                    'amount': withdrawal.withdrawal,
+                    'charges': withdrawal.charges,
+                    'net': withdrawal.net_amount,
+                }
+                all_withdrawals.append(withdrawal_dict)
+                
+           
+            for deposit in deposits_data:
+                original_created_at = deposit.created_at  # Replace with your actual field
+                formatted_created_at = original_created_at.strftime("%Y-%m-%d %H:%M:%S")
+                original_uid = str(deposit.uid)  
+                formatted_uid = original_uid[:8]
+
+                deposit_dict = {
+                    'id': deposit.id,
+                    'uid': formatted_uid,
+                    'created_at': formatted_created_at, 
+                    'phone_number': deposit.user.phone_number,
+                    'status':deposit.status,
+                    'amount':deposit.deposit,
+                    'charges':deposit.charges,
+                    'net':deposit.net_amount,
+                }
+                all_deposits.append(deposit_dict)
+            
+       
+                all_users = []
+                for user in users_data:
+                    bank_data = Bank.objects.get(user=user)
+                    transaction_data = Transactions.objects.filter(user=user).values('won')
+                    transactions_for_last_game_data = TransactionsForLastGameBet.objects.filter(user=user).values('won')
+                    transactions_counting_losses = Transactions.objects.filter(user=user, game_played=True, won=0).values('bet')
+
+                    account_id = bank_data.account_id
+                    print(account_id)
+                    balance = bank_data.balance
+                    h_gain = max(
+                        transaction_data.aggregate(highest=Max(F('won')))['highest'],
+                        transactions_for_last_game_data.aggregate(highest=Max(F('won')))['highest']
+                    )
+                    h_loss = max(
+                       transactions_counting_losses.aggregate(highest=Max(F('bet')))['highest'],
+                        transactions_counting_losses.aggregate(highest=Max(F('bet')))['highest']
+                        
+                    )
+                    profit = bank_data.profit_to_user - bank_data.losses_by_user
+                    games_played = transaction_data.filter(game_played=True).count() + transactions_for_last_game_data.filter(game_played=True).count()
+                    original_created_at = user.created_at  # Replace with your actual field
+                    formatted_created_at = original_created_at.strftime("%Y-%m-%d %H:%M:%S")
+                    original_uid = str(account_id)  
+                    formatted_uid = original_uid[:8]
+
+                    user_data = {
+                        'uid': formatted_uid,
+                        'level':"1",
+                        'username': user.user_name,
+                        'phone_number': user.phone_number,
+                        'status': "active",
+                        'chat_status': "active",
+                        'joined_on': formatted_created_at,
+                        'balance': balance,
+                        'bonus': "0",
+                        'h_gain': h_gain,
+                        'h_loss': f"-{h_loss}",
+                        'profit': profit,
+                        'games_played': games_played,
+                    }
+                    all_users.append(user_data)
+
+
+            
+            items_per_page = 10  # Adjust as needed
+
+            # Create paginator for withdrawals
+            paginator_withdrawals = Paginator(all_withdrawals, items_per_page)
+            page_number_withdrawals = self.request.GET.get('withdrawals_page')
+            withdrawals_page = paginator_withdrawals.get_page(page_number_withdrawals)
+
+            # Create paginator for deposits
+            paginator_deposits = Paginator(all_deposits, items_per_page)
+            page_number_deposits = self.request.GET.get('deposits_page')
+            deposits_page = paginator_deposits.get_page(page_number_deposits)
+            
+            #Create paginator for users
+            
+            paginator_users = Paginator(all_users, items_per_page)
+            page_number_users = self.request.GET.get('users_page')
+            users_page = paginator_users.get_page(page_number_users)
+
+            deposits_by_day = UsersDepositsandWithdrawals.objects.annotate(
+                date=TruncDate('created_at')
+            ).values('date').annotate(total_deposits=Sum('deposit')).order_by('date')
+
+           # Data for Deposits by Day
+            deposits_by_day = UsersDepositsandWithdrawals.objects.annotate(
+                date=TruncDate('created_at')
+            ).values('date').annotate(total_deposits=Sum('deposit')).order_by('date')
+            deposit_labels = [entry['date'].strftime('%Y-%m-%d') for entry in deposits_by_day]
+            deposit_data = [entry['total_deposits'] for entry in deposits_by_day]
+
+            # Data for Withdrawals by Day
+            withdrawals_by_day = UsersDepositsandWithdrawals.objects.annotate(
+                date=TruncDate('created_at')
+            ).values('date').annotate(total_withdrawals=Sum('withdrawal')).order_by('date')
+            withdrawal_labels = [entry['date'].strftime('%Y-%m-%d') for entry in withdrawals_by_day]
+            withdrawal_data = [entry['total_withdrawals'] for entry in withdrawals_by_day]
+            deposit_data_float = [float(str(deposit)) for deposit in deposit_data]
+            # print(deposit_data_float)
+            withdrawal_data_float = [float(str(withdrawal)) for withdrawal in withdrawal_data]
+           
+            
+                        
             context['pot_amount'] = pot_amount
             context['profit'] = profit
             context['revenue'] = revenue
@@ -516,6 +668,18 @@ class AdminView(TemplateView):
             context['players_betting'] = players_betting
             context['players_lost'] = players_lost
             context['players_won'] = players_won
+            context['deposits'] = deposits
+            context['withdrawals'] = withdrawals
+            # Add data for deposits and withdrawals graphs to context
+            context['deposit_labels'] = deposit_labels            
+            context['withdrawal_labels'] = withdrawal_labels
+            context['deposit_data'] = deposit_data_float
+            context['withdrawal_data'] = withdrawal_data_float
+            context['withdrawals_page'] = withdrawals_page
+            context['deposits_page'] = deposits_page
+            context['users_page'] = users_page
+
+         
             
         except OwnersBank.DoesNotExist:
             return 

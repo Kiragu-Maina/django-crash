@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
-from .models import Transactions, User, Games, Bank, Clients, OwnersBank, TransactionsForLastGameBet
+from .models import Transactions, User, Games, Bank, Clients, OwnersBank, TransactionsForLastGameBet, UsersDepositsandWithdrawals
 from .forms import UserChangeForm, UserCreationForm  # Import your UserChangeForm and UserCreationForm
 
 @admin.register(Transactions)
@@ -46,3 +46,4 @@ admin.site.register(Bank, BankAdmin)
 admin.site.register(OwnersBank)
 admin.site.register(Clients)
 admin.site.register(TransactionsForLastGameBet)
+admin.site.register(UsersDepositsandWithdrawals)

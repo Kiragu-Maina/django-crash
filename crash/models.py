@@ -62,6 +62,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     
     phone_number = models.CharField(max_length=16, validators=[phone_validator], unique=True)
     user_name = models.CharField(max_length=30)
+    created_at = models.DateTimeField(auto_now=True)
+    updated_at = models.DateTimeField(auto_now=True)
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
     # is_translator = models.BooleanField(default=False)
@@ -134,6 +136,17 @@ class Bank(models.Model):
     profit_to_user = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     losses_by_user = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     
+class UsersDepositsandWithdrawals(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    deposit = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    withdrawal = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    uid = models.UUIDField(default=uuid.uuid4, editable=False)
+    charges = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    net_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    created_at = models.DateTimeField(auto_now=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    status = models.CharField(max_length=None, default='')
+    
 class GameSets(models.Model):
     created_at = models.DateTimeField(auto_now=True)
     game_set_id = models.CharField(max_length=200)
@@ -148,6 +161,8 @@ class OwnersBank(models.Model):
     total_cash = models.DecimalField(max_digits=50, decimal_places=2, default=0)
     profit_to_owner = models.DecimalField(max_digits=50, decimal_places=2, default=0)
     total_real = models.DecimalField(max_digits=50, decimal_places=2, default=0)
+    total_deposits = models.DecimalField(max_digits=50, decimal_places=2, default=0)
+    total_withdrawals = models.DecimalField(max_digits=50, decimal_places=2, default=0)
 
     def update_balance(self):
             try:
@@ -160,12 +175,19 @@ class OwnersBank(models.Model):
 
                 # Calculate total amount in (losses_by_user)
                 amount_in = Bank.objects.aggregate(total_amount_in=Sum('losses_by_user'))['total_amount_in']
+               # Calculate total deposits
+                deposits = UsersDepositsandWithdrawals.objects.aggregate(total_deposits=Sum('deposit'))['total_deposits']
+
+                # Calculate total withdrawals
+                withdrawals = UsersDepositsandWithdrawals.objects.aggregate(total_withdrawals=Sum('withdrawal'))['total_withdrawals']
 
 
                 if total_balance is not None:
                     self.users_cash = total_balance
                     self.amount_won_by_users = amount_out
                     self.amount_lost_by_users = amount_in
+                    self.total_deposits = deposits
+                    self.total_withdrawals = withdrawals
                     self.total_cash = self.users_cash + self.float_cash
                     self.total_real = self.total_cash - self.users_cash - self.amount_won_by_users + self.amount_lost_by_users
                     self.profit_to_owner = self.total_real - self.float_cash

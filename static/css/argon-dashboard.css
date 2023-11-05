@@ -11104,7 +11104,7 @@ p {
 .dark-version .h4,
 .dark-version .h5,
 .dark-version .h6,
-.dark-version .table thead tr th,
+
 .dark-version a:not(.dropdown-item):not(.choices__item):not(.leaflet-control-zoom-in):not(.leaflet-control-zoom-out):not(.btn):not(.nav-link):not(.fixed-plugin-button),
 .dark-version h1,
 .dark-version h2,
@@ -11124,10 +11124,10 @@ p {
   background-size: 100% 100%, 100% 100%
 }
 
-.dark-version .table>:not(caption)>*>* {
+/* .dark-version .table>:not(caption)>*>* {
   border-color: rgba(255, 255, 255, .4) !important;
   color: rgba(255, 255, 255, .6) !important
-}
+} */
 
 .dark-version label {
   color: rgba(255, 255, 255, .8) !important
@@ -16963,4 +16963,94 @@ cursor: pointer;
   font-size: 14px; /* Adjust the font size to be smaller */
   margin: 10px 0; /* Add margin to separate the paragraphs */
   color: #333; /* Text color */
+}
+#show-dashboard{
+  cursor: pointer;
+}
+#show-control{
+  cursor:pointer;
+}
+#show-bets{
+  cursor:pointer;
+}
+#show-users{
+  cursor:pointer;
+}
+#show-deposits{
+  cursor:pointer;
+}
+#show-withdrawals{
+  cursor:pointer;
+}
+#withdrawal-table {
+  cursor: none;
+  background-color: #051139;
+  font-size: small;
+}
+
+#withdrawal-table thead:hover {
+  background: transparent;
+  
+}
+
+.withdrawal-table thead {
+  background-color: black;
+ 
+  color:blue;
+}
+
+#withdrawal-table tbody tr:hover {
+  background: transparent; /* Change the background color when hovering over a row */
+}
+.withdrawals-link {
+  margin-left: 10px; /* Adjust this value as needed */
+}
+
+#userspage-table {
+  cursor: none;
+  background-color: #051139;
+  font-size: small;
+}
+
+#userspage-table thead:hover {
+  background: transparent;
+  
+}
+
+.userspage-table thead {
+  background-color: black;
+ 
+  color:blue;
+}
+
+#userspage-table tbody tr:hover {
+  background: transparent; /* Change the background color when hovering over a row */
+}
+.userspage-link {
+  margin-left: 10px; /* Adjust this value as needed */
+}
+
+#deposits-table {
+  cursor: none;
+  background-color: #051139;
+  font-size: small;
+  
+}
+
+#deposits-table thead:hover {
+  background: transparent;
+  
+}
+
+.deposits-table thead {
+  background-color: black;
+ 
+  color:blue;
+}
+
+#deposits-table tbody tr:hover {
+  background: transparent; /* Change the background color when hovering over a row */
+}
+.deposits-link {
+  margin-left: 10px; /* Adjust this value as needed */
 }
