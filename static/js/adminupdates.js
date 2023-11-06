@@ -1,22 +1,41 @@
- // Function to check if the URL contains the 'page' parameter
- function hasPageParameter() {
-	const urlParams = new URLSearchParams(window.location.search);
-	return urlParams.has('page');
+function hasPageParameter(pageParameter) {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.has(pageParameter);
 }
 
-// Function to call toggleWithdrawals() when the 'page' parameter is present
-function checkAndCallToggleWithdrawals() {
-	if (hasPageParameter()) {
-		toggleWithdrawals();
+  function checkAndCallToggleWithdrawals() {
+	if (hasPageParameter('deposits_page')) {
+		toggleSection('deposits');
+		
+	} else if (hasPageParameter('withdrawals_page')) {
+		toggleSection('withdrawals');
+		
+	} 
+	else if (hasPageParameter('bets_page')) {
+		toggleSection('betspage');
+		
+	} else if (hasPageParameter('users_page')) {
+		toggleSection('userspage');
+		
+	} else if (hasPageParameter('admins_page')) {
+		toggleSection('adminspage');
+	
 	}
-}
+	else {
 
-// Call the function when the page loads
-window.addEventListener('load', checkAndCallToggleWithdrawals);
+	}
+	
+  }
+  
+  // Call the function when the page loads
+  window.addEventListener('load', function () {
+	checkAndCallToggleWithdrawals(); 
+  });
+  
 
 document.addEventListener('DOMContentLoaded', () => {
 	
-	const socket = new WebSocket('ws://' + window.location.host + '/ws/admin_updates/');
+	const socket = new WebSocket('wss://' + window.location.host + '/ws/admin_updates/');
 
 	// Adjust the WebSocket URL
 
@@ -71,7 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	
 });
 function toggleSection(sectionName) {
-	
+	console.log('toggleSection called')
 	const sections = {
 	  "dashboard": document.getElementById("dashboard"),
 	  "control-game": document.getElementById("control-game"),
@@ -79,6 +98,7 @@ function toggleSection(sectionName) {
 	  "deposits": document.getElementById("deposits"),
 	  "userspage": document.getElementById("userspage"),
 	  "betspage": document.getElementById("betspage"),
+	  "adminspage":document.getElementById("adminspage")
 	};
   
 	const section = sections[sectionName];
@@ -94,6 +114,7 @@ function toggleSection(sectionName) {
 		console.log(sections[key]);
 	  }
 	}
+	
   }
   
 

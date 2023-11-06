@@ -2184,7 +2184,8 @@ button:not(:disabled) {
 }
 
 .nav-item {
-  padding-left: 20px
+  padding-left: 20px;
+  
 }
 
 .nav-fill .nav-item,
@@ -16983,7 +16984,7 @@ cursor: pointer;
   cursor:pointer;
 }
 #withdrawal-table {
-  cursor: none;
+  
   background-color: #051139;
   font-size: small;
 }
@@ -17007,7 +17008,7 @@ cursor: pointer;
 }
 
 #userspage-table {
-  cursor: none;
+ 
   background-color: #051139;
   font-size: small;
 }
@@ -17031,7 +17032,7 @@ cursor: pointer;
 }
 
 #deposits-table {
-  cursor: none;
+  
   background-color: #051139;
   font-size: small;
   

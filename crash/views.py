@@ -1,7 +1,7 @@
 from django.http import JsonResponse, HttpResponse
 from django.views.generic import TemplateView
 from django.views import View
-from .models import Transactions, BettingWindow, CashoutWindow, Games, Bank, OwnersBank, GameSets, TransactionsForLastGameBet, UsersDepositsandWithdrawals, User
+from .models import Transactions, BettingWindow, CashoutWindow, Games, Bank, OwnersBank, GameSets, TransactionsForLastGameBet, UsersDepositsandWithdrawals, User, WhoIsAdmin
 from .utils import ServerSeedGenerator
 
 from django.contrib.messages.views import SuccessMessageMixin
@@ -48,6 +48,7 @@ from django.db.models.functions import TruncDate
 
 import json
 from django.core.paginator import Paginator
+from django.contrib.auth.models import Permission
 
 
 
@@ -459,8 +460,8 @@ class WithdrawView(View):
 # @method_decorator(login_required, name='dispatch')
 class AdminView(TemplateView):
     template_name = 'admin2.html'
-
-
+    
+   
     async def post(self, request, *args, **kwargs):
         action = request.POST.get('action')
 
@@ -507,7 +508,8 @@ class AdminView(TemplateView):
             return JsonResponse(response_data, status=400)
    
     @sync_to_async
-    def get_context_data(self, **kwargs):
+    @method_decorator(permission_required('crash.customadminpermission', raise_exception=True))
+    def get_context_data(self,request, **kwargs):
         context = super().get_context_data(**kwargs)
         
         try:
@@ -526,9 +528,11 @@ class AdminView(TemplateView):
             withdrawals_data = UsersDepositsandWithdrawals.objects.filter(withdrawal__gt=0)
             deposits_data = UsersDepositsandWithdrawals.objects.filter(deposit__gt=0)
             users_data = User.objects.all()
-            all_bets_in_all_transactions = Transactions.objects.all()
-            all_beta_in_all_last_balloon_transactions = TransactionsForLastGameBet.objects.all()
-            
+            admins = WhoIsAdmin.objects.all()
+            all_bets_in_all_transactions = list(Transactions.objects.all())
+            all_bets_in_all_last_balloon_transactions = list(TransactionsForLastGameBet.objects.all())
+            all_bets_sorted = sorted(all_bets_in_all_transactions + all_bets_in_all_last_balloon_transactions, key=lambda bet: bet.created_at)
+
                 
             
         
@@ -536,6 +540,59 @@ class AdminView(TemplateView):
             all_deposits = []
             all_users = []
             all_bets = []
+            all_admins = []
+           
+            
+
+            for admin in admins:
+                
+                
+                    # User has the 'crash.customadminpermission' permission
+                    print(admin)
+                    is_active = 'active' if admin.is_active else 'inactive'
+                    admins_dict = {
+                         'id':admin.id,
+                         'user_name':admin.user.user_name,
+                         'created_at':admin.created_at,
+                         'phone_number':admin.user.phone_number,
+                         'status':is_active,
+                         'role': 'admin'
+                    }
+                    all_admins.append(admins_dict)
+            
+            for bet in all_bets_sorted:
+                
+                original_created_at = bet.created_at  # Replace with your actual field
+                formatted_created_at = original_created_at.strftime("%Y-%m-%d %H:%M:%S")
+                game_id = str(bet.game_id)  # Convert UUID to string
+                formatted_uid = game_id[:8]  # Fix the variable name
+                bank_data = Bank.objects.get(user=user)
+                balance = bank_data.balance
+
+                if bet in all_bets_in_all_transactions:
+                    game_type = 'classic'
+                else:
+                    game_type = 'special'
+
+                bets_dict = {
+                    'id': bet.id,
+                    'username': bet.user.user_name,
+                    'game_id': formatted_uid,
+                    'game_set_id': bet.game_set_id,
+                    'created_at': formatted_created_at,
+                    'game_type': game_type,
+                    'bet_amt': bet.bet,
+                    'cashout': bet.won,
+                    'profit': bet.won - bet.bet,
+                    'net_profit': '0',  # You might need to calculate this based on your business logic
+                    'result': 'won' if bet.won > 0 and bet.game_played == True else 'lost',
+                    'balance': balance
+                }
+                all_bets.append(bets_dict)
+
+                
+             
+                
             
             for withdrawal in withdrawals_data:
                 original_created_at = withdrawal.created_at  # Replace with your actual field
@@ -586,14 +643,15 @@ class AdminView(TemplateView):
                     print(account_id)
                     balance = bank_data.balance
                     h_gain = max(
-                        transaction_data.aggregate(highest=Max(F('won')))['highest'],
-                        transactions_for_last_game_data.aggregate(highest=Max(F('won')))['highest']
+                        transaction_data.aggregate(highest=Max(F('won')))['highest'] or 0,
+                        transactions_for_last_game_data.aggregate(highest=Max(F('won')))['highest'] or 0
                     )
+
                     h_loss = max(
-                       transactions_counting_losses.aggregate(highest=Max(F('bet')))['highest'],
-                        transactions_counting_losses.aggregate(highest=Max(F('bet')))['highest']
-                        
+                        transactions_counting_losses.aggregate(highest=Max(F('bet')))['highest'] or 0,
+                        transactions_counting_losses.aggregate(highest=Max(F('bet')))['highest'] or 0
                     )
+
                     profit = bank_data.profit_to_user - bank_data.losses_by_user
                     games_played = transaction_data.filter(game_played=True).count() + transactions_for_last_game_data.filter(game_played=True).count()
                     original_created_at = user.created_at  # Replace with your actual field
@@ -637,6 +695,19 @@ class AdminView(TemplateView):
             paginator_users = Paginator(all_users, items_per_page)
             page_number_users = self.request.GET.get('users_page')
             users_page = paginator_users.get_page(page_number_users)
+             #Create paginator for bets
+            
+            paginator_bets = Paginator(all_bets, items_per_page)
+            page_number_bets = self.request.GET.get('bets_page')
+            bets_page = paginator_bets.get_page(page_number_bets)
+            
+             #Create paginator for admins
+            
+            paginator_admins = Paginator(all_admins, items_per_page)
+            page_number_admins = self.request.GET.get('admins_page')
+            admins_page = paginator_admins.get_page(page_number_admins)
+
+
 
             deposits_by_day = UsersDepositsandWithdrawals.objects.annotate(
                 date=TruncDate('created_at')
@@ -678,6 +749,8 @@ class AdminView(TemplateView):
             context['withdrawals_page'] = withdrawals_page
             context['deposits_page'] = deposits_page
             context['users_page'] = users_page
+            context['bets_page'] = bets_page
+            context['admins_page'] = admins_page
 
          
             
@@ -687,16 +760,26 @@ class AdminView(TemplateView):
         
         return context
     
-      
+   
     async def get(self, request, *args, **kwargs):
         
-        @sync_to_async 
+        @sync_to_async
         def check_authentication(user):
-            if self.request.user.is_authenticated:
-                return True
+            if user.is_authenticated:
+                try:
+                    admin_instance = WhoIsAdmin.objects.get(user=user)
+                    return admin_instance is not None
+                except WhoIsAdmin.DoesNotExist:
+                    return False  # User is not an admin
+                except Exception as e:
+                    # Handle other potential exceptions (e.g., database connection error)
+                    return False
+            else:
+                return False  # User is not authenticated
+
             
         if await check_authentication(self.request.user):
-            context = await self.get_context_data()
+            context = await self.get_context_data(request)
             return render(request, self.template_name, context)
         else:
             return render(request, 'adminlogin.html')

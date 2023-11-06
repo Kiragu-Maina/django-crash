@@ -12,11 +12,8 @@ phone_validator = RegexValidator(r"^(\+?\d{0,4})?\s?-?\s?(\(?\d{3}\)?)\s?-?\s?(\
 from django.contrib.auth.models import Permission
 from django.db import IntegrityError 
 
-class CustomAdminPermission(Permission):
-    class Meta:
-        proxy = True
-        verbose_name = "Custom Admin Permission"
-        verbose_name_plural = "Custom Admin Permissions"
+
+
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, phone_number, user_name, password=None, **extra_fields):
@@ -75,13 +72,7 @@ class User(AbstractBaseUser, PermissionsMixin):
        
         return str(self.user_name)
 
-    @staticmethod
-    def has_perm(perm, obj=None, **kwargs):
-        return True
-
-    @staticmethod
-    def has_module_perms(app_label, **kwargs):
-        return True
+    
 
     @property
     def is_staff(self):
@@ -90,7 +81,12 @@ class User(AbstractBaseUser, PermissionsMixin):
     @is_staff.setter
     def is_staff(self, value):
         self.is_admin = value
-
+        
+class WhoIsAdmin(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now=True)
+    is_active = models.BooleanField(default=True)
+   
 
 
 class Transactions(models.Model):

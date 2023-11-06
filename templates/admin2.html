@@ -133,14 +133,7 @@
             <span class="nav-link-text ms-1">Bets</span>
           </a>
         </li>
-        <li class="nav-item" id="show-control">
-          <a class="nav-link" onclick="toggleSection('control-game')">
-            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-              <i class="ni ni-collection text-info text-sm opacity-10"></i>
-            </div>
-            <span class="nav-link-text ms-1">Control Panel</span>
-          </a>
-        </li>
+       
         <li class="nav-item" id="show-withdrawals">
           <a class="nav-link" onclick="toggleSection('withdrawals')">
             <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
@@ -158,7 +151,14 @@
           </a>
         </li>
 
-
+        <li class="nav-item" id="show-control">
+          <a class="nav-link" onclick="toggleSection('control-game')">
+            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="ni ni-collection text-info text-sm opacity-10"></i>
+            </div>
+            <span class="nav-link-text ms-1">Control Panel</span>
+          </a>
+        </li>
 
 
         <li class="nav-item">
@@ -169,6 +169,18 @@
             <span class="nav-link-text ms-1">Log out</span>
           </a>
         </li>
+        <li class="nav-item mt-3">
+          <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">System Administrators</h6>
+        </li>
+        <li class="nav-item" id="show-control">
+          <a class="nav-link" onclick="toggleSection('adminspage')">
+            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="ni ni-collection text-info text-sm opacity-10"></i>
+            </div>
+            <span class="nav-link-text ms-1">Admins</span>
+          </a>
+        </li>
+
      
        
         {% else %}
@@ -293,7 +305,7 @@
           <div class="col-md-6">
             <div class="card">
               <div class="card-body">
-                <h5 class="card-title">Withdrawals Chart <span class="withdrawals-link"><a href="#" onclick="toggleWithdrawals()">See all withdrawals</a></span></h5>        
+                <h5 class="card-title">Withdrawals Chart <span class="withdrawals-link"><a href="#" onclick="toggleSection(withdrawals)">See all withdrawals</a></span></h5>        
                 <canvas id="withdrawalsChart" height="200"></canvas>
               </div>
             </div>
@@ -349,17 +361,17 @@
       <div class="pagination">
           <span class="step-links">
               {% if users_page.has_previous %}
-                  <a href="?page=1" onclick="toggleSection('userspage')">&laquo; first</a>
-                  <a href="?page={{ users_page.previous_page_number }}" onclick="toggleSection('userspage')">previous</a>
+                  <a href="?users_page=1">&laquo; first</a>
+                  <a href="?users_page={{ users_page.previous_page_number }}">previous</a>
               {% endif %}
       
               <span class="current">
                   Page {{ users_page.number }} of {{ users_page.paginator.num_pages }}.
               </span>
       
-              {% if withdrawals_page.has_next %}
-                  <a href="?page={{ users_page.next_page_number }}" onclick="toggleSection('userspage')">next</a>
-                  <a href="?page={{ users_page.paginator.num_pages }}" onclick="toggleSection('userspage')">last &raquo;</a>
+              {% if users_page.has_next %}
+                  <a href="?users_page={{ users_page.next_page_number }}">next</a>
+                  <a href="?users_page={{ users_page.paginator.num_pages }}">last &raquo;</a>
               {% endif %}
           </span>
       </div>
@@ -370,26 +382,35 @@
           <thead>
               <tr style="background-color: blue">
                   <th>ID</th>
-                  <th>User ID</th>
-                  <th>Created At</th>
-                  <th>Phone Number</th>
-                  <th>Status</th>
+                  <th>Username</th>
+                  <th>Game id</th>
+                  <th>Game set id</th>
+                  <th>Created at</th>
+                  <th>Game type</th>
                   <th>Amount</th>
-                  <th>Charges</th>
-                  <th>Net Amount</th>
+                  <th>Cashout</th>
+                  <th>Profit</th>
+                  <th>Net profit</th>
+                  <th>Result</th>
+                  <th>Balance</th>
               </tr>
           </thead>
           <tbody>
-              {% for withdrawal in withdrawals_page %}
+              {% for bet in bets_page %}
               <tr>
-                  <td>{{ withdrawal.id }}</td>
-                  <td>{{ withdrawal.uid }}</td>
-                  <td>{{ withdrawal.created_at }}</td>
-                  <td>{{ withdrawal.phone_number }}</td>
-                  <td>{{ withdrawal.status }}</td>
-                  <td>{{ withdrawal.amount }}</td>
-                  <td>{{ withdrawal.charges }}</td>
-                  <td>{{ withdrawal.net }}</td>
+                  <td>{{ bet.id }}</td>
+                  <td>{{ bet.username }}</td>
+                  <td>{{ bet.game_id }}</td>
+                  <td>{{ bet.game_set_id }}</td>
+                  <td>{{ bet.created_at }}</td>
+                  <td>{{ bet.game_type }}</td>
+                  <td>{{ bet.bet_amt }}</td>
+                  <td>{{ bet.cashout }}</td>
+                  <td>{{ bet.profit }}</td>
+                  <td>{{ bet.net_profit }}</td>
+                  <td>{{ bet.result }}</td>
+                  <td>{{ bet.balance }}</td>
+
               </tr>
               {% endfor %}
           </tbody>
@@ -397,18 +418,18 @@
       
       <div class="pagination">
           <span class="step-links">
-              {% if withdrawals_page.has_previous %}
-                  <a href="?page=1" onclick="toggleWithdrawals()">&laquo; first</a>
-                  <a href="?page={{ withdrawals_page.previous_page_number }}" onclick="toggleWithdrawals()">previous</a>
+              {% if bets_page.has_previous %}
+                  <a href="?bets_page=1">&laquo; first</a>
+                  <a href="?bets_page={{ bets_page.previous_page_number }}">previous</a>
               {% endif %}
       
               <span class="current">
-                  Page {{ withdrawals_page.number }} of {{ withdrawals_page.paginator.num_pages }}.
+                  Page {{ bets_page.number }} of {{ bets_page.paginator.num_pages }}.
               </span>
       
-              {% if withdrawals_page.has_next %}
-                  <a href="?page={{ withdrawals_page.next_page_number }}" onclick="toggleWithdrawals()">next</a>
-                  <a href="?page={{ withdrawals_page.paginator.num_pages }}" onclick="toggleWithdrawals()">last &raquo;</a>
+              {% if bets_page.has_next %}
+                  <a href="?bets_page={{ bets_page.next_page_number }}">next</a>
+                  <a href="?bets_page={{ bets_page.paginator.num_pages }}">last &raquo;</a>
               {% endif %}
           </span>
       </div>
@@ -449,8 +470,8 @@
       <div class="pagination">
           <span class="step-links">
               {% if withdrawals_page.has_previous %}
-                  <a href="?page=1" onclick="toggleWithdrawals()">&laquo; first</a>
-                  <a href="?page={{ withdrawals_page.previous_page_number }}" onclick="toggleWithdrawals()">previous</a>
+                  <a href="?withdrawals_page=1">&laquo; first</a>
+                  <a href="?withdrawals_page={{ withdrawals_page.previous_page_number }}">previous</a>
               {% endif %}
       
               <span class="current">
@@ -458,8 +479,8 @@
               </span>
       
               {% if withdrawals_page.has_next %}
-                  <a href="?page={{ withdrawals_page.next_page_number }}" onclick="toggleWithdrawals()">next</a>
-                  <a href="?page={{ withdrawals_page.paginator.num_pages }}" onclick="toggleWithdrawals()">last &raquo;</a>
+                  <a href="?withdrawals_page={{ withdrawals_page.next_page_number }}">next</a>
+                  <a href="?withdrawals_page={{ withdrawals_page.paginator.num_pages }}">last &raquo;</a>
               {% endif %}
           </span>
       </div>
@@ -496,27 +517,76 @@
           </tbody>
       </table>
       
-      <div class="pagination">
-          <span class="step-links">
-              {% if deposits_page.has_previous %}
-                  <a href="?page=1" onclick="toggleDeposits()">&laquo; first</a>
-                  <a href="?page={{ deposits_page.previous_page_number }}" onclick="toggleDeposits()">previous</a>
-              {% endif %}
-      
-              <span class="current">
-                  Page {{ deposits_page.number }} of {{ deposits_page.paginator.num_pages }}.
-              </span>
-      
-              {% if page2.has_next %}
-                  <a href="?page={{ deposits_page.next_page_number }}" onclick="toggleDeposits()">next</a>
-                  <a href="?page={{ deposits_page.paginator.num_pages }}" onclick="toggleDeposits()">last &raquo;</a>
-              {% endif %}
-          </span>
-      </div>
+        <div class="pagination">
+            <span class="step-links">
+                {% if deposits_page.has_previous %}
+                    <a href="?deposits_page=1" >&laquo; first</a>
+                    <a href="?deposits_page={{ deposits_page.previous_page_number }}">previous</a>
+                {% endif %}
+        
+                <span class="current">
+                    Page {{ deposits_page.number }} of {{ deposits_page.paginator.num_pages }}.
+                </span>
+        
+                {% if deposits_page.has_next %}
+                    <a href="?deposits_page={{ deposits_page.next_page_number }}" >next</a>
+                    <a href="?deposits_page={{ deposits_page.paginator.num_pages }}" >last &raquo;</a>
+                {% endif %}
+            </span>
+        </div>
       
       </div>
     
-    
+      <!-- All admins page -->
+      <div class="container-fluid py-4" id="adminspage" style="display:none">
+        <table class="table table-bordered deposits-table" id="deposits-table">
+          <thead>
+              <tr style="background-color: blue">
+                  <th>ID</th>
+                  <th>Username</th>
+                  <th>Created At</th>
+                  <th>Phone Number</th>
+                  <th>Status</th>
+                  <th>Role</th>
+                  <th>Presenter Share</th>
+                  <th>Earnings</th>
+                  
+              </tr>
+          </thead>
+          <tbody>
+              {% for admin in admins_page %}
+              <tr>
+                  <td>{{ admin.id }}</td>
+                  <td>{{ admin.user_name }}</td>
+                  <td>{{ admin.created_at }}</td>
+                  <td>{{ admin.phone_number }}</td>
+                  <td>{{ admin.status }}</td>
+                  <td>{{ admin.role }}</td>
+                 
+              </tr>
+              {% endfor %}
+          </tbody>
+      </table>
+      
+        <div class="pagination">
+            <span class="step-links">
+                {% if admins_page.has_previous %}
+                    <a href="?admins_page=1" >&laquo; first</a>
+                    <a href="?admins_page={{ admins_page.previous_page_number }}">previous</a>
+                {% endif %}
+        
+                <span class="current">
+                    Page {{ admins_page.number }} of {{ admins_page.paginator.num_pages }}.
+                </span>
+        
+                {% if admins_page.has_next %}
+                    <a href="?admins_page={{ admins_page.next_page_number }}" >next</a>
+                    <a href="?admins_page={{ admins_page.paginator.num_pages }}" >last &raquo;</a>
+                {% endif %}
+            </span>
+        </div>
+      
+      </div>
     
     <div class="container-fluid py-4" id="control-game" style="display:none">
       <div class="row mt-4">
@@ -1203,7 +1273,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.css" />
 <script src="{% static 'js/adminupdates.js' %}"></script>
-<script src="{% static 'js/adminnewdashboard.js'}"></script>
+
 
 
   
