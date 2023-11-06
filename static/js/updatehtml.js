@@ -4,6 +4,10 @@ document.addEventListener('DOMContentLoaded', () => {
 	const socket = new WebSocket('wss://' + window.location.host + '/ws/table_updates/');
 	const socket2 = new WebSocket('wss://' + window.location.host + '/ws/balance_updates/');
 	const errorText = document.getElementById('error-text');
+
+	const cashoutButton = document.getElementById('cashout-button');
+	
+	
 	let type;
 
 	
@@ -13,6 +17,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 		if (data.type == 'table_update') {
 			type = 'won';
+			cashoutButton.textContent = `CASHOUT (${parseFloat(data.won).toFixed(2)})`;
+
 			updateTable(data, type);
 		} else if (data.type == 'bet_placed_update') {
 			type = 'placed';

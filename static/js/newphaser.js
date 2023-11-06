@@ -1144,18 +1144,20 @@ class Example extends Phaser.Scene {
 		}
 
 		async function updateCashoutButtonText(counterText) {
-			let bet_amount = 0;
+			if (!cashoutclicked){
+				let bet_amount = 0;
 
-			if (typeof globalBetAmount !== 'undefined') {
-				bet_amount = globalBetAmount;
+				if (typeof globalBetAmount !== 'undefined') {
+					bet_amount = globalBetAmount;
+				}
+
+				const cashoutButton = document.getElementById('cashout-button');
+				const counterValue = parseFloat(counterText.text.substring(1)); // Assuming counterText contains something like "$1.23"
+
+				const cashoutAmount = Math.floor(bet_amount * counterValue);
+
+				cashoutButton.textContent = `CASHOUT (${cashoutAmount})`;
 			}
-
-			const cashoutButton = document.getElementById('cashout-button');
-			const counterValue = parseFloat(counterText.text.substring(1)); // Assuming counterText contains something like "$1.23"
-
-			const cashoutAmount = Math.floor(bet_amount * counterValue);
-
-			cashoutButton.textContent = `CASHOUT (${cashoutAmount})`;
 		}
 
 		function CountingComplete(crashpoint) {
