@@ -157,8 +157,8 @@ class OwnersBank(models.Model):
     total_cash = models.DecimalField(max_digits=50, decimal_places=2, default=0)
     profit_to_owner = models.DecimalField(max_digits=50, decimal_places=2, default=0)
     total_real = models.DecimalField(max_digits=50, decimal_places=2, default=0)
-    total_deposits = models.DecimalField(max_digits=50, decimal_places=2, default=0)
-    total_withdrawals = models.DecimalField(max_digits=50, decimal_places=2, default=0)
+    total_deposits = models.DecimalField(max_digits=50, decimal_places=2, default=0, null=True)
+    total_withdrawals = models.DecimalField(max_digits=50, decimal_places=2, default=0, null=True)
 
     def update_balance(self):
             try:
