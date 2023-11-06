@@ -40,9 +40,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Run database migrations and collect static files
 RUN python manage.py makemigrations && \
     python manage.py migrate && \      
-    python manage.py collectstatic --noinput && \
-    python manage.py initadmin && \
-    python manage.py populate_users
+    python manage.py collectstatic --noinput
+   
     
 
 # Start the application using Daphne and Celery

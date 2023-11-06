@@ -632,49 +632,49 @@ class AdminView(TemplateView):
                 all_deposits.append(deposit_dict)
             
        
-                all_users = []
-                for user in users_data:
-                    bank_data = Bank.objects.get(user=user)
-                    transaction_data = Transactions.objects.filter(user=user).values('won')
-                    transactions_for_last_game_data = TransactionsForLastGameBet.objects.filter(user=user).values('won')
-                    transactions_counting_losses = Transactions.objects.filter(user=user, game_played=True, won=0).values('bet')
+            
+            for user in users_data:
+                bank_data = Bank.objects.get(user=user)
+                transaction_data = Transactions.objects.filter(user=user).values('won')
+                transactions_for_last_game_data = TransactionsForLastGameBet.objects.filter(user=user).values('won')
+                transactions_counting_losses = Transactions.objects.filter(user=user, game_played=True, won=0).values('bet')
 
-                    account_id = bank_data.account_id
-                    print(account_id)
-                    balance = bank_data.balance
-                    h_gain = max(
-                        transaction_data.aggregate(highest=Max(F('won')))['highest'] or 0,
-                        transactions_for_last_game_data.aggregate(highest=Max(F('won')))['highest'] or 0
-                    )
+                account_id = bank_data.account_id
+                print(account_id)
+                balance = bank_data.balance
+                h_gain = max(
+                    transaction_data.aggregate(highest=Max(F('won')))['highest'] or 0,
+                    transactions_for_last_game_data.aggregate(highest=Max(F('won')))['highest'] or 0
+                )
 
-                    h_loss = max(
-                        transactions_counting_losses.aggregate(highest=Max(F('bet')))['highest'] or 0,
-                        transactions_counting_losses.aggregate(highest=Max(F('bet')))['highest'] or 0
-                    )
+                h_loss = max(
+                    transactions_counting_losses.aggregate(highest=Max(F('bet')))['highest'] or 0,
+                    transactions_counting_losses.aggregate(highest=Max(F('bet')))['highest'] or 0
+                )
 
-                    profit = bank_data.profit_to_user - bank_data.losses_by_user
-                    games_played = transaction_data.filter(game_played=True).count() + transactions_for_last_game_data.filter(game_played=True).count()
-                    original_created_at = user.created_at  # Replace with your actual field
-                    formatted_created_at = original_created_at.strftime("%Y-%m-%d %H:%M:%S")
-                    original_uid = str(account_id)  
-                    formatted_uid = original_uid[:8]
+                profit = bank_data.profit_to_user - bank_data.losses_by_user
+                games_played = transaction_data.filter(game_played=True).count() + transactions_for_last_game_data.filter(game_played=True).count()
+                original_created_at = user.created_at  # Replace with your actual field
+                formatted_created_at = original_created_at.strftime("%Y-%m-%d %H:%M:%S")
+                original_uid = str(account_id)  
+                formatted_uid = original_uid[:8]
 
-                    user_data = {
-                        'uid': formatted_uid,
-                        'level':"1",
-                        'username': user.user_name,
-                        'phone_number': user.phone_number,
-                        'status': "active",
-                        'chat_status': "active",
-                        'joined_on': formatted_created_at,
-                        'balance': balance,
-                        'bonus': "0",
-                        'h_gain': h_gain,
-                        'h_loss': f"-{h_loss}",
-                        'profit': profit,
-                        'games_played': games_played,
-                    }
-                    all_users.append(user_data)
+                user_data = {
+                    'uid': formatted_uid,
+                    'level':"1",
+                    'username': user.user_name,
+                    'phone_number': user.phone_number,
+                    'status': "active",
+                    'chat_status': "active",
+                    'joined_on': formatted_created_at,
+                    'balance': balance,
+                    'bonus': "0",
+                    'h_gain': h_gain,
+                    'h_loss': f"-{h_loss}",
+                    'profit': profit,
+                    'games_played': games_played,
+                }
+                all_users.append(user_data)
 
 
             
