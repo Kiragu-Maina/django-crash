@@ -90,7 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	
 });
 function toggleSection(sectionName) {
-	console.log('toggleSection called')
+	console.log('toggleSection called');
 	const sections = {
 	  "dashboard": document.getElementById("dashboard"),
 	  "control-game": document.getElementById("control-game"),
@@ -98,23 +98,45 @@ function toggleSection(sectionName) {
 	  "deposits": document.getElementById("deposits"),
 	  "userspage": document.getElementById("userspage"),
 	  "betspage": document.getElementById("betspage"),
-	  "adminspage":document.getElementById("adminspage")
+	  "adminspage": document.getElementById("adminspage")
 	};
+  
+	// Corrected variable declarations
+	const dashboard_span = document.getElementById("show-dashboard-span");
+	const control_game_span = document.getElementById("show-control-game-span");
+	const withdrawals_span = document.getElementById("show-withdrawals-span");
+	const deposits_span = document.getElementById("show-deposits-span");
+	const userspage_span = document.getElementById("show-userspage-span");
+	const betspage_span = document.getElementById("show-betspage-span");
+	const adminspage_span = document.getElementById("show-adminspage-span");
   
 	const section = sections[sectionName];
   
 	if (section) {
 	  section.style.display = 'block';
+	  // Corrected text-decoration style assignment
+	  if (sectionName === "dashboard") dashboard_span.style.textDecoration = 'underline';
+	  if (sectionName === "control-game") control_game_span.style.textDecoration = 'underline';
+	  if (sectionName === "withdrawals") withdrawals_span.style.textDecoration = 'underline';
+	  if (sectionName === "deposits") deposits_span.style.textDecoration = 'underline';
+	  if (sectionName === "userspage") userspage_span.style.textDecoration = 'underline';
+	  if (sectionName === "betspage") betspage_span.style.textDecoration = 'underline';
+	  if (sectionName === "adminspage") adminspage_span.style.textDecoration = 'underline';
 	}
   
 	for (const key in sections) {
 	  if (sections.hasOwnProperty(key) && key !== sectionName && sections[key] !== null) {
-		
 		sections[key].style.display = 'none';
-		console.log(sections[key]);
+		// Corrected text-decoration style assignment
+		if (key === "dashboard") dashboard_span.style.textDecoration = 'none';
+		if (key === "control-game") control_game_span.style.textDecoration = 'none';
+		if (key === "withdrawals") withdrawals_span.style.textDecoration = 'none';
+		if (key === "deposits") deposits_span.style.textDecoration = 'none';
+		if (key === "userspage") userspage_span.style.textDecoration = 'none';
+		if (key === "betspage") betspage_span.style.textDecoration = 'none';
+		if (key === "adminspage") adminspage_span.style.textDecoration = 'none';
 	  }
 	}
-	
   }
   
 
