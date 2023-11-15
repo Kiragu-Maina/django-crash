@@ -134,7 +134,7 @@
             <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
               <i class="ni ni-collection text-info text-sm opacity-10"></i>
             </div>
-            <span class="nav-link-text ms-1">Register</span>
+            <span class="nav-link-text ms-1">Register as admin</span>
           </a>
         </li>
         {% endif %}
@@ -276,7 +276,7 @@
       </div>
       <div class="card-footer text-center pt-0 px-lg-2 px-1">
         <p class="mb-4 text-sm mx-auto">
-          Don't have an account?
+          Don't have an admin account?
           <p><a href="#ex2" class="text-primary text-gradient font-weight-bold" rel="modal:open">Register</a></p>
         </p>
 
@@ -295,18 +295,62 @@
     <div class="card card-plain">
       <div class="card-header pb-0 text-start">
         
-        <h4 class="font-weight-bolder">Register</h4>
+        <h4 class="font-weight-bolder">Register admin</h4>
         <p id="error2" style="color: red"></p>
-        <p class="mb-0">Enter your email and password to sign in</p>
+        <p class="mb-0">Enter your phone_number and password to get access to admin page</p>
+        <p class="mb-0">Note: You need to have a regular account first</p>
       </div>
       <div class="card-body">
         <form id="register-form" role="form">
           {% csrf_token %}
+          
           <div class="mb-3">
-            <input type="text" class="form-control" id = "user_name" name = "user_name" placeholder="Username" aria-label="Name">
+            <div class="mb-3">
+              <input type="text" id = "phone_number2" class="form-control form-control-lg" placeholder="Phone Number" aria-label="Phone_number">
+            </div>
+            <div class="mb-3">
+              <input type="password" id = "password3" class="form-control form-control-lg" placeholder="Password" aria-label="Password">
+            </div>
+          
+          
+          <div class="text-center">
+            <button type="button" id="register-submit-btn" class="btn bg-gradient-dark w-100 my-4 mb-2">Sign up</button>
+          </div>
+          <div id="spinner2" style="display: none;">
+            <!-- Add your spinner HTML or image here -->
+            <div class="spinner-border" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
+          <p class="text-sm mt-3 mb-0">No regular account? <p><a href="#ex3" class="text-primary text-gradient font-weight-bold" rel="modal:open">Register</a></p>
+
+        </form>
+      </div>
+    
+      
+    </div>
+  
+    
+    <a href="#" rel="modal:close">Close</a>
+  </div>
+  <div id="ex3" class="modal">
+    
+    
+    <div class="card card-plain">
+      <div class="card-header pb-0 text-start">
+        
+        <h4 class="font-weight-bolder">Register</h4>
+        <p id="error3" style="color: red"></p>
+        <p class="mb-0">Enter your email and password to sign in</p>
+      </div>
+      <div class="card-body">
+        <form id="register-form-2" role="form">
+          {% csrf_token %}
+          <div class="mb-3">
+            <input type="text" class="form-control" id = "user_name3" name = "user_name" placeholder="Username" aria-label="Name">
           </div>
           <div class="mb-3">
-            <input type="text" class="form-control" id="phone_number2" name = "phone_number" placeholder="Phone_number" aria-label="phone_number">
+            <input type="text" class="form-control" id="phone_number3" name = "phone_number" placeholder="Phone_number" aria-label="phone_number">
           </div>
           <div class="mb-3">
             <input type="password" class="form-control" id="password1" name="password1" placeholder="Password" aria-label="Password">
@@ -316,9 +360,9 @@
           </div>
           
           <div class="text-center">
-            <button type="button" id="register-submit-btn" class="btn bg-gradient-dark w-100 my-4 mb-2">Sign up</button>
+            <button type="button" id="register-submit-btn2" class="btn bg-gradient-dark w-100 my-4 mb-2">Sign up</button>
           </div>
-          <div id="spinner2" style="display: none;">
+          <div id="spinner3" style="display: none;">
             <!-- Add your spinner HTML or image here -->
             <div class="spinner-border" role="status">
                 <span class="sr-only">Loading...</span>
@@ -387,29 +431,25 @@
                 }
             });
         });
+
         $('#register-submit-btn').click(function () {
           $("#register_submit_btn").hide();
          $("#spinner2").show();
-          var phone_number = $('#phone_number2').val();
-          var username = $('#user_name').val();
+              var phone_number = $('#phone_number2').val();
 
-          var password1 = $('#password1').val();
-          var password2 = $('#password2').val();
-          var csrf_token = $("input[name=csrfmiddlewaretoken]").val();  // Get the CSRF token
+              var password = $('#password3').val();
+              var csrf_token = $("input[name=csrfmiddlewaretoken]").val();  // Get the CSRF token
 
-          // Prepare the data to be sent
-          var data = {
-              user_name: username,
-              phone_number: phone_number,
-              password1: password1,
-              password2: password2,
-
-              csrfmiddlewaretoken: csrf_token
-          };
+              // Prepare the data to be sent
+              var data = {
+                  username: phone_number,
+                  password: password,
+                  csrfmiddlewaretoken: csrf_token
+              };
 
           // Send an AJAX POST request to the server
           $.ajax({
-              url: '{% url "register" %}',  // Replace with your actual login URL
+              url: '{% url "add_admin" %}',  // Replace with your actual login URL
               type: 'POST',
               data: data,
               success: function (response) {
@@ -436,6 +476,56 @@
               }
           });
       });
+      $('#register-submit-btn2').click(function () {
+        $("#register_submit_btn2").hide();
+       $("#spinner3").show();
+        var phone_number = $('#phone_number3').val();
+        var username = $('#user_name3').val();
+
+        var password1 = $('#password1').val();
+        var password2 = $('#password2').val();
+        var csrf_token = $("input[name=csrfmiddlewaretoken]").val();  // Get the CSRF token
+
+        // Prepare the data to be sent
+        var data = {
+            user_name: username,
+            phone_number: phone_number,
+            password1: password1,
+            password2: password2,
+
+            csrfmiddlewaretoken: csrf_token
+        };
+
+        // Send an AJAX POST request to the server
+        $.ajax({
+            url: '{% url "register" %}',  // Replace with your actual login URL
+            type: 'POST',
+            data: data,
+            success: function (response) {
+                // Handle the response from the server, e.g., redirect or show a success message
+                console.log(response);
+                window.location.href = '{% url "adminpage" %}';
+
+                
+            },
+            error: function (xhr, status, error) {
+              $("#spinner3").hide();
+                try {
+                  var errorResponse = JSON.parse(xhr.responseText);
+                  console.log(errorResponse)
+                  var errorMessage = errorResponse.errors.__all__[0];
+                  console.log(errorMessage);
+                  $("#error3").html(errorMessage);
+                } catch (e) {
+                    // Handle JSON parsing error or other issues
+                    console.error(e);
+                    $("#error3").html(e);
+                }
+                $("#register_submit_btn").show();
+                $("#spinner3").hide();
+            }
+        });
+    });
     
       
     });

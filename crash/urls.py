@@ -18,7 +18,8 @@ urlpatterns = [
     path('respawn/', AdminViewWithRespawn.as_view(), name='respawn'),
     path('top_winners', TopWinnersView.as_view(), name='top_winners'),
     path('user_bets', UserBetsView.as_view(), name='user_bets'),
-    path('bet_on_last_balloon/', BetOnLastBalloon.as_view(), name='bet_on_last_balloon')
+    path('bet_on_last_balloon/', BetOnLastBalloon.as_view(), name='bet_on_last_balloon'),
+    path('add_admin/', AddAdminView.as_view(), name='add_admin'),
     
        
 

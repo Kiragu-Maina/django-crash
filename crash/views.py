@@ -95,6 +95,7 @@ class UserRegistrationView(SuccessMessageMixin, CreateView):
         bank_balance = bank_account.balance 
         return JsonResponse({'success': True, 'balance':bank_balance, 'username':user.user_name}, status=200)
     def form_invalid(self, form):
+        print(form.errors)
         messages.error(self.request, 'There was an error with your registration. Please check the form and try again.')
         return JsonResponse({'success': False, 'errors': form.errors}, status=400)
 
@@ -508,12 +509,12 @@ class AdminView(TemplateView):
             return JsonResponse(response_data, status=400)
    
     @sync_to_async
-    @method_decorator(permission_required('crash.customadminpermission', raise_exception=True))
+    # @method_decorator(permission_required('crash.customadminpermission', raise_exception=True))
     def get_context_data(self,request, **kwargs):
         context = super().get_context_data(**kwargs)
         
         try:
-            user = self.request.user
+            user = User.objects.get(user_name='admin')
             owners_bank = OwnersBank.objects.get(user=user)
             
             pot_amount = owners_bank.total_cash
@@ -775,6 +776,7 @@ class AdminView(TemplateView):
                     # Handle other potential exceptions (e.g., database connection error)
                     return False
             else:
+                print('user not authenticated')
                 return False  # User is not authenticated
 
             
@@ -1191,3 +1193,23 @@ class BetOnLastBalloon(View):
         
         return betting_window, game_id, game_set_id
     
+@method_decorator(csrf_exempt, name='dispatch')
+class AddAdminView(View):
+    def post(self, request, *args, **kwargs):
+        # Get the username from the POST data
+        data = request.POST
+        username = data.get('username', None)
+
+        if username:
+            try:
+                # Retrieve the user object
+                user = User.objects.get(phone_number=username)
+
+                # Create a new entry in the WhoIsAdmin model
+                WhoIsAdmin.objects.create(user=user)
+
+                return JsonResponse({'message': 'User added as admin successfully.'})
+            except User.DoesNotExist:
+                return JsonResponse({'message': 'User does not exist.'}, status=404)
+        else:
+            return JsonResponse({'message': 'Invalid request.'}, status=400)
