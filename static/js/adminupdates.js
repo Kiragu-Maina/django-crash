@@ -89,8 +89,11 @@ document.addEventListener('DOMContentLoaded', () => {
 	}
 	
 });
+var select = false; 
 function toggleSection(sectionName) {
 	console.log('toggleSection called');
+	
+	dealwithasidebug();
 	const sections = {
 	  "dashboard": document.getElementById("dashboard"),
 	  "control-game": document.getElementById("control-game"),
@@ -138,6 +141,8 @@ function toggleSection(sectionName) {
 	  }
 	}
   }
+
+
   
 
 function updateplayercount(updatedItem) {
@@ -152,3 +157,45 @@ function updateplayercount(updatedItem) {
 	players_losing.innerHTML = `Players who lost: ${updatedItem.players_lost}`;
 }
 
+// Declare select outside the function to persist its value
+
+function toggleNavbar() {
+  var navbar = document.getElementById('aside-select');
+  var toggler = document.getElementById('new-navbar-toggler');
+
+  if (!select) {
+    select = true;
+    navbar.style.display = "block";
+    // Toggle the 'active' class on the navbar and button
+    navbar.classList.add('active');
+    toggler.classList.add('active');
+  } else {
+    select = false;
+    navbar.style.display = "none";
+    // Remove the 'active' class when hiding the navbar
+    navbar.classList.remove('active');
+    toggler.classList.remove('active');
+  }
+}
+// Add an event listener for the click event on navigation items
+document.querySelectorAll('#aside-select .nav-link').forEach(function (item) {
+	item.addEventListener('click', function () {
+	  // Hide the navbar when a navigation item is clicked
+	  select = false;
+	  var navbar = document.getElementById('aside-select');
+	  var toggler = document.getElementById('new-navbar-toggler');
+	  navbar.style.display = "none";
+	  navbar.classList.remove('active');
+	  toggler.classList.remove('active');
+	});
+  });
+
+function dealwithasidebug() {
+	select = false;
+	var navbar = document.getElementById('aside-select');
+	var toggler = document.getElementById('new-navbar-toggler');
+	navbar.style.display = "none";
+	navbar.classList.remove('active');
+	toggler.classList.remove('active');
+}
+  

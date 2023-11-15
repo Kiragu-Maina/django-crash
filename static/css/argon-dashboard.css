@@ -17060,3 +17060,72 @@ cursor: pointer;
 .deposits-link {
   margin-left: 10px; /* Adjust this value as needed */
 }
+/* Styles for the collapsed navbar */
+#aside-select {
+  display: none;
+  flex-direction: column;
+  background-color: #051139; /* Set the background color */
+  position: fixed;
+  top: 56px; /* Adjust this value based on your design */
+  left: 0;
+  width: 75%; /* Set the width to cover 3/4 of the screen */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  transition: transform 0.3s ease, width 0.3s ease; /* Add smooth transition for better user experience */
+}
+
+#aside-select .nav-link {
+  padding: 10px 20px; /* Adjust the padding as needed */
+  color: #333; /* Set the text color */
+  text-decoration: none;
+  list-style: none; /* Remove the bullets/dots */
+  border-bottom: 3px solid white; /* Add a border between nav links for separation */
+  transition: background-color 0.3s ease; /* Add a smooth transition for background color */
+}
+
+#aside-select .nav-link:last-child {
+  border-bottom: none; /* Remove the border for the last nav link */
+}
+
+/* Styles for the button */
+#new-navbar-toggler {
+  display: none;
+  background-color: transparent;
+  border: none;
+  font-size: 20px;
+  outline: none;
+  cursor: pointer;
+  color: white;
+}
+
+#new-navbar-toggler.active {
+  color: #fff; /* Set the color when active */
+}
+
+@media (max-width: 768px) {
+  #new-navbar-toggler {
+    display: block;
+  }
+
+  #aside-select {
+    display: none;
+  }
+  #aside-select.active {
+    display: flex;
+    transform: translateX(0);
+    list-style: none;
+  }
+  
+
+  #new-navbar-toggler.active {
+    background-color: #007bff; /* Set the background color when active */
+  }
+
+  #aside-select .nav-link {
+    color: #fff; /* Set the text color for the navbar items on smaller screens */
+  }
+
+  #aside-select .nav-link:hover {
+    background-color: #007bff; /* Set the hover background color for the navbar items on smaller screens */
+  }
+}
